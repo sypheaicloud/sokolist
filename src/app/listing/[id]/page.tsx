@@ -4,10 +4,11 @@ import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { startConversation } from '../../messages/actions';
-import { MapPin, Tag, User, MessageCircle, ArrowLeft, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
+import { MapPin, User, MessageCircle, ArrowLeft, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function ListingDetailPage({ params }: { params: { id: string } }) {
+export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const session = await auth();
 
@@ -35,9 +36,15 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
 
                 <div className="grid gap-8 md:grid-cols-2">
                     {/* Image Section */}
-                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square">
+                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square relative">
                         {listing.imageUrl ? (
-                            <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
+                            <Image
+                                src={listing.imageUrl}
+                                alt={listing.title}
+                                fill
+                                className="w-full h-full object-cover"
+                                unoptimized
+                            />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-600 bg-slate-900">
                                 No image available

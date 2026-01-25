@@ -2,6 +2,7 @@ import { getConversations } from './actions';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MessageSquare, ArrowRight, User } from 'lucide-react';
 
 export default async function InboxPage() {
@@ -41,9 +42,9 @@ export default async function InboxPage() {
                                 href={`/messages/${chat.id}`}
                                 className="group flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-4 transition-all hover:bg-white/10 hover:border-white/10"
                             >
-                                <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-slate-800">
+                                <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-slate-800 relative">
                                     {chat.listingImage ? (
-                                        <img src={chat.listingImage} alt="" className="h-full w-full object-cover" />
+                                        <Image src={chat.listingImage} alt="" fill className="object-cover" unoptimized />
                                     ) : (
                                         <div className="h-full w-full flex items-center justify-center text-slate-600">
                                             <Tag className="h-6 w-6" />

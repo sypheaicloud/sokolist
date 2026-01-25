@@ -60,7 +60,7 @@ export default async function ProfilePage() {
 
                         {/* Empty State for now */}
                         <div className="rounded-xl border border-dashed border-white/10 bg-white/5 p-12 text-center text-slate-500">
-                            <p>You haven't posted any ads yet.</p>
+                            <p>You haven&apos;t posted any ads yet.</p>
                             <Link href="/post" className="mt-2 text-emerald-400 hover:underline">Start selling today</Link>
                         </div>
                     </section>

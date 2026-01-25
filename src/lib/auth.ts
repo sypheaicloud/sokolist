@@ -4,7 +4,6 @@ import { z } from "zod";
 import { db } from "./db";
 import { users } from "./schema";
 import { eq } from "drizzle-orm";
-// @ts-ignore
 import bcrypt from "bcryptjs";
 
 import GoogleProvider from "next-auth/providers/google";
@@ -49,7 +48,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     callbacks: {
         async session({ session, token }) {
             if (token.sub && session.user) {
-                // @ts-ignore
                 session.user.id = token.sub;
             }
             return session;

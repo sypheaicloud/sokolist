@@ -1,13 +1,14 @@
 import { db } from '@/lib/db';
-import { conversations, listings, users, messages } from '@/lib/schema';
-import { eq, asc } from 'drizzle-orm';
+import { conversations, listings } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { getMessages, sendMessage } from '../actions';
 import { notFound, redirect } from 'next/navigation';
-import { ArrowLeft, Send, User } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export default async function ChatPage({ params }: { params: { conversationId: string } }) {
+export default async function ChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
     const { conversationId } = await params;
     const session = await auth();
     if (!session?.user) redirect('/login');
@@ -34,9 +35,9 @@ export default async function ChatPage({ params }: { params: { conversationId: s
                     <Link href="/messages" className="text-slate-400 hover:text-white transition-colors">
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
-                    <div className="h-10 w-10 rounded-lg overflow-hidden bg-slate-800">
+                    <div className="h-10 w-10 rounded-lg overflow-hidden bg-slate-800 relative">
                         {data.listing?.imageUrl && (
-                            <img src={data.listing.imageUrl} alt="" className="h-full w-full object-cover" />
+                            <Image src={data.listing.imageUrl} alt="" fill className="object-cover" unoptimized />
                         )}
                     </div>
                     <div>
@@ -61,8 +62,8 @@ export default async function ChatPage({ params }: { params: { conversationId: s
                             return (
                                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${isMe
-                                            ? 'bg-purple-600 text-white rounded-tr-none'
-                                            : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
+                                        ? 'bg-purple-600 text-white rounded-tr-none'
+                                        : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
                                         }`}>
                                         {msg.content}
                                     </div>

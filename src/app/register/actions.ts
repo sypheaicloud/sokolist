@@ -14,7 +14,16 @@ const RegisterSchema = z.object({
     password: z.string().min(6),
 });
 
-export async function registerUser(prevState: any, formData: FormData) {
+export type RegisterUserState = {
+    errors?: {
+        name?: string[];
+        email?: string[];
+        password?: string[];
+    };
+    message?: string;
+} | undefined;
+
+export async function registerUser(prevState: RegisterUserState, formData: FormData) {
     const validatedFields = RegisterSchema.safeParse({
         name: formData.get('name'),
         email: formData.get('email'),
@@ -49,7 +58,7 @@ export async function registerUser(prevState: any, formData: FormData) {
             password: hashedPassword,
             isVerified: false,
         });
-    } catch (error) {
+    } catch {
         return {
             message: 'Database Error: Failed to Create User.',
         };

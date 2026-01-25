@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
 import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
-export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> | any }) {
+export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> }) {
   const session = await auth();
   const params = await searchParams;
 
@@ -145,10 +146,12 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
           {/* Image */}
           <div className="h-48 w-full relative overflow-hidden bg-slate-800">
             {item.imageUrl ? (
-              <img
+              <Image
                 src={item.imageUrl}
                 alt={item.title}
+                fill
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                unoptimized
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-slate-600 font-medium bg-gradient-to-br from-slate-800 to-slate-900">
@@ -176,7 +179,7 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
   );
 }
 
-function CategoryCard({ icon: Icon, label, color }: { icon: any, label: string, color: string }) {
+function CategoryCard({ icon: Icon, label, color }: { icon: React.ElementType, label: string, color: string }) {
   return (
     <Link href={`/?category=${encodeURIComponent(label)}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border border-white/5`}>
       <Icon className="h-8 w-8" />

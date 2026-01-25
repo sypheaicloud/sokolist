@@ -34,7 +34,6 @@ export async function getListings(searchParams?: { q?: string; category?: string
 
     const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
-    // @ts-ignore
     const allListings = await query.where(whereClause).orderBy(desc(listings.createdAt));
 
     return allListings;

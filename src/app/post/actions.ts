@@ -17,7 +17,19 @@ const CreateListingSchema = z.object({
     imageUrl: z.string().url("Please enter a valid URL").optional().or(z.literal('')),
 });
 
-export async function createListing(prevState: any, formData: FormData) {
+export type CreateListingState = {
+    errors?: {
+        title?: string[];
+        description?: string[];
+        price?: string[];
+        category?: string[];
+        location?: string[];
+        imageUrl?: string[];
+    };
+    message?: string;
+} | undefined;
+
+export async function createListing(prevState: CreateListingState, formData: FormData) {
     const session = await auth();
 
     if (!session?.user) {
