@@ -1,15 +1,15 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from 'ws';
 
-const createDb = () => {
-    const url = process.env.DATABASE_URL;
-    if (!url) {
-        // Return a mock or handle missing URL during build
-        console.warn("DATABASE_URL is missing. DB operations will fail at runtime.");
-        return drizzle(neon("postgresql://dummy:dummy@localhost:5432/dummy"));
-    }
-    const sql = neon(url);
-    return drizzle(sql);
-};
+if (!process.env.DATABASE_URL) {
+    console.warn("DATABASE_URL is missing.");
+}
 
-export const db = createDb();
+// Support for local dev
+if (typeof window === 'undefined') {
+    neonConfig.webSocketConstructor = ws;
+}
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL || 'postgres://localhost/db' });
+export const db = drizzle(pool);
