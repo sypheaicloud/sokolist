@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart } from "lucide-react";
+import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
-export default async function LandingPage() {
+export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> | any }) {
   const session = await auth();
+  const params = await searchParams;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30">
@@ -58,29 +59,37 @@ export default async function LandingPage() {
 
           {/* Search Bar */}
           <div className="mx-auto mt-8 max-w-2xl">
-            <div className="group relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
+            <form action="/" method="GET" className="group relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
               <Search className="ml-3 h-5 w-5 text-slate-400" />
               <input
                 type="text"
+                name="q"
+                defaultValue={params.q}
                 placeholder="What are you looking for?"
                 className="flex-1 bg-transparent px-2 py-3 text-white placeholder:text-slate-500 focus:outline-none"
               />
               <div className="h-8 w-[1px] bg-white/10" />
               <div className="flex items-center gap-2 px-3 text-slate-400">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm whitespace-nowrap">Kenya</span>
+                <input
+                  type="text"
+                  name="location"
+                  defaultValue={params.location}
+                  placeholder="Kenya"
+                  className="w-24 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                />
               </div>
-              <button className="rounded-xl bg-purple-600 p-3 text-white hover:bg-purple-500 transition-colors">
+              <button type="submit" className="rounded-xl bg-purple-600 p-3 text-white hover:bg-purple-500 transition-colors">
                 <ArrowRight className="h-5 w-5" />
               </button>
-            </div>
+            </form>
             <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-slate-500">
               <span>Popular:</span>
-              <button className="hover:text-purple-400 transition-colors">Toyota Vitz</button>
+              <Link href="/?q=Toyota" className="hover:text-purple-400 transition-colors">Toyota Vitz</Link>
               <span>•</span>
-              <button className="hover:text-purple-400 transition-colors">iPhone 14</button>
+              <Link href="/?q=iPhone" className="hover:text-purple-400 transition-colors">iPhone 14</Link>
               <span>•</span>
-              <button className="hover:text-purple-400 transition-colors">Apartments in Kilimani</button>
+              <Link href="/?category=Real Estate" className="hover:text-purple-400 transition-colors">Apartments in Kilimani</Link>
             </div>
           </div>
         </div>
@@ -100,10 +109,17 @@ export default async function LandingPage() {
         </div>
 
         {/* Featured Listings (Real Data) */}
-        <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Just In</h2>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-semibold tracking-tight text-white">
+            {params.category ? `${params.category} Listings` : (params.q ? `Results for "${params.q}"` : "Just In")}
+          </h2>
+          {(params.q || params.category || params.location) && (
+            <Link href="/" className="text-sm text-purple-400 hover:underline">Clear all</Link>
+          )}
+        </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <Suspense fallback={<div className="col-span-full text-center text-slate-500 py-12">Loading listings...</div>}>
-            <ListingGrid />
+            <ListingGrid searchParams={params} />
           </Suspense>
         </div>
       </section>
@@ -111,8 +127,16 @@ export default async function LandingPage() {
   );
 }
 
-async function ListingGrid() {
-  const items = await getListings();
+async function ListingGrid({ searchParams }: { searchParams: { q?: string; category?: string; location?: string } }) {
+  const items = await getListings(searchParams);
+
+  if (items.length === 0) {
+    return (
+      <div className="col-span-full py-20 text-center rounded-3xl border border-dashed border-white/10 bg-white/5">
+        <p className="text-slate-500">No listings found matching your search.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -138,7 +162,10 @@ async function ListingGrid() {
               <span className="rounded-full bg-purple-500/20 px-2.5 py-0.5 text-xs font-medium text-purple-300">
                 {item.category}
               </span>
-              <span className="text-xs text-slate-400">{item.location}</span>
+              <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                {item.userVerified && <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 fill-emerald-400/10" />}
+                <span>{item.location}</span>
+              </div>
             </div>
             <h3 className="mb-1 text-lg font-semibold text-slate-100 group-hover:text-purple-400 transition-colors truncate">{item.title}</h3>
             <p className="font-bold text-emerald-400">KSh {item.price.toLocaleString()}</p>
@@ -151,7 +178,7 @@ async function ListingGrid() {
 
 function CategoryCard({ icon: Icon, label, color }: { icon: any, label: string, color: string }) {
   return (
-    <Link href={`/browse?category=${label.toLowerCase()}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border border-white/5`}>
+    <Link href={`/?category=${encodeURIComponent(label)}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border border-white/5`}>
       <Icon className="h-8 w-8" />
       <span className="font-medium text-slate-200 group-hover:text-white">{label}</span>
     </Link>

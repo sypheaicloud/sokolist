@@ -21,3 +21,19 @@ export const listings = pgTable('listings', {
     imageUrl: text('image_url'),
     createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const conversations = pgTable('conversations', {
+    id: text('id').primaryKey(),
+    listingId: text('listing_id').references(() => listings.id).notNull(),
+    buyerId: text('buyer_id').references(() => users.id).notNull(),
+    sellerId: text('seller_id').references(() => users.id).notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const messages = pgTable('messages', {
+    id: text('id').primaryKey(),
+    conversationId: text('conversation_id').references(() => conversations.id).notNull(),
+    senderId: text('sender_id').references(() => users.id).notNull(),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+});
