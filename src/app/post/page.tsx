@@ -71,9 +71,10 @@ export default function PostAdPage() {
                                     id="category"
                                     name="category"
                                     required
+                                    defaultValue=""
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 sm:text-sm appearance-none"
                                 >
-                                    <option value="" disabled selected className="bg-slate-900 text-slate-500">Select a category</option>
+                                    <option value="" disabled className="bg-slate-900 text-slate-500">Select a category</option>
                                     {CATEGORIES.map(cat => (
                                         <option key={cat} value={cat} className="bg-slate-900 text-white">{cat}</option>
                                     ))}
