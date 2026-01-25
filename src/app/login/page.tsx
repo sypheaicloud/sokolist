@@ -3,7 +3,6 @@
 import { useState, useActionState } from 'react';
 import { authenticate, signInWithGoogle } from './actions';
 import { registerUser } from '../register/actions';
-import Link from 'next/link';
 
 export default function LoginPage() {
     const [mode, setMode] = useState<'signin' | 'signup'>('signin');

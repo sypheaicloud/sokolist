@@ -50,7 +50,7 @@ export default async function LandingPage() {
 
         <div className="container relative z-10 mx-auto px-4 text-center">
           <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
-            Kenya's Premier Marketplace
+            Kenya&apos;s Premier Marketplace
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 md:text-xl">
             Buy, sell, trade, and connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.

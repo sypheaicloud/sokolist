@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 const main = async () => {
     console.log('Seeding database...');
 
-    // Clear existing data
+    // Clear existing data (Postgres syntax)
     await db.delete(listings);
     await db.delete(users);
 

@@ -31,7 +31,8 @@ export async function registerUser(prevState: any, formData: FormData) {
     const { email, password, name } = validatedFields.data;
 
     // Check if user exists
-    const existingUser = await db.select().from(users).where(eq(users.email, email)).get();
+    const usersList = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    const existingUser = usersList[0];
     if (existingUser) {
         return {
             message: 'Email already in use.',

@@ -12,7 +12,7 @@ export default function RegisterPage() {
             <div className="w-full max-w-md space-y-8 rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold tracking-tight text-white">Create Account</h2>
-                    <p className="mt-2 text-sm text-slate-400">Join Kenya's Premier Marketplace today</p>
+                    <p className="mt-2 text-sm text-slate-400">Join Kenya&apos;s Premier Marketplace today</p>
                 </div>
 
                 <form action={dispatch} className="mt-8 space-y-6">
