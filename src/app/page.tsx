@@ -22,6 +22,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
             <Link href="/browse" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Browse</Link>
             <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Messages</Link>
+            {(session?.user as any)?.isAdmin && (
+              <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
+                <ShieldCheck className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
           </div>
           <div className="flex items-center gap-4">
             {session?.user ? (
