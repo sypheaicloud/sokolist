@@ -7,6 +7,9 @@ export const users = pgTable('users', {
     password: text('password'),
     image: text('image'),
     isVerified: boolean('is_verified').default(false),
+    isAdmin: boolean('is_admin').default(false),
+    isBanned: boolean('is_banned').default(false),
+    bannedAt: timestamp('banned_at'),
     createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -19,6 +22,8 @@ export const listings = pgTable('listings', {
     location: text('location').notNull(),
     userId: text('user_id').references(() => users.id),
     imageUrl: text('image_url'),
+    isApproved: boolean('is_approved').default(true),
+    isActive: boolean('is_active').default(true),
     createdAt: timestamp('created_at').defaultNow(),
 });
 
