@@ -6,14 +6,14 @@ import { users } from "./schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
-// import GoogleProvider from "next-auth/providers/google";
+import GoogleProvider from "next-auth/providers/google";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
-        // GoogleProvider({
-        //     clientId: process.env.GOOGLE_CLIENT_ID,
-        //     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        // }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
         Credentials({
             credentials: {
                 email: {},
