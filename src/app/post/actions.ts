@@ -51,7 +51,17 @@ export async function createListing(prevState: CreateListingState, formData: For
     }
 
     const imageFile = formData.get('image');
+    console.log('--- Post Ad Debug ---');
+    console.log('imageFile:', imageFile);
+    console.log('is File?', imageFile instanceof File);
+    if (imageFile instanceof File) {
+        console.log('file name:', imageFile.name);
+        console.log('file size:', imageFile.size);
+    }
+
     const hasImage = imageFile instanceof File && imageFile.size > 0;
+    console.log('hasImage:', hasImage);
+    console.log('---------------------');
 
     const validatedFields = CreateListingSchema.safeParse({
         title: formData.get('title'),
