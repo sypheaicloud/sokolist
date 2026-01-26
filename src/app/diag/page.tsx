@@ -119,7 +119,7 @@ export default async function DiagPage() {
 
                 <div className="mt-8 p-4 rounded-xl border border-purple-500/20 bg-purple-500/10">
                     <h2 className="text-sm font-semibold text-purple-300 mb-2 font-mono">Build Identifier</h2>
-                    <code className="text-xs text-slate-400">Commit: Diagnostic_v2 - Jan 26 14:35</code>
+                    <code className="text-xs text-slate-400">Commit: Live_DB_Verify_v3 - Jan 26 14:55</code>
                 </div>
 
                 <Link href="/" className="mt-8 block text-center text-sm text-slate-500 hover:text-white transition-colors">
