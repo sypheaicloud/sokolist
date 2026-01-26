@@ -22,11 +22,11 @@ const CreateListingSchema = z.object({
     image: z.any()
         .refine((file) => {
             if (!file || file === 'null') return true;
-            return file instanceof File && file.size <= MAX_FILE_SIZE;
+            return typeof file === 'object' && 'size' in file && (file as any).size <= MAX_FILE_SIZE;
         }, `Max image size is 5MB.`)
         .refine((file) => {
             if (!file || file === 'null') return true;
-            return file instanceof File && ACCEPTED_IMAGE_TYPES.includes(file.type);
+            return typeof file === 'object' && 'type' in file && ACCEPTED_IMAGE_TYPES.includes((file as any).type);
         }, "Only .jpg, .jpeg, .png and .webp formats are supported.")
         .optional().or(z.literal('null')),
 });
@@ -51,17 +51,8 @@ export async function createListing(prevState: CreateListingState, formData: For
     }
 
     const imageFile = formData.get('image');
-    console.log('--- Post Ad Debug ---');
-    console.log('imageFile:', imageFile);
-    console.log('is File?', imageFile instanceof File);
-    if (imageFile instanceof File) {
-        console.log('file name:', imageFile.name);
-        console.log('file size:', imageFile.size);
-    }
-
-    const hasImage = imageFile instanceof File && imageFile.size > 0;
-    console.log('hasImage:', hasImage);
-    console.log('---------------------');
+    // More robust check for File-like objects
+    const hasImage = !!(imageFile && typeof imageFile === 'object' && 'size' in imageFile && (imageFile as any).size > 0);
 
     const validatedFields = CreateListingSchema.safeParse({
         title: formData.get('title'),
@@ -85,8 +76,8 @@ export async function createListing(prevState: CreateListingState, formData: For
 
     try {
         // Handle image upload if a file was provided
-        if (image instanceof File && image.size > 0) {
-            const blob = await put(`listings/${uuidv4()}-${image.name}`, image, {
+        if (hasImage && image && image !== 'null') {
+            const blob = await put(`listings/${uuidv4()}-${(image as any).name || 'image'}`, image as any, {
                 access: 'public',
             });
             imageUrl = blob.url;

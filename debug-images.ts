@@ -1,15 +1,14 @@
 import { db } from './src/lib/db';
 import { listings } from './src/lib/schema';
+import { notLike, and, isNotNull } from 'drizzle-orm';
 
 async function checkListings() {
-    console.log("Fetching recent listings to check image URLs...");
+    console.log("Listing ALL Image URLs in the database...");
     try {
-        const results = await db.select().from(listings).limit(5);
-        results.forEach(item => {
-            console.log(`ID: ${item.id}`);
-            console.log(`Title: ${item.title}`);
-            console.log(`Image URL: ${item.imageUrl}`);
-            console.log('---');
+        const results = await db.select().from(listings);
+        console.log(`Total listings: ${results.length}`);
+        results.forEach((item, i) => {
+            console.log(`${i + 1}. [${item.title}] -> ${item.imageUrl || 'NULL'}`);
         });
     } catch (error) {
         console.error("Error fetching listings:", error);
