@@ -1,8 +1,9 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useState, useActionState } from 'react';
 import { createListing } from './actions';
-import { ArrowLeft, Camera, Loader2 } from 'lucide-react';
+import { ArrowLeft, Camera, Loader2, XCircle } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const CATEGORIES = [
@@ -17,6 +18,20 @@ const CATEGORIES = [
 
 export default function PostAdPage() {
     const [state, dispatch, isPending] = useActionState(createListing, undefined);
+    const [preview, setPreview] = useState<string | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setPreview(null);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
@@ -110,19 +125,44 @@ export default function PostAdPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="imageUrl" className="text-sm font-medium text-slate-200 flex items-center gap-2">
+                            <label className="text-sm font-medium text-slate-200 flex items-center gap-2">
                                 <Camera className="h-4 w-4" />
-                                Image URL
+                                Photos
                             </label>
-                            <input
-                                id="imageUrl"
-                                name="imageUrl"
-                                type="url"
-                                placeholder="https://images.unsplash.com/..."
-                                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 sm:text-sm"
-                            />
-                            <p className="text-[10px] text-slate-500 mt-1">For now, please provide a direct image link (e.g. from Unsplash or Pinterest).</p>
-                            {state?.errors?.imageUrl && <p className="text-xs text-red-500">{state.errors.imageUrl}</p>}
+
+                            <div className="mt-2 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-8 transition-all hover:border-purple-500/50">
+                                {preview ? (
+                                    <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg shadow-2xl">
+                                        <Image
+                                            src={preview}
+                                            alt="Preview"
+                                            fill
+                                            className="object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setPreview(null)}
+                                            className="absolute right-2 top-2 rounded-full bg-red-600 p-1.5 text-white shadow-lg hover:bg-red-500 transition-colors"
+                                        >
+                                            <XCircle className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 text-slate-400">
+                                        <Camera className="h-12 w-12 opacity-20" />
+                                        <div className="text-sm font-semibold text-slate-300">Click to upload photos</div>
+                                        <div className="text-xs">PNG, JPG or WEBP (max. 5MB)</div>
+                                        <input
+                                            type="file"
+                                            name="image"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                            {state?.errors?.image && <p className="text-xs text-red-500 mt-2">{state.errors.image}</p>}
                         </div>
 
                         {state?.message && !state?.errors && (

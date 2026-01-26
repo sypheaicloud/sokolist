@@ -7,6 +7,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { put } from '@vercel/blob';
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const CreateListingSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
@@ -14,7 +18,12 @@ const CreateListingSchema = z.object({
     price: z.coerce.number().min(0, "Price cannot be negative"),
     category: z.string().min(1, "Please select a category"),
     location: z.string().min(2, "Location is required"),
-    imageUrl: z.string().url("Please enter a valid URL").optional().or(z.literal('')),
+    image: z.any()
+        .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
+        .refine(
+            (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+            "Only .jpg, .jpeg, .png and .webp formats are supported."
+        ).optional().or(z.literal('null')),
 });
 
 export type CreateListingState = {
@@ -24,7 +33,7 @@ export type CreateListingState = {
         price?: string[];
         category?: string[];
         location?: string[];
-        imageUrl?: string[];
+        image?: string[];
     };
     message?: string;
 } | undefined;
@@ -36,13 +45,15 @@ export async function createListing(prevState: CreateListingState, formData: For
         return { message: "You must be logged in to post an ad." };
     }
 
+    const imageFile = formData.get('image') as File;
+
     const validatedFields = CreateListingSchema.safeParse({
         title: formData.get('title'),
         description: formData.get('description'),
         price: formData.get('price'),
         category: formData.get('category'),
         location: formData.get('location'),
-        imageUrl: formData.get('imageUrl'),
+        image: imageFile.size > 0 ? imageFile : 'null',
     });
 
     if (!validatedFields.success) {
@@ -52,9 +63,19 @@ export async function createListing(prevState: CreateListingState, formData: For
         };
     }
 
-    const { title, description, price, category, location, imageUrl } = validatedFields.data;
+    const { title, description, price, category, location, image } = validatedFields.data;
+
+    let imageUrl = null;
 
     try {
+        // Handle image upload if a file was provided
+        if (image && image !== 'null') {
+            const blob = await put(`listings/${uuidv4()}-${image.name}`, image, {
+                access: 'public',
+            });
+            imageUrl = blob.url;
+        }
+
         await db.insert(listings).values({
             id: uuidv4(),
             title,
@@ -63,13 +84,13 @@ export async function createListing(prevState: CreateListingState, formData: For
             category,
             location,
             userId: session.user.id,
-            imageUrl: imageUrl || null,
+            imageUrl: imageUrl,
             createdAt: new Date(),
         });
     } catch (error) {
-        console.error("Database Error:", error);
+        console.error("Error creating listing:", error);
         return {
-            message: 'Database Error: Failed to create listing.',
+            message: 'An error occurred while creating your listing. Please try again.',
         };
     }
 
