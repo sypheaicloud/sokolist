@@ -50,7 +50,7 @@ export default function PostAdPage() {
                         <p className="mt-2 text-sm text-slate-400">Reach thousands of buyers across Kenya.</p>
                     </div>
 
-                    <form action={dispatch} className="space-y-6">
+                    <form action={dispatch} encType="multipart/form-data" className="space-y-6">
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-2">
                                 <label htmlFor="title" className="text-sm font-medium text-slate-200">Title</label>

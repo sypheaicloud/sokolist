@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { put } from '@vercel/blob';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -19,11 +20,15 @@ const CreateListingSchema = z.object({
     category: z.string().min(1, "Please select a category"),
     location: z.string().min(2, "Location is required"),
     image: z.any()
-        .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
-        .refine(
-            (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-            "Only .jpg, .jpeg, .png and .webp formats are supported."
-        ).optional().or(z.literal('null')),
+        .refine((file) => {
+            if (!file || file === 'null') return true;
+            return file instanceof File && file.size <= MAX_FILE_SIZE;
+        }, `Max image size is 5MB.`)
+        .refine((file) => {
+            if (!file || file === 'null') return true;
+            return file instanceof File && ACCEPTED_IMAGE_TYPES.includes(file.type);
+        }, "Only .jpg, .jpeg, .png and .webp formats are supported.")
+        .optional().or(z.literal('null')),
 });
 
 export type CreateListingState = {
@@ -45,7 +50,8 @@ export async function createListing(prevState: CreateListingState, formData: For
         return { message: "You must be logged in to post an ad." };
     }
 
-    const imageFile = formData.get('image') as File;
+    const imageFile = formData.get('image');
+    const hasImage = imageFile instanceof File && imageFile.size > 0;
 
     const validatedFields = CreateListingSchema.safeParse({
         title: formData.get('title'),
@@ -53,7 +59,7 @@ export async function createListing(prevState: CreateListingState, formData: For
         price: formData.get('price'),
         category: formData.get('category'),
         location: formData.get('location'),
-        image: imageFile.size > 0 ? imageFile : 'null',
+        image: hasImage ? imageFile : 'null',
     });
 
     if (!validatedFields.success) {
@@ -69,7 +75,7 @@ export async function createListing(prevState: CreateListingState, formData: For
 
     try {
         // Handle image upload if a file was provided
-        if (image && image !== 'null') {
+        if (image instanceof File && image.size > 0) {
             const blob = await put(`listings/${uuidv4()}-${image.name}`, image, {
                 access: 'public',
             });
@@ -87,13 +93,15 @@ export async function createListing(prevState: CreateListingState, formData: For
             imageUrl: imageUrl,
             createdAt: new Date(),
         });
+
+        revalidatePath('/');
     } catch (error) {
+        if (isRedirectError(error)) throw error;
         console.error("Error creating listing:", error);
         return {
             message: 'An error occurred while creating your listing. Please try again.',
         };
     }
 
-    revalidatePath('/');
     redirect('/');
 }
