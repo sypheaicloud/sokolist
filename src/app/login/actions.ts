@@ -27,6 +27,11 @@ export async function authenticate(
         if (isRedirectError(error)) throw error;
 
         if (error instanceof AuthError) {
+            // Check for our custom error message relayed through Auth.js
+            if (error.cause?.err instanceof Error && error.cause.err.message === 'GOOGLE_ACCOUNT_EXISTS') {
+                return 'This account was created with Google. Please click "Continue with Google" to sign in.';
+            }
+
             switch (error.type) {
                 case 'CredentialsSignin':
                     return 'Invalid email or password.';

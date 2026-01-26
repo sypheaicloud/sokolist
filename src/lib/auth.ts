@@ -28,12 +28,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data;
-                    // SQLite 'get' is not directly available in all drizzle drivers, using generic select
                     const result = await db.select().from(users).where(eq(users.email, email));
                     const user = result[0];
 
                     if (!user) return null;
-                    if (!user.password) return null;
+
+                    // If user exists but has no password, they signed up with Google
+                    if (!user.password) {
+                        throw new Error("GOOGLE_ACCOUNT_EXISTS");
+                    }
 
                     const passwordsMatch = await bcrypt.compare(password, user.password);
                     if (passwordsMatch) return user;
