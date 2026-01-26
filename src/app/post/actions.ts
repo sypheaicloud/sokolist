@@ -22,11 +22,11 @@ const CreateListingSchema = z.object({
     image: z.any()
         .refine((file) => {
             if (!file || file === 'null') return true;
-            return typeof file === 'object' && 'size' in file && (file as any).size <= MAX_FILE_SIZE;
+            return typeof file === 'object' && 'size' in file && (file as { size: number }).size <= MAX_FILE_SIZE;
         }, `Max image size is 5MB.`)
         .refine((file) => {
             if (!file || file === 'null') return true;
-            return typeof file === 'object' && 'type' in file && ACCEPTED_IMAGE_TYPES.includes((file as any).type);
+            return typeof file === 'object' && 'type' in file && ACCEPTED_IMAGE_TYPES.includes((file as { type: string }).type);
         }, "Only .jpg, .jpeg, .png and .webp formats are supported.")
         .optional().or(z.literal('null')),
 });
@@ -54,14 +54,14 @@ export async function createListing(prevState: CreateListingState, formData: For
 
     // Check if we have a valid file with content
     const isFile = !!(imageFile && typeof imageFile === 'object' && 'size' in imageFile);
-    const hasImage = isFile && (imageFile as any).size > 0;
+    const hasImage = isFile && (imageFile as { size: number }).size > 0;
 
     console.log('[POST_AD] Image Debug:', {
         exists: !!imageFile,
         isFile,
-        size: isFile ? (imageFile as any).size : 'N/A',
-        name: isFile ? (imageFile as any).name : 'N/A',
-        type: isFile ? (imageFile as any).type : 'N/A'
+        size: isFile ? (imageFile as { size: number }).size : 'N/A',
+        name: isFile ? (imageFile as { name: string }).name : 'N/A',
+        type: isFile ? (imageFile as { type: string }).type : 'N/A'
     });
 
     const validatedFields = CreateListingSchema.safeParse({
@@ -89,7 +89,8 @@ export async function createListing(prevState: CreateListingState, formData: For
         // Handle image upload if a file was provided
         if (hasImage && image && image !== 'null') {
             console.log('[POST_AD] Attempting Vercel Blob upload...');
-            const blob = await put(`listings/${uuidv4()}-${(image as any).name || 'image'}`, image as any, {
+            const finalImage = image as unknown as File;
+            const blob = await put(`listings/${uuidv4()}-${finalImage.name || 'image'}`, finalImage, {
                 access: 'public',
             });
             imageUrl = blob.url;
