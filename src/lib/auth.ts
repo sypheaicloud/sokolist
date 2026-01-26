@@ -48,7 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/login',
     },
     callbacks: {
-        async signIn({ user, account, profile }) {
+        async signIn({ user, account }) {
             // Auto-sync Google users to our database since we don't use an adapter
             if (account?.provider === 'google' && user.email) {
                 try {
@@ -79,10 +79,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
             return true;
         },
-        async jwt({ token, user, trigger, session }) {
+        async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
+                // Set isAdmin on the session object for UI checks
                 if (user.email === 'djboziah@gmail.com') {
                     token.isAdmin = true;
                 } else {
@@ -90,7 +91,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     try {
                         const dbUser = await db.select().from(users).where(eq(users.email, user.email!)).limit(1);
                         token.isAdmin = dbUser[0]?.isAdmin ?? false;
-                    } catch (e) {
+                    } catch {
                         token.isAdmin = false;
                     }
                 }
@@ -100,7 +101,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
-                (session.user as any).isAdmin = token.isAdmin === true;
+                (session.user as { isAdmin?: boolean }).isAdmin = token.isAdmin === true;
             }
             return session;
         }
