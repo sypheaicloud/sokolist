@@ -13,6 +13,7 @@ const CATEGORIES = [
     "Jobs",
     "Services",
     "Dating",
+    "Auctions",
     "Free Stuff"
 ];
 

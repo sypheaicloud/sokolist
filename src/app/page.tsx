@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck } from "lucide-react";
+import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -112,6 +112,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <CategoryCard icon={Briefcase} label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard icon={Wrench} label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
           <CategoryCard icon={Heart} label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
+          <CategoryCard icon={Gavel} label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
           <CategoryCard icon={Gift} label="Free Stuff" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
         </div>
 

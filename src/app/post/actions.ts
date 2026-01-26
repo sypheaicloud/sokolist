@@ -51,8 +51,18 @@ export async function createListing(prevState: CreateListingState, formData: For
     }
 
     const imageFile = formData.get('image');
-    // More robust check for File-like objects
-    const hasImage = !!(imageFile && typeof imageFile === 'object' && 'size' in imageFile && (imageFile as any).size > 0);
+
+    // Check if we have a valid file with content
+    const isFile = !!(imageFile && typeof imageFile === 'object' && 'size' in imageFile);
+    const hasImage = isFile && (imageFile as any).size > 0;
+
+    console.log('[POST_AD] Image Debug:', {
+        exists: !!imageFile,
+        isFile,
+        size: isFile ? (imageFile as any).size : 'N/A',
+        name: isFile ? (imageFile as any).name : 'N/A',
+        type: isFile ? (imageFile as any).type : 'N/A'
+    });
 
     const validatedFields = CreateListingSchema.safeParse({
         title: formData.get('title'),
@@ -64,6 +74,7 @@ export async function createListing(prevState: CreateListingState, formData: For
     });
 
     if (!validatedFields.success) {
+        console.log('[POST_AD] Validation Failed:', validatedFields.error.flatten().fieldErrors);
         return {
             errors: validatedFields.error.flatten().fieldErrors,
             message: 'Missing or invalid fields.',
@@ -77,12 +88,17 @@ export async function createListing(prevState: CreateListingState, formData: For
     try {
         // Handle image upload if a file was provided
         if (hasImage && image && image !== 'null') {
+            console.log('[POST_AD] Attempting Vercel Blob upload...');
             const blob = await put(`listings/${uuidv4()}-${(image as any).name || 'image'}`, image as any, {
                 access: 'public',
             });
             imageUrl = blob.url;
+            console.log('[POST_AD] Upload successful. URL:', imageUrl);
+        } else {
+            console.log('[POST_AD] No image to upload.');
         }
 
+        console.log('[POST_AD] Inserting into DB with imageUrl:', imageUrl);
         await db.insert(listings).values({
             id: uuidv4(),
             title,
@@ -98,11 +114,12 @@ export async function createListing(prevState: CreateListingState, formData: For
         revalidatePath('/');
     } catch (error) {
         if (isRedirectError(error)) throw error;
-        console.error("Error creating listing:", error);
+        console.error("[POST_AD] Fatal Error:", error);
         return {
             message: 'An error occurred while creating your listing. Please try again.',
         };
     }
 
+    console.log('[POST_AD] Success! Redirecting...');
     redirect('/');
 }
