@@ -105,7 +105,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       {/* Categories */}
       <section className="container mx-auto px-4 py-12">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7 mb-16">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8 mb-16">
           <CategoryCard icon={Car} label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard icon={Smartphone} label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
           <CategoryCard icon={Home} label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
@@ -113,7 +113,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <CategoryCard icon={Wrench} label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
           <CategoryCard icon={Heart} label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
           <CategoryCard icon={Gavel} label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
-          <CategoryCard icon={Gift} label="Free Stuff" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
+          <CategoryCard icon={Gift} label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
         </div>
 
         {/* Featured Listings (Real Data) */}

@@ -14,7 +14,7 @@ const CATEGORIES = [
     "Services",
     "Dating",
     "Auctions",
-    "Free Stuff"
+    "Free Parts"
 ];
 
 export default function PostAdPage() {

@@ -55,13 +55,13 @@ export async function createListing(prevState: CreateListingState, formData: For
     // Check if we have a valid file with content
     const isFile = !!(imageFile && typeof imageFile === 'object' && 'size' in imageFile);
     const hasImage = isFile && (imageFile as { size: number }).size > 0;
+    const hasToken = !!process.env.BLOB_READ_WRITE_TOKEN;
 
+    console.log('[POST_AD] Environment Check:', { hasToken });
     console.log('[POST_AD] Image Debug:', {
         exists: !!imageFile,
         isFile,
         size: isFile ? (imageFile as { size: number }).size : 'N/A',
-        name: isFile ? (imageFile as { name: string }).name : 'N/A',
-        type: isFile ? (imageFile as { type: string }).type : 'N/A'
     });
 
     const validatedFields = CreateListingSchema.safeParse({
@@ -87,19 +87,21 @@ export async function createListing(prevState: CreateListingState, formData: For
 
     try {
         // Handle image upload if a file was provided
-        if (hasImage && image && image !== 'null') {
+        if (hasImage && image && image !== 'null' && hasToken) {
             console.log('[POST_AD] Attempting Vercel Blob upload...');
             const finalImage = image as unknown as File;
             const blob = await put(`listings/${uuidv4()}-${finalImage.name || 'image'}`, finalImage, {
                 access: 'public',
             });
             imageUrl = blob.url;
-            console.log('[POST_AD] Upload successful. URL:', imageUrl);
+            console.log('[POST_AD] Upload successful:', imageUrl);
+        } else if (hasImage && !hasToken) {
+            console.warn('[POST_AD] Warning: Image provided but BLOB_READ_WRITE_TOKEN is missing!');
         } else {
             console.log('[POST_AD] No image to upload.');
         }
 
-        console.log('[POST_AD] Inserting into DB with imageUrl:', imageUrl);
+        console.log('[POST_AD] Saving to DB with imageUrl:', imageUrl);
         await db.insert(listings).values({
             id: uuidv4(),
             title,
@@ -115,12 +117,11 @@ export async function createListing(prevState: CreateListingState, formData: For
         revalidatePath('/');
     } catch (error) {
         if (isRedirectError(error)) throw error;
-        console.error("[POST_AD] Fatal Error:", error);
+        console.error("[POST_AD] Fatality Error:", error);
         return {
             message: 'An error occurred while creating your listing. Please try again.',
         };
     }
 
-    console.log('[POST_AD] Success! Redirecting...');
     redirect('/');
 }
