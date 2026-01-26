@@ -46,20 +46,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/login',
     },
     callbacks: {
+        async signIn({ user }) {
+            if (user?.email === 'djboziah@gmail.com') {
+                try {
+                    // Update database to ensure admin status is permanent
+                    await db.update(users)
+                        .set({ isAdmin: true, isVerified: true })
+                        .where(eq(users.email, user.email!));
+                } catch (err) {
+                    console.error('Failed to auto-grant admin in signIn:', err);
+                }
+            }
+            return true;
+        },
         async session({ session, token }) {
             if (token.sub && session.user) {
                 session.user.id = token.sub;
 
-                // Automatically make djboziah@gmail.com an admin
+                // Set isAdmin on the session object for UI checks
                 if (session.user.email === 'djboziah@gmail.com') {
-                    // Update session object
                     (session.user as any).isAdmin = true;
-
-                    // Update database (fire and forget)
-                    db.update(users)
-                        .set({ isAdmin: true, isVerified: true })
-                        .where(eq(users.email, session.user.email))
-                        .execute().catch(err => console.error('Failed to auto-grant admin:', err));
                 }
             }
             return session;
