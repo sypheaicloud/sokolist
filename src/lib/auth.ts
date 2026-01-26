@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import { v4 as uuidv4 } from 'uuid';
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { db } from "./db";
@@ -47,10 +48,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/login',
     },
     callbacks: {
-        async signIn({ user }) {
+        async signIn({ user, account, profile }) {
+            // Auto-sync Google users to our database since we don't use an adapter
+            if (account?.provider === 'google' && user.email) {
+                try {
+                    const existingUser = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
+                    if (!existingUser[0]) {
+                        await db.insert(users).values({
+                            id: user.id || uuidv4(),
+                            email: user.email,
+                            name: user.name,
+                            image: user.image,
+                            isVerified: true, // Google accounts are pre-verified
+                            isAdmin: user.email === 'djboziah@gmail.com',
+                        });
+                    }
+                } catch (err) {
+                    console.error('Failed to sync Google user to DB:', err);
+                }
+            }
+
             if (user?.email === 'djboziah@gmail.com') {
                 try {
-                    // Update database to ensure admin status is permanent
                     await db.update(users)
                         .set({ isAdmin: true, isVerified: true })
                         .where(eq(users.email, user.email!));
@@ -60,14 +79,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
             return true;
         },
-        async session({ session, token }) {
-            if (token.sub && session.user) {
-                session.user.id = token.sub;
-
-                // Set isAdmin on the session object for UI checks
-                if (session.user.email === 'djboziah@gmail.com') {
-                    (session.user as any).isAdmin = true;
+        async jwt({ token, user, trigger, session }) {
+            if (user) {
+                token.id = user.id;
+                token.email = user.email;
+                if (user.email === 'djboziah@gmail.com') {
+                    token.isAdmin = true;
+                } else {
+                    // Check DB for existing users
+                    try {
+                        const dbUser = await db.select().from(users).where(eq(users.email, user.email!)).limit(1);
+                        token.isAdmin = dbUser[0]?.isAdmin ?? false;
+                    } catch (e) {
+                        token.isAdmin = false;
+                    }
                 }
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            if (session.user) {
+                session.user.id = token.id as string;
+                (session.user as any).isAdmin = token.isAdmin === true;
             }
             return session;
         }

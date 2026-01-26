@@ -2,9 +2,16 @@
 
 import { signIn } from '@/lib/auth';
 import { AuthError } from 'next-auth';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 
 export async function signInWithGoogle() {
-    await signIn('google');
+    try {
+        await signIn('google', { redirectTo: '/' });
+    } catch (error) {
+        if (isRedirectError(error)) throw error;
+        console.error('Google sign-in failed:', error);
+        throw error;
+    }
 }
 
 export async function authenticate(
@@ -17,14 +24,18 @@ export async function authenticate(
             redirectTo: '/',
         });
     } catch (error) {
+        if (isRedirectError(error)) throw error;
+
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':
-                    return 'Invalid credentials.';
+                    return 'Invalid email or password.';
                 default:
-                    return 'Something went wrong.';
+                    return 'Authentication failed. Please try again.';
             }
         }
-        throw error;
+
+        console.error('Login error:', error);
+        return 'An unexpected error occurred. Please try again.';
     }
 }
