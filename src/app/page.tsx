@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-// Added 'Printer' to imports
 import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera, Calendar, Utensils, Terminal, Printer } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
