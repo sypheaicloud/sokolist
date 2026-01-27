@@ -3,7 +3,8 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera, Calendar, Utensils, Terminal, Printer } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getListings } from './actions'; // ✅ Only importing getListings
+// ✅ FIXED LINE BELOW: We only import getListings. Removed createListing.
+import { getListings } from './actions';
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> }) {
     const session = await auth();
@@ -11,6 +12,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30">
+            {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
                 <div className="container mx-auto flex h-16 items-center justify-between px-4">
                     <div className="flex items-center gap-2">
@@ -121,6 +123,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                     <CategoryCard icon={Printer} label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
                 </div>
 
+                {/* Featured Listings (Real Data) */}
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-semibold tracking-tight text-white">
                         {params.category ? `${params.category} Listings` : (params.q ? `Results for "${params.q}"` : "Just In")}
