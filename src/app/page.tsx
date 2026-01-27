@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-// ✅ SAFE IMPORTS: Keeping it crash-free
-import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles, AlertTriangle, Eye, Map } from "lucide-react";
+// ✅ SAFE IMPORTS: Removed 'Map', 'AlertTriangle', 'Eye' to prevent crashes
+import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -13,7 +13,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
 
-      {/* 🔒 COMBINED HEADER: Forces Top Bar + Nav to stay together and on top */}
+      {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
 
         {/* 1. TOP CREDIT BAR */}
@@ -152,7 +152,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </div>
       </section>
 
-      {/* 🛡️ SAFETY DISCLAIMER FOOTER */}
+      {/* 🛡️ SAFETY DISCLAIMER FOOTER (Fixed with Emojis to prevent crashes) */}
       <footer className="border-t border-white/10 bg-slate-900/50 py-12 mt-20 relative z-10">
         <div className="container mx-auto px-4">
           <div className="mb-8 text-center">
@@ -164,25 +164,28 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
-              <div className="h-10 w-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 mb-3">
-                <AlertTriangle className="h-5 w-5" />
+            {/* Safety Tip 1 */}
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+              <div className="h-10 w-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-xl mb-3">
+                ⚠️
               </div>
               <h4 className="font-semibold text-white mb-1">Do Not Prepay</h4>
               <p className="text-xs text-slate-400">Never pay for items in advance, including delivery fees. Scammers often ask for small amounts upfront.</p>
             </div>
 
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
-              <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 mb-3">
-                <Eye className="h-5 w-5" />
+            {/* Safety Tip 2 */}
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+              <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-xl mb-3">
+                🔎
               </div>
               <h4 className="font-semibold text-white mb-1">Inspect Products</h4>
               <p className="text-xs text-slate-400">Always check the item thoroughly before handing over money. If it looks too good to be true, it probably is.</p>
             </div>
 
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
-              <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-3">
-                <Map className="h-5 w-5" />
+            {/* Safety Tip 3 */}
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+              <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-xl mb-3">
+                📍
               </div>
               <h4 className="font-semibold text-white mb-1">Meet in Public</h4>
               <p className="text-xs text-slate-400">Meet in safe, busy public locations like malls or police stations. Avoid secluded areas.</p>
