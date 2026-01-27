@@ -7,10 +7,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { upload } from '@vercel/blob/client';
 
-// ✅ UPDATED LIST: Added "Shuttle/Car Rental" at the bottom
+// ✅ UPDATED LIST: Added Laptops and 4K TVs
 const CATEGORIES = [
     "Vehicles",
     "Electronics",
+    "Laptops",     // 🆕 Added
+    "4K TVs",      // 🆕 Added
     "Real Estate",
     "Jobs",
     "Services",
@@ -22,7 +24,7 @@ const CATEGORIES = [
     "Restaurants",
     "Tech Support - AI, DevOps, Infrastructure",
     "Printing Service",
-    "Shuttle/Car Rental" // 🆕 Added this!
+    "Shuttle/Car Rental"
 ];
 
 export default function PostAdPage() {

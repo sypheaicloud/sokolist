@@ -60,7 +60,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </nav>
       </header>
 
-      {/* Hero Section - Added 'pt-32' to push content down below the new double-header */}
+      {/* Hero Section */}
       <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-32 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
@@ -117,10 +117,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       <section className="container mx-auto px-4 py-12">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
 
-        {/* SAFE GRID: Uses Emojis to prevent crash */}
+        {/* SAFE GRID: Updated with Laptops and 4K TVs */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
+          <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" /> {/* 🆕 Added */}
+          <CategoryCard emoji="📺" label="4K TVs" color="bg-red-500/10 text-red-400 border-red-500/20" />   {/* 🆕 Added */}
           <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
           <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
@@ -131,7 +133,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <CategoryCard emoji="📸" label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
           <CategoryCard emoji="📅" label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="🍽️" label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
-          <CategoryCard emoji="💻" label="Tech Support - AI, DevOps" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
+          <CategoryCard emoji="🤖" label="Tech Support - AI, DevOps" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
           <CategoryCard emoji="🖨️" label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
           <CategoryCard emoji="🚐" label="Shuttle/Car Rental" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
         </div>

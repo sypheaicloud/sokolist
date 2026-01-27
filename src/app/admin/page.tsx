@@ -26,7 +26,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30">
 
-            {/* SIDEBAR - Fixed Z-Index */}
+            {/* SIDEBAR */}
             <aside className="fixed top-0 bottom-0 left-0 w-64 bg-slate-900 border-r border-white/10 z-[9999] pointer-events-auto flex flex-col">
                 <div className="p-6 border-b border-white/10">
                     <div className="flex items-center gap-2">
