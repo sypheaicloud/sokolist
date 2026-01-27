@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useActionState } from 'react';
+import { useState, useActionState, useRef } from 'react';
 import { createListing } from './actions';
 import { ArrowLeft, Camera, Loader2, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { upload } from '@vercel/blob/client'; // NEW: Client-side upload
 
 const CATEGORIES = [
     "Vehicles",
@@ -20,6 +21,8 @@ const CATEGORIES = [
 export default function PostAdPage() {
     const [state, dispatch, isPending] = useActionState(createListing, undefined);
     const [preview, setPreview] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false); // Track upload status
+    const inputFileRef = useRef<HTMLInputElement>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -32,6 +35,41 @@ export default function PostAdPage() {
         } else {
             setPreview(null);
         }
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // STOP the default form submission
+
+        const formData = new FormData(e.currentTarget);
+        const file = inputFileRef.current?.files?.[0];
+
+        // 1. If there is a file, upload it to Vercel Blob first
+        if (file) {
+            setIsUploading(true);
+            try {
+                const newBlob = await upload(file.name, file, {
+                    access: 'public',
+                    handleUploadUrl: '/api/upload', // This points to the API route you created in Step 1
+                });
+
+                // Success! We got a URL back.
+                // Replace the heavy 'file' object with the lightweight URL string
+                formData.set('imageUrl', newBlob.url);
+                formData.delete('image'); // Remove the raw file so we don't crash the server action
+
+                console.log("✅ Upload complete:", newBlob.url);
+            } catch (error) {
+                console.error("❌ Upload failed:", error);
+                alert("Image upload failed. Please try again.");
+                setIsUploading(false);
+                return; // Stop here if upload fails
+            }
+            setIsUploading(false);
+        }
+
+        // 2. Now send the data (with the URL) to your Server Action
+        // @ts-ignore - dispatch expects FormData, but React types are strict
+        dispatch(formData);
     };
 
     return (
@@ -51,7 +89,7 @@ export default function PostAdPage() {
                         <p className="mt-2 text-sm text-slate-400">Reach thousands of buyers across Kenya.</p>
                     </div>
 
-                    <form action={dispatch} encType="multipart/form-data" className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-2">
                                 <label htmlFor="title" className="text-sm font-medium text-slate-200">Title</label>
@@ -125,13 +163,24 @@ export default function PostAdPage() {
                             {state?.errors?.description && <p className="text-xs text-red-500">{state.errors.description}</p>}
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             <label className="text-sm font-medium text-slate-200 flex items-center gap-2">
                                 <Camera className="h-4 w-4" />
                                 Photos
                             </label>
 
-                            <div className="mt-2 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-8 transition-all hover:border-purple-500/50">
+                            {/* Persistent File Input - Ref attached here */}
+                            <input
+                                ref={inputFileRef}
+                                id="image-upload"
+                                type="file"
+                                name="image"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="sr-only"
+                            />
+
+                            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-8 transition-all hover:border-purple-500/50">
                                 {preview ? (
                                     <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg shadow-2xl">
                                         <Image
@@ -142,28 +191,27 @@ export default function PostAdPage() {
                                         />
                                         <button
                                             type="button"
-                                            onClick={() => setPreview(null)}
+                                            onClick={() => {
+                                                setPreview(null);
+                                                if (inputFileRef.current) inputFileRef.current.value = '';
+                                            }}
                                             className="absolute right-2 top-2 rounded-full bg-red-600 p-1.5 text-white shadow-lg hover:bg-red-500 transition-colors"
                                         >
                                             <XCircle className="h-4 w-4" />
                                         </button>
                                     </div>
                                 ) : (
-                                    <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 text-slate-400">
+                                    <label
+                                        htmlFor="image-upload"
+                                        className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 text-slate-400 py-4"
+                                    >
                                         <Camera className="h-12 w-12 opacity-20" />
                                         <div className="text-sm font-semibold text-slate-300">Click to upload photos</div>
-                                        <div className="text-xs">PNG, JPG or WEBP (max. 5MB)</div>
-                                        <input
-                                            type="file"
-                                            name="image"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            className="hidden"
-                                        />
+                                        <div className="text-xs">Max 500MB (Fast Upload)</div>
                                     </label>
                                 )}
                             </div>
-                            {state?.errors?.image && <p className="text-xs text-red-500 mt-2">{state.errors.image}</p>}
+                            {state?.errors?.imageUrl && <p className="text-xs text-red-500 mt-2">{state.errors.imageUrl}</p>}
                         </div>
 
                         {state?.message && !state?.errors && (
@@ -174,13 +222,13 @@ export default function PostAdPage() {
 
                         <button
                             type="submit"
-                            disabled={isPending}
+                            disabled={isPending || isUploading}
                             className="flex w-full items-center justify-center rounded-xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-purple-600/20"
                         >
-                            {isPending ? (
+                            {(isPending || isUploading) ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Posting...
+                                    {isUploading ? 'Uploading Image...' : 'Creating Listing...'}
                                 </>
                             ) : (
                                 'Post My Ad Now'
