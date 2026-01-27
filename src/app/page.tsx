@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
 // ✅ SAFE IMPORTS: Keeping it crash-free
-import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles } from "lucide-react";
+import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles, AlertTriangle, Eye, Map } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -11,7 +11,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
 
       {/* 🔒 COMBINED HEADER: Forces Top Bar + Nav to stay together and on top */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
@@ -114,22 +114,21 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* Categories */}
-      <section className="container mx-auto px-4 py-12">
+      <section className="container mx-auto px-4 py-12 flex-1">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
 
         {/* SAFE GRID: Updated with Laptops and 4K TVs */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
-          <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" /> {/* 🆕 Added */}
-          <CategoryCard emoji="📺" label="4K TVs" color="bg-red-500/10 text-red-400 border-red-500/20" />   {/* 🆕 Added */}
+          <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" />
+          <CategoryCard emoji="📺" label="4K TVs" color="bg-red-500/10 text-red-400 border-red-500/20" />
           <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
           <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
           <CategoryCard emoji="❤️" label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
           <CategoryCard emoji="⚖️" label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
           <CategoryCard emoji="🎁" label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
-
           <CategoryCard emoji="📸" label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
           <CategoryCard emoji="📅" label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="🍽️" label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
@@ -152,6 +151,53 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           </Suspense>
         </div>
       </section>
+
+      {/* 🛡️ SAFETY DISCLAIMER FOOTER */}
+      <footer className="border-t border-white/10 bg-slate-900/50 py-12 mt-20 relative z-10">
+        <div className="container mx-auto px-4">
+          <div className="mb-8 text-center">
+            <h3 className="text-lg font-bold text-white mb-2 flex items-center justify-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-emerald-400" />
+              Safety First: Avoid Scams
+            </h3>
+            <p className="text-slate-400 text-sm">Follow these simple rules to stay safe while trading on SokoKenya.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
+              <div className="h-10 w-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 mb-3">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <h4 className="font-semibold text-white mb-1">Do Not Prepay</h4>
+              <p className="text-xs text-slate-400">Never pay for items in advance, including delivery fees. Scammers often ask for small amounts upfront.</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
+              <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 mb-3">
+                <Eye className="h-5 w-5" />
+              </div>
+              <h4 className="font-semibold text-white mb-1">Inspect Products</h4>
+              <p className="text-xs text-slate-400">Always check the item thoroughly before handing over money. If it looks too good to be true, it probably is.</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
+              <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-3">
+                <Map className="h-5 w-5" />
+              </div>
+              <h4 className="font-semibold text-white mb-1">Meet in Public</h4>
+              <p className="text-xs text-slate-400">Meet in safe, busy public locations like malls or police stations. Avoid secluded areas.</p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center border-t border-white/5 pt-8">
+            <p className="text-xs text-slate-500 mb-1">&copy; {new Date().getFullYear()} SokoKenya. All rights reserved.</p>
+            <p className="text-[10px] text-slate-600 font-medium uppercase tracking-widest">
+              Website Design by <span className="text-slate-500">Syphe IT</span>
+            </p>
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }
