@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { upload } from '@vercel/blob/client';
 
-// ✅ UPDATED LIST: Now includes AI, Events, Restaurants, Tech Support, Printing
+// ✅ COPY THIS EXACT LIST
 const CATEGORIES = [
   "Vehicles",
   "Electronics",
@@ -17,11 +17,11 @@ const CATEGORIES = [
   "Dating",
   "Auctions",
   "Free Parts",
-  "AI Photoshoot",
-  "Events",
-  "Restaurants",
-  "Tech Support - AI, DevOps, Infrastructure",
-  "Printing Service"
+  "AI Photoshoot",                              // NEW
+  "Events",                                     // NEW
+  "Restaurants",                                // NEW
+  "Tech Support - AI, DevOps, Infrastructure",  // NEW
+  "Printing Service"                            // NEW
 ];
 
 export default function PostAdPage() {
