@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { ShieldCheck, LayoutDashboard, FileText, Users, LogOut, Trash2, PauseCircle, PlayCircle, Ban, Power, Shield } from "lucide-react";
-import { getAdminData, deleteListing, toggleListingStatus, deleteUser, toggleUserBan, toggleUserAdmin } from "./actions";
+import { ShieldCheck, LayoutDashboard, FileText, Users, LogOut, Trash2, PauseCircle, PlayCircle, Ban, Power, Shield, ExternalLink } from "lucide-react";
+import { getAdminData, deleteListing, toggleListingStatus, deleteUser, toggleUserBan, toggleUserAdmin, banUser } from "./actions";
 
 // ⚡ FORCE DYNAMIC: Ensures fresh data every time
 export const dynamic = 'force-dynamic';
@@ -80,7 +80,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     </div>
                 )}
 
-                {/* VIEW: LISTINGS */}
+                {/* VIEW: LISTINGS (UPGRADED) */}
                 {currentView === 'listings' && (
                     <div className="rounded-2xl border border-white/10 bg-slate-900/50 overflow-hidden shadow-2xl">
                         <div className="overflow-x-auto">
@@ -100,7 +100,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                     ) : (
                                         listings.map((listing) => (
                                             <tr key={listing.id} className="hover:bg-white/5 transition-colors">
-                                                <td className="p-4 font-medium text-white">{listing.title}</td>
+                                                <td className="p-4 font-medium text-white group">
+                                                    {/* 🔗 CLICKABLE TITLE TO INSPECT LISTING */}
+                                                    <a href={`/listing/${listing.id}`} target="_blank" className="flex items-center gap-2 hover:text-purple-400 transition-colors">
+                                                        {listing.title}
+                                                        <ExternalLink className="h-3 w-3 opacity-50" />
+                                                    </a>
+                                                </td>
                                                 <td className="p-4 text-emerald-400">KSh {listing.price.toLocaleString()}</td>
                                                 {/* @ts-expect-error - user check */}
                                                 <td className="p-4 text-slate-300">{listing.user?.email || 'Unknown'}</td>
@@ -112,21 +118,26 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                     }
                                                 </td>
                                                 <td className="p-4 flex justify-end gap-2">
+
+                                                    {/* 1. TOGGLE HOLD (Temp Deactivate) */}
                                                     <form action={toggleListingStatus}>
                                                         <input type="hidden" name="id" value={listing.id} />
                                                         {/* @ts-expect-error - status check */}
                                                         <input type="hidden" name="currentStatus" value={listing.status || 'ACTIVE'} />
-                                                        <button className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 cursor-pointer" title="Toggle Hold">
+                                                        <button className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 cursor-pointer" title={listing.status === 'ACTIVE' ? "Deactivate (Hold)" : "Activate"}>
                                                             {/* @ts-expect-error - status check */}
                                                             {listing.status === 'HOLD' ? <PlayCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}
                                                         </button>
                                                     </form>
+
+                                                    {/* 2. DELETE LISTING */}
                                                     <form action={deleteListing}>
                                                         <input type="hidden" name="id" value={listing.id} />
                                                         <button className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 cursor-pointer" title="Delete Forever">
                                                             <Trash2 className="h-4 w-4" />
                                                         </button>
                                                     </form>
+
                                                 </td>
                                             </tr>
                                         ))
@@ -137,7 +148,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     </div>
                 )}
 
-                {/* VIEW: USERS (UPDATED WITH NEW ACTIONS) */}
+                {/* VIEW: USERS */}
                 {currentView === 'users' && (
                     <div className="rounded-2xl border border-white/10 bg-slate-900/50 overflow-hidden shadow-2xl">
                         <div className="overflow-x-auto">
@@ -160,14 +171,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                 <td className="p-4 font-medium text-white">{user.name}</td>
                                                 <td className="p-4 text-slate-300">{user.email}</td>
                                                 <td className="p-4">
-                                                    {/* ADMIN INDICATOR */}
                                                     {user.isAdmin
                                                         ? <span className="flex items-center gap-1 text-purple-400 font-bold"><Shield className="h-3 w-3" /> Admin</span>
                                                         : <span className="text-slate-500">User</span>
                                                     }
                                                 </td>
                                                 <td className="p-4">
-                                                    {/* BANNED INDICATOR */}
                                                     {user.isBanned
                                                         ? <span className="px-2 py-1 rounded bg-red-500/20 text-red-400 text-xs font-bold">BANNED</span>
                                                         : <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">ACTIVE</span>
@@ -175,7 +184,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                 </td>
                                                 <td className="p-4 flex justify-end gap-2">
 
-                                                    {/* 1. MAKE ADMIN TOGGLE */}
+                                                    {/* MAKE ADMIN */}
                                                     <form action={toggleUserAdmin}>
                                                         <input type="hidden" name="id" value={user.id} />
                                                         <input type="hidden" name="isAdmin" value={String(user.isAdmin)} />
@@ -184,7 +193,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                         </button>
                                                     </form>
 
-                                                    {/* 2. DEACTIVATE/BAN TOGGLE */}
+                                                    {/* DEACTIVATE/BAN */}
                                                     <form action={toggleUserBan}>
                                                         <input type="hidden" name="id" value={user.id} />
                                                         <input type="hidden" name="isBanned" value={String(user.isBanned)} />
@@ -193,7 +202,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                         </button>
                                                     </form>
 
-                                                    {/* 3. DELETE USER */}
+                                                    {/* DELETE */}
                                                     <form action={deleteUser}>
                                                         <input type="hidden" name="id" value={user.id} />
                                                         <button type="submit" className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 cursor-pointer" title="Delete User Permanently">
