@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera, Calendar, Utensils, Terminal, Printer } from "lucide-react";
+// ✅ FIXED IMPORTS: Removed 'Printer', 'Terminal', 'Utensils', 'Calendar' to prevent crash
+import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera } from "lucide-react";
 import { auth } from "@/lib/auth";
-// ✅ FIXED: This line now ONLY imports getListings.
 import { getListings } from './actions';
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> }) {
@@ -104,7 +104,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <section className="container mx-auto px-4 py-12">
                 <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
 
-                {/* Updated Grid for Categories */}
+                {/* Updated Grid for Categories - USING SAFE ICONS */}
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
                     <CategoryCard icon={Car} label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
                     <CategoryCard icon={Smartphone} label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
@@ -115,14 +115,14 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                     <CategoryCard icon={Gavel} label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
                     <CategoryCard icon={Gift} label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
 
+                    {/* SAFE ICONS USED BELOW TO PREVENT CRASH */}
                     <CategoryCard icon={Camera} label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
-                    <CategoryCard icon={Calendar} label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
-                    <CategoryCard icon={Utensils} label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
-                    <CategoryCard icon={Terminal} label="Tech Support - AI, DevOps, Infrastructure" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
-                    <CategoryCard icon={Printer} label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
+                    <CategoryCard icon={Gift} label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
+                    <CategoryCard icon={Home} label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
+                    <CategoryCard icon={Smartphone} label="Tech Support - AI, DevOps, Infrastructure" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
+                    <CategoryCard icon={Briefcase} label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
                 </div>
 
-                {/* Featured Listings (Real Data) */}
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-semibold tracking-tight text-white">
                         {params.category ? `${params.category} Listings` : (params.q ? `Results for "${params.q}"` : "Just In")}
