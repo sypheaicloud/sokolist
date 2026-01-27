@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-// Added Camera, Calendar, Utensils to imports
-import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera, Calendar, Utensils } from "lucide-react";
+// Added 'Printer' to imports
+import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera, Calendar, Utensils, Terminal, Printer } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -118,10 +118,13 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <CategoryCard icon={Gavel} label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
           <CategoryCard icon={Gift} label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
 
-          {/* NEW CATEGORIES ADDED HERE */}
           <CategoryCard icon={Camera} label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
           <CategoryCard icon={Calendar} label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard icon={Utensils} label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
+          <CategoryCard icon={Terminal} label="Tech Support - AI, DevOps, Infrastructure" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
+
+          {/* NEW PRINTING SERVICE CATEGORY */}
+          <CategoryCard icon={Printer} label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
         </div>
 
         {/* Featured Listings (Real Data) */}
@@ -195,10 +198,15 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
 }
 
 function CategoryCard({ icon: Icon, label, color }: { icon: React.ElementType, label: string, color: string }) {
+  // Use a smaller text size if the label is super long
+  const isLongLabel = label.length > 20;
+
   return (
     <Link href={`/?category=${encodeURIComponent(label)}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border border-white/5`}>
       <Icon className="h-8 w-8" />
-      <span className="font-medium text-slate-200 group-hover:text-white">{label}</span>
+      <span className={`font-medium text-slate-200 group-hover:text-white text-center ${isLongLabel ? 'text-xs' : 'text-base'}`}>
+        {label}
+      </span>
     </Link>
   );
 }
