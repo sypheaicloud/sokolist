@@ -1,213 +1,224 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Suspense } from "react";
-// ✅ SAFE IMPORTS: Keeping it crash-free
-import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getListings } from './actions';
+import { redirect } from "next/navigation";
+import { ShieldCheck, LayoutDashboard, FileText, Users, LogOut, Trash2, PauseCircle, PlayCircle, Ban, Power, Shield, ExternalLink } from "lucide-react";
+import { getAdminData, deleteListing, toggleListingStatus, deleteUser, toggleUserBan, toggleUserAdmin } from "./actions";
 
-export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> }) {
+// ⚡ FORCE DYNAMIC: Ensures fresh data every time
+export const dynamic = 'force-dynamic';
+
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const session = await auth();
     const params = await searchParams;
+    const currentView = params.view || 'dashboard';
+
+    // 🔒 SECURITY CHECK
+    if (!session?.user || !(session.user as { isAdmin?: boolean }).isAdmin) {
+        redirect("/");
+    }
+
+    // Fetch Data
+    const { listings, users } = await getAdminData();
+    const activeListings = listings.length;
+    const totalUsers = users.length;
+    // @ts-expect-error - status checking
+    const pendingListings = listings.filter(l => l.status === 'HOLD').length;
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30">
 
-            {/* 🌟 NEW: Syphe IT Top Bar Credit with Email */}
-            <div className="fixed top-0 left-0 right-0 z-[60] h-8 bg-gradient-to-r from-purple-900 to-slate-900 flex items-center justify-center border-b border-white/10 text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest shadow-lg">
-                <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
-                Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
-                <span className="hidden sm:inline mx-2 text-purple-500">|</span>
-                <span className="text-purple-300 lowercase tracking-normal">sypheit@gmail.com</span>
-            </div>
-
-            {/* Navigation */}
-            <nav className="fixed top-8 left-0 right-0 z-50 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
-                <div className="container mx-auto flex h-16 items-center justify-between px-4">
+            {/* SIDEBAR - Fixed Z-Index */}
+            <aside className="fixed top-0 bottom-0 left-0 w-64 bg-slate-900 border-r border-white/10 z-[9999] pointer-events-auto flex flex-col">
+                <div className="p-6 border-b border-white/10">
                     <div className="flex items-center gap-2">
                         <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
-                        <span className="text-xl font-bold tracking-tight">SokoKenya</span>
-                    </div>
-                    <div className="hidden items-center gap-6 md:flex">
-                        <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
-                        <Link href="/browse" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Browse</Link>
-                        <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Messages</Link>
-                        {(session?.user as { isAdmin?: boolean })?.isAdmin && (
-                            <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
-                                Admin
-                            </Link>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-4">
-                        {session?.user ? (
-                            <Link href="/profile" className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white transition-colors">
-                                <div className="h-8 w-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
-                                    <span>U</span>
-                                </div>
-                                <span>{session.user.name?.split(' ')[0]}</span>
-                            </Link>
-                        ) : (
-                            <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Login</Link>
-                        )}
-                        <Link href="/post" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 hover:bg-slate-200 transition-colors">
-                            Post Ad
-                        </Link>
+                        <span className="text-xl font-bold tracking-tight text-white">SokoAdmin</span>
                     </div>
                 </div>
-            </nav>
 
-            {/* Hero Section */}
-            <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-24 pb-12">
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
-                    <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1628526521369-2b4e72d24484?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay" />
+                <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
+                    <a href="/admin?view=dashboard" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer hover:scale-105 ${currentView === 'dashboard' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
+                        <LayoutDashboard className="h-5 w-5" />
+                        <span className="font-medium">Dashboard</span>
+                    </a>
+                    <a href="/admin?view=listings" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer hover:scale-105 ${currentView === 'listings' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
+                        <FileText className="h-5 w-5" />
+                        <span className="font-medium">Listings</span>
+                    </a>
+                    <a href="/admin?view=users" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer hover:scale-105 ${currentView === 'users' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
+                        <Users className="h-5 w-5" />
+                        <span className="font-medium">Users</span>
+                    </a>
+                </nav>
+
+                <div className="p-4 border-t border-white/10">
+                    <a href="/" className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
+                        <LogOut className="h-5 w-5" />
+                        <span className="font-medium">Exit Admin</span>
+                    </a>
                 </div>
+            </aside>
 
-                <div className="container relative z-10 mx-auto px-4 text-center">
-                    <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
-                        Kenya&apos;s Premier Marketplace
-                    </h1>
-                    <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 md:text-xl">
-                        Buy, sell, trade, and connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
-                    </p>
+            {/* Main Content */}
+            <main className="pl-64 min-h-screen relative z-0 bg-slate-950 p-8">
+                <header className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight capitalize text-white">{currentView}</h1>
+                        <p className="text-slate-400 mt-1">Overview of system performance</p>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-sm font-medium">
+                        <ShieldCheck className="h-4 w-4" />
+                        Super Admin
+                    </div>
+                </header>
 
-                    <div className="mx-auto mt-8 max-w-2xl">
-                        <form action="/" method="GET" className="group relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
-                            <span className="ml-3 text-slate-400">🔍</span>
-                            <input
-                                type="text"
-                                name="q"
-                                defaultValue={params.q}
-                                placeholder="What are you looking for?"
-                                className="flex-1 bg-transparent px-2 py-3 text-white placeholder:text-slate-500 focus:outline-none"
-                            />
-                            <div className="h-8 w-[1px] bg-white/10" />
-                            <div className="flex items-center gap-2 px-3 text-slate-400">
-                                <span className="text-slate-400">📍</span>
-                                <input
-                                    type="text"
-                                    name="location"
-                                    defaultValue={params.location}
-                                    placeholder="Kenya"
-                                    className="w-24 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
-                                />
-                            </div>
-                            <button type="submit" className="rounded-xl bg-purple-600 p-3 text-white hover:bg-purple-500 transition-colors">
-                                ➔
-                            </button>
-                        </form>
-                        <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-slate-500">
-                            <span>Popular:</span>
-                            <Link href="/?q=Toyota" className="hover:text-purple-400 transition-colors">Toyota Vitz</Link>
-                            <span>•</span>
-                            <Link href="/?q=iPhone" className="hover:text-purple-400 transition-colors">iPhone 14</Link>
-                            <span>•</span>
-                            <Link href="/?category=Real Estate" className="hover:text-purple-400 transition-colors">Apartments in Kilimani</Link>
+                {/* VIEW: DASHBOARD */}
+                {currentView === 'dashboard' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <StatCard label="Total Listings" value={activeListings.toString()} change="Live on site" />
+                        <StatCard label="Registered Users" value={totalUsers.toString()} change="Total accounts" />
+                        <StatCard label="On Hold / Pending" value={pendingListings.toString()} change="Requires review" alert />
+                    </div>
+                )}
+
+                {/* VIEW: LISTINGS */}
+                {currentView === 'listings' && (
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/50 overflow-hidden shadow-2xl">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-white/5 text-slate-400 font-medium border-b border-white/10">
+                                    <tr>
+                                        <th className="p-4">Title</th>
+                                        <th className="p-4">Price</th>
+                                        <th className="p-4">Seller</th>
+                                        <th className="p-4">Status</th>
+                                        <th className="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/10">
+                                    {listings.length === 0 ? (
+                                        <tr><td colSpan={5} className="p-8 text-center text-slate-500">No listings found.</td></tr>
+                                    ) : (
+                                        listings.map((listing) => (
+                                            <tr key={listing.id} className="hover:bg-white/5 transition-colors">
+                                                <td className="p-4 font-medium text-white group">
+                                                    <a href={`/listing/${listing.id}`} target="_blank" className="flex items-center gap-2 hover:text-purple-400 transition-colors">
+                                                        {listing.title}
+                                                        <ExternalLink className="h-3 w-3 opacity-50" />
+                                                    </a>
+                                                </td>
+                                                <td className="p-4 text-emerald-400">KSh {listing.price.toLocaleString()}</td>
+                                                {/* @ts-expect-error - user check */}
+                                                <td className="p-4 text-slate-300">{listing.user?.email || 'Unknown'}</td>
+                                                <td className="p-4">
+                                                    {/* @ts-expect-error - status check */}
+                                                    {listing.status === 'ACTIVE'
+                                                        ? <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">ACTIVE</span>
+                                                        : <span className="px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 text-xs font-bold">HOLD</span>
+                                                    }
+                                                </td>
+                                                <td className="p-4 flex justify-end gap-2">
+                                                    <form action={toggleListingStatus}>
+                                                        <input type="hidden" name="id" value={listing.id} />
+                                                        {/* @ts-expect-error - status check */}
+                                                        <input type="hidden" name="currentStatus" value={listing.status || 'ACTIVE'} />
+                                                        <button className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 cursor-pointer" title="Toggle Hold">
+                                                            {/* @ts-expect-error - status check */}
+                                                            {listing.status === 'HOLD' ? <PlayCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}
+                                                        </button>
+                                                    </form>
+                                                    <form action={deleteListing}>
+                                                        <input type="hidden" name="id" value={listing.id} />
+                                                        <button className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 cursor-pointer" title="Delete Forever">
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </div>
-            </section>
+                )}
 
-            {/* Categories */}
-            <section className="container mx-auto px-4 py-12">
-                <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
-
-                {/* SAFE GRID: Uses Emojis to prevent crash */}
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
-                    <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
-                    <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
-                    <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
-                    <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
-                    <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
-                    <CategoryCard emoji="❤️" label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
-                    <CategoryCard emoji="⚖️" label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
-                    <CategoryCard emoji="🎁" label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
-
-                    <CategoryCard emoji="📸" label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
-                    <CategoryCard emoji="📅" label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
-                    <CategoryCard emoji="🍽️" label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
-                    <CategoryCard emoji="💻" label="Tech Support - AI, DevOps" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
-                    <CategoryCard emoji="🖨️" label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
-                    <CategoryCard emoji="🚐" label="Shuttle/Car Rental" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
-                </div>
-
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl font-semibold tracking-tight text-white">
-                        {params.category ? `${params.category} Listings` : (params.q ? `Results for "${params.q}"` : "Just In")}
-                    </h2>
-                    {(params.q || params.category || params.location) && (
-                        <Link href="/" className="text-sm text-purple-400 hover:underline">Clear all</Link>
-                    )}
-                </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    <Suspense fallback={<div className="col-span-full text-center text-slate-500 py-12">Loading listings...</div>}>
-                        <ListingGrid searchParams={params} />
-                    </Suspense>
-                </div>
-            </section>
+                {/* VIEW: USERS */}
+                {currentView === 'users' && (
+                    <div className="rounded-2xl border border-white/10 bg-slate-900/50 overflow-hidden shadow-2xl">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-white/5 text-slate-400 font-medium border-b border-white/10">
+                                    <tr>
+                                        <th className="p-4">Name</th>
+                                        <th className="p-4">Email</th>
+                                        <th className="p-4">Role</th>
+                                        <th className="p-4">Status</th>
+                                        <th className="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/10">
+                                    {users.length === 0 ? (
+                                        <tr><td colSpan={5} className="p-8 text-center text-slate-500">No users found.</td></tr>
+                                    ) : (
+                                        users.map((user) => (
+                                            <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                                                <td className="p-4 font-medium text-white">{user.name}</td>
+                                                <td className="p-4 text-slate-300">{user.email}</td>
+                                                <td className="p-4">
+                                                    {user.isAdmin
+                                                        ? <span className="flex items-center gap-1 text-purple-400 font-bold"><Shield className="h-3 w-3" /> Admin</span>
+                                                        : <span className="text-slate-500">User</span>
+                                                    }
+                                                </td>
+                                                <td className="p-4">
+                                                    {user.isBanned
+                                                        ? <span className="px-2 py-1 rounded bg-red-500/20 text-red-400 text-xs font-bold">BANNED</span>
+                                                        : <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">ACTIVE</span>
+                                                    }
+                                                </td>
+                                                <td className="p-4 flex justify-end gap-2">
+                                                    <form action={toggleUserAdmin}>
+                                                        <input type="hidden" name="id" value={user.id} />
+                                                        <input type="hidden" name="isAdmin" value={String(user.isAdmin)} />
+                                                        <button type="submit" className={`p-2 rounded-lg cursor-pointer ${user.isAdmin ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700/50 text-slate-500 hover:text-purple-400'}`} title={user.isAdmin ? "Remove Admin" : "Make Admin"}>
+                                                            <Shield className="h-4 w-4" />
+                                                        </button>
+                                                    </form>
+                                                    <form action={toggleUserBan}>
+                                                        <input type="hidden" name="id" value={user.id} />
+                                                        <input type="hidden" name="isBanned" value={String(user.isBanned)} />
+                                                        <button type="submit" className={`p-2 rounded-lg cursor-pointer ${user.isBanned ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/10 text-emerald-400 hover:bg-red-500/10 hover:text-red-400'}`} title={user.isBanned ? "Activate User" : "Deactivate/Ban User"}>
+                                                            <Power className="h-4 w-4" />
+                                                        </button>
+                                                    </form>
+                                                    <form action={deleteUser}>
+                                                        <input type="hidden" name="id" value={user.id} />
+                                                        <button type="submit" className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 cursor-pointer" title="Delete User Permanently">
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </main>
         </div>
     );
 }
 
-async function ListingGrid({ searchParams }: { searchParams: { q?: string; category?: string; location?: string } }) {
-    const items = await getListings(searchParams);
-
-    if (items.length === 0) {
-        return (
-            <div className="col-span-full py-20 text-center rounded-3xl border border-dashed border-white/10 bg-white/5">
-                <p className="text-slate-500">No listings found matching your search.</p>
-            </div>
-        );
-    }
-
+function StatCard({ label, value, change, alert = false }: { label: string, value: string, change: string, alert?: boolean }) {
     return (
-        <>
-            {items.map((item) => (
-                <Link key={item.id} href={`/listing/${item.id}`} className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10">
-                    <div className="h-48 w-full relative overflow-hidden bg-slate-800">
-                        {item.imageUrl ? (
-                            <Image
-                                src={item.imageUrl}
-                                alt={item.title}
-                                fill
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                unoptimized
-                            />
-                        ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-slate-600 font-medium bg-gradient-to-br from-slate-800 to-slate-900">
-                                {item.category}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="p-4">
-                        <div className="mb-2 flex items-center justify-between">
-                            <span className="rounded-full bg-purple-500/20 px-2.5 py-0.5 text-xs font-medium text-purple-300">
-                                {item.category}
-                            </span>
-                            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                                <span>{item.location}</span>
-                            </div>
-                        </div>
-                        <h3 className="mb-1 text-lg font-semibold text-slate-100 group-hover:text-purple-400 transition-colors truncate">{item.title}</h3>
-                        <p className="font-bold text-emerald-400">KSh {item.price.toLocaleString()}</p>
-                    </div>
-                </Link>
-            ))}
-        </>
-    );
-}
-
-// ✅ SAFE CARD
-function CategoryCard({ emoji, label, color }: { emoji: string, label: string, color: string }) {
-    const isLongLabel = label.length > 20;
-    return (
-        <Link href={`/?category=${encodeURIComponent(label)}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border border-white/5`}>
-            <span className="text-3xl">{emoji}</span>
-            <span className={`font-medium text-slate-200 group-hover:text-white text-center ${isLongLabel ? 'text-xs' : 'text-base'}`}>
-                {label}
-            </span>
-        </Link>
+        <div className="p-6 rounded-2xl border border-white/10 bg-white/5">
+            <p className="text-slate-400 text-sm font-medium mb-1">{label}</p>
+            <h3 className="text-3xl font-bold text-white mb-2">{value}</h3>
+            <p className={`text-xs font-medium ${alert ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {change}
+            </p>
+        </div>
     );
 }

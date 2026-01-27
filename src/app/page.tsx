@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
 // ✅ SAFE IMPORTS: Keeping it crash-free
-import { Search, MapPin, ArrowRight, User, ShieldCheck } from "lucide-react";
+import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -12,42 +12,56 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30">
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-slate-950/50 backdrop-blur-xl">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
-            <span className="text-xl font-bold tracking-tight">SokoKenya</span>
-          </div>
-          <div className="hidden items-center gap-6 md:flex">
-            <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
-            <Link href="/browse" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Browse</Link>
-            <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Messages</Link>
-            {(session?.user as { isAdmin?: boolean })?.isAdmin && (
-              <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
-                Admin
-              </Link>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
-            {session?.user ? (
-              <Link href="/profile" className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white transition-colors">
-                <div className="h-8 w-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
-                  <span>U</span>
-                </div>
-                <span>{session.user.name?.split(' ')[0]}</span>
-              </Link>
-            ) : (
-              <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Login</Link>
-            )}
-            <Link href="/post" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 hover:bg-slate-200 transition-colors">
-              Post Ad
-            </Link>
-          </div>
-        </div>
-      </nav>
 
-      {/* Hero Section */}
-      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-24 pb-12">
+      {/* 🔒 COMBINED HEADER: Forces Top Bar + Nav to stay together and on top */}
+      <header className="fixed top-0 left-0 right-0 z-[100]">
+
+        {/* 1. TOP CREDIT BAR */}
+        <div className="h-8 bg-gradient-to-r from-purple-900 to-slate-900 flex items-center justify-center border-b border-white/10 text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest shadow-lg relative z-[101]">
+          <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
+          Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
+          <span className="hidden sm:inline mx-2 text-purple-500">|</span>
+          <span className="text-purple-300 lowercase tracking-normal">sypheit@gmail.com</span>
+        </div>
+
+        {/* 2. NAVIGATION BAR */}
+        <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
+          <div className="container mx-auto flex h-full items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
+              <span className="text-xl font-bold tracking-tight">SokoKenya</span>
+            </div>
+            <div className="hidden items-center gap-6 md:flex">
+              <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
+              <Link href="/browse" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Browse</Link>
+              <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Messages</Link>
+              {(session?.user as { isAdmin?: boolean })?.isAdmin && (
+                <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
+                  Admin
+                </Link>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              {session?.user ? (
+                <Link href="/profile" className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white transition-colors">
+                  <div className="h-8 w-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
+                    <span>U</span>
+                  </div>
+                  <span>{session.user.name?.split(' ')[0]}</span>
+                </Link>
+              ) : (
+                <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Login</Link>
+              )}
+              <Link href="/post" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 hover:bg-slate-200 transition-colors">
+                Post Ad
+              </Link>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      {/* Hero Section - Added 'pt-32' to push content down below the new double-header */}
+      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-32 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
@@ -103,7 +117,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       <section className="container mx-auto px-4 py-12">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
 
-        {/* SAFE GRID: Added Shuttle/Car Rental */}
+        {/* SAFE GRID: Uses Emojis to prevent crash */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
@@ -189,7 +203,7 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
   );
 }
 
-// ✅ SAFE CARD
+// ✅ SAFE CARD: Accepts Emoji String instead of Component to avoid crashes
 function CategoryCard({ emoji, label, color }: { emoji: string, label: string, color: string }) {
   const isLongLabel = label.length > 20;
   return (
