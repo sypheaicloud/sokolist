@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-// ✅ SAFE IMPORTS: No broken icons here
+// ✅ SAFE IMPORTS: Removed broken icons
 import { Search, MapPin, ArrowRight, User, ShieldCheck } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
@@ -32,7 +32,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             {session?.user ? (
               <Link href="/profile" className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white transition-colors">
                 <div className="h-8 w-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
-                  <span>U</span>
+                  <User className="h-4 w-4" />
                 </div>
                 <span>{session.user.name?.split(' ')[0]}</span>
               </Link>
@@ -188,6 +188,7 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
   );
 }
 
+// ✅ SAFE CARD: Accepts Emoji String instead of Component to avoid crashes
 function CategoryCard({ emoji, label, color }: { emoji: string, label: string, color: string }) {
   const isLongLabel = label.length > 20;
   return (
