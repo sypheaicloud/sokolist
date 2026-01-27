@@ -2,13 +2,62 @@
 
 import { db } from '@/lib/db';
 import { users, listings } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/admin';
 import { revalidatePath } from 'next/cache';
 
-export async function banUser(userId: string) {
+// --- FETCH DATA FOR DASHBOARD ---
+
+export async function getAdminData() {
     await requireAdmin();
 
+    // 1. Fetch Listings with User Info
+    // We join with the users table to display the seller's email
+    const allListings = await db
+        .select({
+            id: listings.id,
+            title: listings.title,
+            price: listings.price,
+            createdAt: listings.createdAt,
+            isActive: listings.isActive,
+            // We explicitly map the user info structure for the UI
+            user: {
+                email: users.email
+            }
+        })
+        .from(listings)
+        .leftJoin(users, eq(listings.userId, users.id))
+        .orderBy(desc(listings.createdAt));
+
+    // 2. Fetch Users
+    const allUsers = await db
+        .select()
+        .from(users)
+        .orderBy(desc(users.createdAt));
+
+    // 3. Transform for UI (Handle the count manually or separate query)
+    // For MVP, we pass simple arrays. The UI will just show the array length if we don't do complex SQL counts.
+
+    return {
+        listings: allListings.map(l => ({
+            ...l,
+            // Map Drizzle's boolean isActive to the string status the UI expects ('ACTIVE' or 'HOLD')
+            status: l.isActive ? 'ACTIVE' : 'HOLD'
+        })),
+        users: allUsers
+    };
+}
+
+// --- ACTIONS (Connected to Forms) ---
+
+export async function banUser(formData: FormData) {
+    await requireAdmin();
+    const userId = formData.get('id') as string;
+
+    if (!userId) return;
+
+    // This handles both Ban and Unban logic depending on current state if you wanted,
+    // but here we forcefully BAN as per the function name.
     await db.update(users)
         .set({ isBanned: true, bannedAt: new Date() })
         .where(eq(users.id, userId));
@@ -17,21 +66,13 @@ export async function banUser(userId: string) {
     return { success: true };
 }
 
-export async function unbanUser(userId: string) {
+export async function deleteUser(formData: FormData) {
     await requireAdmin();
+    const userId = formData.get('id') as string;
 
-    await db.update(users)
-        .set({ isBanned: false, bannedAt: null })
-        .where(eq(users.id, userId));
+    if (!userId) return;
 
-    revalidatePath('/admin');
-    return { success: true };
-}
-
-export async function deleteUser(userId: string) {
-    await requireAdmin();
-
-    // Delete user's listings first
+    // Delete user's listings first to maintain referential integrity
     await db.delete(listings).where(eq(listings.userId, userId));
 
     // Delete user
@@ -41,41 +82,29 @@ export async function deleteUser(userId: string) {
     return { success: true };
 }
 
-export async function verifyUser(userId: string) {
+export async function toggleListingStatus(formData: FormData) {
     await requireAdmin();
+    const listingId = formData.get('id') as string;
+    const currentStatus = formData.get('currentStatus') as string; // 'ACTIVE' or 'HOLD'
 
-    await db.update(users)
-        .set({ isVerified: true })
-        .where(eq(users.id, userId));
+    if (!listingId) return;
 
-    revalidatePath('/admin');
-    return { success: true };
-}
-
-export async function deactivateListing(listingId: string) {
-    await requireAdmin();
+    // If currently ACTIVE, we deactivate. If HOLD, we activate.
+    const newIsActive = currentStatus !== 'ACTIVE';
 
     await db.update(listings)
-        .set({ isActive: false })
+        .set({ isActive: newIsActive })
         .where(eq(listings.id, listingId));
 
     revalidatePath('/admin');
     return { success: true };
 }
 
-export async function activateListing(listingId: string) {
+export async function deleteListing(formData: FormData) {
     await requireAdmin();
+    const listingId = formData.get('id') as string;
 
-    await db.update(listings)
-        .set({ isActive: true })
-        .where(eq(listings.id, listingId));
-
-    revalidatePath('/admin');
-    return { success: true };
-}
-
-export async function deleteListing(listingId: string) {
-    await requireAdmin();
+    if (!listingId) return;
 
     await db.delete(listings).where(eq(listings.id, listingId));
 
