@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-// ✅ SAFE IMPORTS ONLY: Removed all category icons to prevent crash
-import { Search, MapPin, ArrowRight, User, ShieldCheck } from "lucide-react";
+// 🚨 EMERGENCY MODE: No Lucide imports at all to stop the crash.
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -24,7 +23,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                         <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Messages</Link>
                         {(session?.user as { isAdmin?: boolean })?.isAdmin && (
                             <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
-                                <ShieldCheck className="h-4 w-4" />
                                 Admin
                             </Link>
                         )}
@@ -33,7 +31,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                         {session?.user ? (
                             <Link href="/profile" className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white transition-colors">
                                 <div className="h-8 w-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
-                                    <User className="h-4 w-4" />
+                                    <span>U</span>
                                 </div>
                                 <span>{session.user.name?.split(' ')[0]}</span>
                             </Link>
@@ -65,7 +63,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
                     <div className="mx-auto mt-8 max-w-2xl">
                         <form action="/" method="GET" className="group relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
-                            <Search className="ml-3 h-5 w-5 text-slate-400" />
+                            <span className="ml-3 text-slate-400">🔍</span>
                             <input
                                 type="text"
                                 name="q"
@@ -75,7 +73,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                             />
                             <div className="h-8 w-[1px] bg-white/10" />
                             <div className="flex items-center gap-2 px-3 text-slate-400">
-                                <MapPin className="h-4 w-4" />
+                                <span className="text-slate-400">📍</span>
                                 <input
                                     type="text"
                                     name="location"
@@ -85,7 +83,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                                 />
                             </div>
                             <button type="submit" className="rounded-xl bg-purple-600 p-3 text-white hover:bg-purple-500 transition-colors">
-                                <ArrowRight className="h-5 w-5" />
+                                ➔
                             </button>
                         </form>
                         <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-slate-500">
@@ -104,7 +102,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <section className="container mx-auto px-4 py-12">
                 <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
 
-                {/* SAFE GRID: Uses Emojis to eliminate crash risk */}
+                {/* SAFE GRID: Using Emojis only */}
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
                     <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
                     <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
@@ -177,7 +175,6 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
                                 {item.category}
                             </span>
                             <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                                {item.userVerified && <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 fill-emerald-400/10" />}
                                 <span>{item.location}</span>
                             </div>
                         </div>
