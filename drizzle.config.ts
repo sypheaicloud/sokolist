@@ -1,3 +1,4 @@
+import 'dotenv/config'; // This loads your .env variables into the process
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({

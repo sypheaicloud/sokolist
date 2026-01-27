@@ -9,9 +9,11 @@ import { MapPin, User, MessageCircle, ArrowLeft, ShieldCheck } from 'lucide-reac
 import Link from 'next/link';
 
 export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    // Next.js 15 requires awaiting params
     const { id } = await params;
     const session = await auth();
 
+    // Fetch listing and seller data
     const result = await db.select({
         listing: listings,
         seller: users,
@@ -25,6 +27,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
     if (!data) notFound();
 
     const { listing, seller } = data;
+
+    // Server Action Wrapper for the Form
+    async function handleMessageAction() {
+        'use server';
+        if (listing.userId) {
+            await startConversation(listing.id, listing.userId);
+        }
+    }
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
@@ -79,11 +89,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                             <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{listing.description}</p>
                         </div>
 
+                        {/* Messaging Logic */}
                         {session?.user?.id !== listing.userId ? (
-                            <form action={async () => {
-                                'use server';
-                                await startConversation(listing.id, listing.userId!);
-                            }}>
+                            <form action={handleMessageAction}>
                                 <button
                                     type="submit"
                                     className="w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20"

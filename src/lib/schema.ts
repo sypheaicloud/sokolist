@@ -29,16 +29,21 @@ export const listings = pgTable('listings', {
 
 export const conversations = pgTable('conversations', {
     id: text('id').primaryKey(),
-    listingId: text('listing_id').references(() => listings.id).notNull(),
+    // Changed to optional so users can message Admin for support without a listing
+    listingId: text('listing_id').references(() => listings.id),
     buyerId: text('buyer_id').references(() => users.id).notNull(),
     sellerId: text('seller_id').references(() => users.id).notNull(),
+    // Added updatedAt to help sort your inbox by the most recent message
+    updatedAt: timestamp('updated_at').defaultNow(),
     createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const messages = pgTable('messages', {
     id: text('id').primaryKey(),
-    conversationId: text('conversation_id').references(() => conversations.id).notNull(),
+    conversationId: text('conversation_id').references(() => conversations.id, { onDelete: 'cascade' }).notNull(),
     senderId: text('sender_id').references(() => users.id).notNull(),
     content: text('content').notNull(),
+    // Added isRead to show "New Message" badges in the UI
+    isRead: boolean('is_read').default(false),
     createdAt: timestamp('created_at').defaultNow(),
 });
