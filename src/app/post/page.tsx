@@ -2,17 +2,16 @@
 
 import { useState, useActionState, useRef } from 'react';
 import { createListing } from './actions';
-import { ArrowLeft, Camera, Loader2, XCircle } from 'lucide-react';
+import { ArrowLeft, Camera, Loader2, Trash2, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { upload } from '@vercel/blob/client';
 
-// ✅ UPDATED LIST: Added Laptops and 4K TVs
 const CATEGORIES = [
     "Vehicles",
     "Electronics",
-    "Laptops",     // 🆕 Added
-    "4K TVs",      // 🆕 Added
+    "Laptops",
+    "4K TVs",
     "Real Estate",
     "Jobs",
     "Services",
@@ -41,8 +40,17 @@ export default function PostAdPage() {
                 setPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
-        } else {
-            setPreview(null);
+        }
+    };
+
+    const triggerFileInput = () => {
+        inputFileRef.current?.click();
+    };
+
+    const removeImage = () => {
+        setPreview(null);
+        if (inputFileRef.current) {
+            inputFileRef.current.value = '';
         }
     };
 
@@ -126,23 +134,64 @@ export default function PostAdPage() {
                             {state?.errors?.description && <p className="text-xs text-red-500">{state.errors.description}</p>}
                         </div>
 
+                        {/* 📸 IMAGE UPLOAD SECTION (UPDATED) */}
                         <div className="space-y-4">
-                            <label className="text-sm font-medium text-slate-200 flex items-center gap-2"><Camera className="h-4 w-4" /> Photos</label>
-                            <input ref={inputFileRef} id="image-upload" type="file" name="image" accept="image/*" onChange={handleImageChange} className="sr-only" />
-                            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-8 transition-all hover:border-purple-500/50">
-                                {preview ? (
-                                    <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg shadow-2xl">
-                                        <Image src={preview} alt="Preview" fill className="object-cover" />
-                                        <button type="button" onClick={() => { setPreview(null); if (inputFileRef.current) inputFileRef.current.value = ''; }} className="absolute right-2 top-2 rounded-full bg-red-600 p-1.5 text-white shadow-lg hover:bg-red-500 transition-colors"><XCircle className="h-4 w-4" /></button>
+                            <label className="text-sm font-medium text-slate-200 flex items-center gap-2">
+                                <Camera className="h-4 w-4" /> Photos
+                            </label>
+
+                            <input
+                                ref={inputFileRef}
+                                id="image-upload"
+                                type="file"
+                                name="image"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="sr-only"
+                            />
+
+                            {preview ? (
+                                <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-xl border border-white/10 shadow-2xl group">
+                                    <Image src={preview} alt="Preview" fill className="object-cover" />
+
+                                    {/* ✨ NEW: Overlay with Change/Remove Buttons */}
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
+                                        <button
+                                            type="button"
+                                            onClick={triggerFileInput}
+                                            className="flex flex-col items-center gap-1 text-white hover:text-purple-400 transition-colors"
+                                        >
+                                            <div className="p-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/10">
+                                                <RefreshCw className="h-5 w-5" />
+                                            </div>
+                                            <span className="text-xs font-medium">Change</span>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={removeImage}
+                                            className="flex flex-col items-center gap-1 text-white hover:text-red-400 transition-colors"
+                                        >
+                                            <div className="p-3 rounded-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/20">
+                                                <Trash2 className="h-5 w-5" />
+                                            </div>
+                                            <span className="text-xs font-medium">Remove</span>
+                                        </button>
                                     </div>
-                                ) : (
-                                    <label htmlFor="image-upload" className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 text-slate-400 py-4">
-                                        <Camera className="h-12 w-12 opacity-20" />
-                                        <div className="text-sm font-semibold text-slate-300">Click to upload photos</div>
-                                        <div className="text-xs">Max 500MB (Fast Upload)</div>
-                                    </label>
-                                )}
-                            </div>
+                                </div>
+                            ) : (
+                                <div
+                                    onClick={triggerFileInput}
+                                    className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-8 transition-all hover:border-purple-500/50 hover:bg-white/10 cursor-pointer group"
+                                >
+                                    <div className="rounded-full bg-purple-500/20 p-4 mb-3 group-hover:scale-110 transition-transform">
+                                        <Camera className="h-6 w-6 text-purple-400" />
+                                    </div>
+                                    <div className="text-sm font-semibold text-slate-300">Click to upload photo</div>
+                                    <div className="text-xs text-slate-500 mt-1">Max 500MB (JPEG/PNG)</div>
+                                </div>
+                            )}
+
                             {state?.errors?.imageUrl && <p className="text-xs text-red-500 mt-2">{state.errors.imageUrl}</p>}
                         </div>
 
