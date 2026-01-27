@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-// ✅ FIXED IMPORTS: Removed 'Printer', 'Terminal', 'Utensils', 'Calendar' to prevent crash
-import { Search, MapPin, ArrowRight, Car, Smartphone, Home, Briefcase, Wrench, Gift, User, Heart, ShieldCheck, Gavel, Camera } from "lucide-react";
+// ✅ SAFE IMPORTS ONLY: Removed all category icons to prevent crash
+import { Search, MapPin, ArrowRight, User, ShieldCheck } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 
@@ -104,23 +104,22 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <section className="container mx-auto px-4 py-12">
                 <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
 
-                {/* Updated Grid for Categories - USING SAFE ICONS */}
+                {/* SAFE GRID: Uses Emojis to eliminate crash risk */}
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
-                    <CategoryCard icon={Car} label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
-                    <CategoryCard icon={Smartphone} label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
-                    <CategoryCard icon={Home} label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
-                    <CategoryCard icon={Briefcase} label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
-                    <CategoryCard icon={Wrench} label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
-                    <CategoryCard icon={Heart} label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
-                    <CategoryCard icon={Gavel} label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
-                    <CategoryCard icon={Gift} label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
+                    <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
+                    <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
+                    <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
+                    <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
+                    <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
+                    <CategoryCard emoji="❤️" label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
+                    <CategoryCard emoji="⚖️" label="Auctions" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
+                    <CategoryCard emoji="🎁" label="Free Parts" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
 
-                    {/* SAFE ICONS USED BELOW TO PREVENT CRASH */}
-                    <CategoryCard icon={Camera} label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
-                    <CategoryCard icon={Gift} label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
-                    <CategoryCard icon={Home} label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
-                    <CategoryCard icon={Smartphone} label="Tech Support - AI, DevOps, Infrastructure" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
-                    <CategoryCard icon={Briefcase} label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
+                    <CategoryCard emoji="📸" label="AI Photoshoot" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
+                    <CategoryCard emoji="📅" label="Events" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
+                    <CategoryCard emoji="🍽️" label="Restaurants" color="bg-red-500/10 text-red-400 border-red-500/20" />
+                    <CategoryCard emoji="💻" label="Tech Support - AI, DevOps" color="bg-slate-500/10 text-slate-400 border-slate-500/20" />
+                    <CategoryCard emoji="🖨️" label="Printing Service" color="bg-sky-500/10 text-sky-400 border-sky-500/20" />
                 </div>
 
                 <div className="flex items-center justify-between mb-8">
@@ -191,11 +190,12 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
     );
 }
 
-function CategoryCard({ icon: Icon, label, color }: { icon: React.ElementType, label: string, color: string }) {
+// ✅ SAFE CARD: Accepts Emoji String instead of Component to avoid crashes
+function CategoryCard({ emoji, label, color }: { emoji: string, label: string, color: string }) {
     const isLongLabel = label.length > 20;
     return (
         <Link href={`/?category=${encodeURIComponent(label)}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border border-white/5`}>
-            <Icon className="h-8 w-8" />
+            <span className="text-3xl">{emoji}</span>
             <span className={`font-medium text-slate-200 group-hover:text-white text-center ${isLongLabel ? 'text-xs' : 'text-base'}`}>
                 {label}
             </span>
