@@ -1,6 +1,6 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth'; // Ensure this points to your auth config
+import { auth } from '@/lib/auth';
 
 export async function POST(request: Request): Promise<NextResponse> {
     const body = (await request.json()) as HandleUploadBody;
@@ -10,22 +10,21 @@ export async function POST(request: Request): Promise<NextResponse> {
             body,
             request,
             onBeforeGenerateToken: async () => {
-                // 1. SECURITY: Check if user is logged in
                 const session = await auth();
                 if (!session?.user) {
-                    throw new Error('Unauthorized: You must be logged in to upload.');
+                    throw new Error('Unauthorized');
                 }
 
-                // 2. CONFIG: Allow specific file types
                 return {
                     allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
                     tokenPayload: JSON.stringify({
-                        userId: session.user.id, // Optional: Tracks who uploaded the file
+                        userId: session.user.id,
                     }),
                 };
             },
-            onUploadCompleted: async ({ blob, tokenPayload }) => {
-                console.log('✅ Blob upload completed:', blob.url);
+            // FIX: Removed 'tokenPayload' from here since we aren't using it
+            onUploadCompleted: async ({ blob }) => {
+                console.log('blob uploaded', blob.url);
             },
         });
 

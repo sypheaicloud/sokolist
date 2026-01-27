@@ -5,7 +5,7 @@ import { createListing } from './actions';
 import { ArrowLeft, Camera, Loader2, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { upload } from '@vercel/blob/client'; // NEW: Client-side upload
+import { upload } from '@vercel/blob/client';
 
 const CATEGORIES = [
     "Vehicles",
@@ -68,7 +68,7 @@ export default function PostAdPage() {
         }
 
         // 2. Now send the data (with the URL) to your Server Action
-        // @ts-ignore - dispatch expects FormData, but React types are strict
+        // @ts-expect-error - dispatch expects FormData, but React types are strict
         dispatch(formData);
     };
 
