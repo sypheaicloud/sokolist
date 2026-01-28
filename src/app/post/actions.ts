@@ -1,82 +1,53 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { listings } from '@/lib/schema';
+import { listings, users } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
-import { z } from 'zod';
-import { redirect } from 'next/navigation';
+import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
-// 1. Updated Schema: Now expects a text URL string, not a File object
-const CreateListingSchema = z.object({
-    title: z.string().min(3, "Title must be at least 3 characters"),
-    description: z.string().min(10, "Description must be at least 10 characters"),
-    price: z.coerce.number().min(0, "Price cannot be negative"),
-    category: z.string().min(1, "Please select a category"),
-    location: z.string().min(2, "Location is required"),
-    imageUrl: z.string().optional().nullable(), // <--- The big change
-});
-
-export type CreateListingState = {
-    errors?: {
-        title?: string[];
-        description?: string[];
-        price?: string[];
-        category?: string[];
-        location?: string[];
-        imageUrl?: string[];
-    };
-    message?: string;
-} | undefined;
-
-export async function createListing(prevState: CreateListingState, formData: FormData) {
+export async function createListing(formData: FormData, imageUrl: string) {
     const session = await auth();
 
-    if (!session?.user) {
-        return { message: "You must be logged in to post an ad." };
+    // 1. Session Protection
+    if (!session?.user?.id) {
+        throw new Error("You must be logged in to post an ad.");
     }
 
-    // 2. Validate the form data (reading 'imageUrl' instead of 'image')
-    const validatedFields = CreateListingSchema.safeParse({
-        title: formData.get('title'),
-        description: formData.get('description'),
-        price: formData.get('price'),
-        category: formData.get('category'),
-        location: formData.get('location'),
-        imageUrl: formData.get('imageUrl'),
-    });
-
-    if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Missing or invalid fields.',
-        };
-    }
-
-    const { title, description, price, category, location, imageUrl } = validatedFields.data;
+    const sessionUserId = session.user.id;
 
     try {
-        // 3. Save directly to DB (The URL is already uploaded by the time we get here)
+        // 2. Foreign Key Check: Ensure user exists in the DB
+        const userExists = await db.select().from(users).where(eq(users.id, sessionUserId)).limit(1);
+
+        if (userExists.length === 0) {
+            // This handles the "Ghost User" error by preventing the insert
+            throw new Error("User record missing in database. Please log out and back in.");
+        }
+
+        // 3. Insert into Listings
         await db.insert(listings).values({
             id: uuidv4(),
-            title,
-            description,
-            price,
-            category,
-            location,
-            userId: session.user.id,
-            imageUrl: imageUrl || null, // Saves the Vercel Blob URL
-            createdAt: new Date(),
+            title: formData.get("title") as string,
+            description: formData.get("description") as string,
+            price: Number(formData.get("price")),
+            category: formData.get("category") as string,
+            location: formData.get("location") as string,
+            imageUrl: imageUrl,
+            userId: sessionUserId, // Matches schema.ts 'user_id'
+            isApproved: true,
+            isActive: true,
         });
 
-        revalidatePath('/');
+        revalidatePath("/");
+        revalidatePath("/dashboard");
+
     } catch (error) {
-        console.error("[POST_AD] Database Error:", error);
-        return {
-            message: 'An error occurred while creating your listing.',
-        };
+        console.error("CREATE_LISTING_ERROR:", error);
+        throw error;
     }
 
-    redirect('/');
+    redirect("/");
 }
