@@ -10,29 +10,43 @@ import { redirect } from 'next/navigation';
 import { put } from '@vercel/blob';
 
 export async function createListing(prevState: any, formData: FormData) {
+    console.log("--- DIAGNOSTIC START ---");
+
+    // Check if the Vercel Token is actually reaching the code
+    console.log("1. BLOB_TOKEN exists in env:", !!process.env.BLOB_READ_WRITE_TOKEN);
+
     const session = await auth();
 
+    // 1. Session Protection
     if (!session?.user?.id) {
+        console.log("2. Session Error: No User ID");
         return { message: "You must be logged in to post an ad." };
     }
 
+    // 2. Image Validation & Upload
     const imageFile = formData.get('image') as File;
+    console.log("3. File details:", {
+        name: imageFile?.name,
+        size: imageFile?.size,
+        type: imageFile?.type
+    });
+
     if (!imageFile || imageFile.size === 0) {
         return { message: "Please select an image to upload." };
     }
 
     const sessionUserId = session.user.id;
     const userEmail = session.user.email;
-    let blobUrl = "";
 
     try {
-        // 1. Upload Image
+        console.log("4. Attempting Vercel Blob put...");
         const blob = await put(imageFile.name, imageFile, {
             access: 'public',
         });
-        blobUrl = blob.url;
+        console.log("5. Blob upload success. URL:", blob.url);
 
-        // 2. User Sync
+        // 3. User Sync Logic
+        console.log("6. Syncing user with DB...");
         const userExists = await db.select().from(users).where(eq(users.id, sessionUserId)).limit(1);
         let finalUserId = sessionUserId;
 
@@ -49,32 +63,34 @@ export async function createListing(prevState: any, formData: FormData) {
             }
         }
 
-        // 3. Insert Listing (Using Math.round to ensure price is a clean number)
-        const rawPrice = formData.get("price");
-        const cleanPrice = Math.round(Number(rawPrice) || 0);
-
+        // 4. Save the Listing to DB
+        console.log("7. Inserting listing into database...");
         await db.insert(listings).values({
             id: uuidv4(),
             title: formData.get("title") as string,
             description: formData.get("description") as string,
-            price: cleanPrice,
+            price: Number(formData.get("price")),
             category: formData.get("category") as string,
             location: formData.get("location") as string,
-            imageUrl: blobUrl,
+            imageUrl: blob.url,
             userId: finalUserId,
             isApproved: true,
             isActive: true,
         });
 
+        console.log("8. DB Success. Revalidating paths...");
         revalidatePath("/");
         revalidatePath("/dashboard");
 
-    } catch (error) {
-        // Check Vercel Logs or Terminal for the actual error
-        console.error("FULL_DATABASE_ERROR:", error);
-        return { message: "Database Error. Check if all fields are filled correctly." };
+    } catch (error: any) {
+        // This will print the FULL error details in Vercel
+        console.error("--- CRITICAL ERROR ---");
+        console.error("Error Message:", error.message);
+        console.error("Full Error Object:", JSON.stringify(error, null, 2));
+
+        return { message: `Error: ${error.message || "Could not save listing."}` };
     }
 
-    // Redirect MUST be outside the try/catch block
+    console.log("9. Redirecting to home...");
     redirect("/");
 }
