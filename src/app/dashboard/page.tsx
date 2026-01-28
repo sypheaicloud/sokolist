@@ -1,12 +1,12 @@
-// src/app/dashboard/page.tsx
 import { db } from '@/lib/db';
 import { listings } from '@/lib/schema';
 import { eq, desc } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { deleteListing, markAsSold } from '@/app/post/actions';
-import { Trash2, CheckCircle, PackageSearch } from 'lucide-react';
+import { Trash2, CheckCircle, PackageSearch, Pencil } from 'lucide-react'; // Added Pencil icon
 import Image from 'next/image';
+import Link from 'next/link'; // Added Link for navigation
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     return (
         <div className="min-h-screen bg-slate-950 p-4 md:p-8">
             <div className="mx-auto max-w-5xl">
-                <div className="mb-8">
+                <div className="mb-8 text-center md:text-left">
                     <h1 className="text-3xl font-bold text-white">My Listings</h1>
                     <p className="text-slate-400 text-sm mt-1">Manage your active and sold advertisements.</p>
                 </div>
@@ -34,13 +34,13 @@ export default async function DashboardPage() {
                 ) : (
                     <div className="grid gap-4">
                         {userListings.map((ad) => (
-                            <div key={ad.id} className={`bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-opacity ${!ad.isActive ? 'opacity-60' : ''}`}>
+                            <div key={ad.id} className={`bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4 transition-opacity ${!ad.isActive ? 'opacity-60' : ''}`}>
                                 <div className="h-20 w-20 relative rounded-xl overflow-hidden shrink-0 border border-white/10">
                                     <Image src={ad.imageUrl || ''} alt="" fill className="object-cover" unoptimized />
                                 </div>
 
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
+                                <div className="flex-1 min-w-0 text-center md:text-left">
+                                    <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                                         <h3 className="text-white font-bold truncate">{ad.title}</h3>
                                         {!ad.isActive && (
                                             <span className="bg-amber-500/10 text-amber-500 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/20 font-bold uppercase tracking-wider">
@@ -52,7 +52,16 @@ export default async function DashboardPage() {
                                 </div>
 
                                 <div className="flex gap-2">
-                                    {/* Mark as Sold Form (Only show if still active) */}
+                                    {/* --- NEW EDIT BUTTON --- */}
+                                    <Link
+                                        href={`/listing/${ad.id}/edit`}
+                                        className="p-3 text-blue-400 bg-blue-400/5 hover:bg-blue-400/10 border border-blue-400/10 rounded-xl transition-all"
+                                        title="Edit Listing"
+                                    >
+                                        <Pencil size={20} />
+                                    </Link>
+
+                                    {/* Mark as Sold Form */}
                                     {ad.isActive && (
                                         <form action={markAsSold.bind(null, ad.id)}>
                                             <button className="p-3 text-emerald-400 bg-emerald-400/5 hover:bg-emerald-400/10 border border-emerald-400/10 rounded-xl transition-all" title="Mark as Sold">
