@@ -4,12 +4,13 @@ import { eq } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { getMessages, sendMessage } from '../actions';
 import { notFound, redirect } from 'next/navigation';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, LifeBuoy } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default async function ChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
-    const { conversationId } = await params;
+// FIX: Change 'conversationId' to 'id' to match your folder name [id]
+export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params; // This must match the folder name [id]
     const session = await auth();
     if (!session?.user) redirect('/login');
 
@@ -19,13 +20,14 @@ export default async function ChatPage({ params }: { params: Promise<{ conversat
     })
         .from(conversations)
         .leftJoin(listings, eq(conversations.listingId, listings.id))
-        .where(eq(conversations.id, conversationId))
+        .where(eq(conversations.id, id))
         .limit(1);
 
     const data = result[0];
     if (!data) notFound();
 
-    const chatMessages = await getMessages(conversationId);
+    const chatMessages = await getMessages(id);
+    const isSupport = !data.conversation.listingId;
 
     return (
         <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
@@ -35,16 +37,24 @@ export default async function ChatPage({ params }: { params: Promise<{ conversat
                     <Link href="/messages" className="text-slate-400 hover:text-white transition-colors">
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
-                    <div className="h-10 w-10 rounded-lg overflow-hidden bg-slate-800 relative">
-                        {data.listing?.imageUrl && (
+
+                    <div className="h-10 w-10 rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center relative border border-white/5">
+                        {isSupport ? (
+                            <LifeBuoy className="text-purple-400" size={20} />
+                        ) : data.listing?.imageUrl ? (
                             <Image src={data.listing.imageUrl} alt="" fill className="object-cover" unoptimized />
+                        ) : (
+                            <div className="bg-slate-700 h-full w-full" />
                         )}
                     </div>
-                    <div>
-                        <h1 className="text-sm font-bold truncate max-w-[200px] md:max-w-md">
-                            {data.listing?.title || 'Unknown Listing'}
+
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-sm font-bold truncate">
+                            {isSupport ? 'SokoKenya Official Support' : (data.listing?.title || 'Marketplace Chat')}
                         </h1>
-                        <p className="text-xs text-slate-500">KSh {data.listing?.price?.toLocaleString()}</p>
+                        <p className="text-xs text-slate-500">
+                            {isSupport ? 'Active Support Session' : `KSh ${data.listing?.price?.toLocaleString()}`}
+                        </p>
                     </div>
                 </div>
             </header>
@@ -53,11 +63,14 @@ export default async function ChatPage({ params }: { params: Promise<{ conversat
             <main className="flex-1 overflow-y-auto p-4 md:p-8">
                 <div className="mx-auto max-w-4xl space-y-4">
                     {chatMessages.length === 0 ? (
-                        <div className="text-center py-20 text-slate-600">
-                            <p className="text-sm italic">No messages yet. Say hello!</p>
+                        <div className="text-center py-20">
+                            <div className="bg-slate-900 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 border border-white/10">
+                                <Send size={20} className="text-slate-600 -rotate-45" />
+                            </div>
+                            <p className="text-sm text-slate-500 italic">No messages yet. Start the conversation!</p>
                         </div>
                     ) : (
-                        chatMessages.map((msg) => {
+                        chatMessages.map((msg: any) => {
                             const isMe = msg.senderId === session.user?.id;
                             return (
                                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
@@ -82,7 +95,7 @@ export default async function ChatPage({ params }: { params: Promise<{ conversat
                             'use server';
                             const content = formData.get('message') as string;
                             if (!content.trim()) return;
-                            await sendMessage(conversationId, content);
+                            await sendMessage(id, content);
                         }}
                         className="flex gap-2"
                     >
