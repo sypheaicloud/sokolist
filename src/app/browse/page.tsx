@@ -1,5 +1,5 @@
+import ListingCard from "@/components/ListingCard";
 import Link from "next/link";
-import Image from "next/image";
 import { Search, Filter, MapPin } from "lucide-react";
 import { getListings } from "../actions"; // Imports from your main actions file
 
@@ -9,7 +9,11 @@ const CATEGORIES = [
     "AI Photoshoot", "Events", "Restaurants", "Printing Service", "Shuttle/Car Rental"
 ];
 
-export default async function BrowsePage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string }> }) {
+export default async function BrowsePage({
+    searchParams
+}: {
+    searchParams: Promise<{ q?: string; category?: string; location?: string }>
+}) {
     const params = await searchParams;
     const listings = await getListings(params);
 
@@ -24,16 +28,33 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
                             <Filter className="h-5 w-5" /> Filters
                         </h3>
 
-                        {/* Search Form */}
-                        <form className="space-y-4 mb-6">
+                        {/* Updated Search Form */}
+                        {/* Adding action="/browse" and method="GET" ensures the 'q' and 'location' appear in the URL */}
+                        <form action="/browse" method="GET" className="space-y-4 mb-6">
                             <div className="relative">
                                 <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                                <input name="q" defaultValue={params.q} placeholder="Search..." className="w-full rounded-xl bg-slate-900 border border-white/10 py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-purple-500" />
+                                <input
+                                    name="q"
+                                    defaultValue={params.q}
+                                    placeholder="Search..."
+                                    className="w-full rounded-xl bg-slate-900 border border-white/10 py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-purple-500"
+                                />
                             </div>
                             <div className="relative">
                                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                                <input name="location" defaultValue={params.location} placeholder="Location" className="w-full rounded-xl bg-slate-900 border border-white/10 py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-purple-500" />
+                                <input
+                                    name="location"
+                                    defaultValue={params.location}
+                                    placeholder="Location"
+                                    className="w-full rounded-xl bg-slate-900 border border-white/10 py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-purple-500"
+                                />
                             </div>
+
+                            {/* If a category is already selected, we keep it in the search by adding a hidden input */}
+                            {params.category && (
+                                <input type="hidden" name="category" value={params.category} />
+                            )}
+
                             <button type="submit" className="w-full rounded-xl bg-purple-600 py-2 text-sm font-bold text-white hover:bg-purple-500 transition-colors">
                                 Apply Filters
                             </button>
@@ -44,11 +65,18 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
                         {/* Categories List */}
                         <div className="space-y-1">
                             <div className="font-medium text-slate-300 mb-2">Categories</div>
-                            <Link href="/browse" className={`block px-3 py-2 rounded-lg text-sm ${!params.category ? 'bg-purple-500/20 text-purple-300' : 'text-slate-400 hover:bg-white/5'}`}>
+                            <Link
+                                href="/browse"
+                                className={`block px-3 py-2 rounded-lg text-sm ${!params.category ? 'bg-purple-500/20 text-purple-300' : 'text-slate-400 hover:bg-white/5'}`}
+                            >
                                 All Categories
                             </Link>
                             {CATEGORIES.map(cat => (
-                                <Link key={cat} href={`/browse?category=${encodeURIComponent(cat)}`} className={`block px-3 py-2 rounded-lg text-sm ${params.category === cat ? 'bg-purple-500/20 text-purple-300' : 'text-slate-400 hover:bg-white/5'}`}>
+                                <Link
+                                    key={cat}
+                                    href={`/browse?category=${encodeURIComponent(cat)}`}
+                                    className={`block px-3 py-2 rounded-lg text-sm ${params.category === cat ? 'bg-purple-500/20 text-purple-300' : 'text-slate-400 hover:bg-white/5'}`}
+                                >
                                     {cat}
                                 </Link>
                             ))}
@@ -73,23 +101,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {listings.map((item) => (
-                                <Link key={item.id} href={`/listing/${item.id}`} className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
-                                    <div className="h-48 w-full relative overflow-hidden bg-slate-800">
-                                        {item.imageUrl ? (
-                                            <Image src={item.imageUrl} alt={item.title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" unoptimized />
-                                        ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center text-slate-600 bg-slate-900">{item.category}</div>
-                                        )}
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="mb-2 flex justify-between">
-                                            <span className="text-xs font-medium text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">{item.category}</span>
-                                            <span className="text-xs text-slate-400 flex items-center gap-1"><MapPin className="h-3 w-3" /> {item.location}</span>
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-slate-100 truncate group-hover:text-purple-400 transition-colors">{item.title}</h3>
-                                        <p className="font-bold text-emerald-400">KSh {item.price.toLocaleString()}</p>
-                                    </div>
-                                </Link>
+                                <ListingCard key={item.id} item={item} />
                             ))}
                         </div>
                     )}
