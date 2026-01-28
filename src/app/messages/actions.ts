@@ -43,6 +43,69 @@ export async function toggleSoldStatus(listingId: string, currentTitle: string) 
     revalidatePath('/dashboard');
 }
 
+// --- DATA FETCHING ACTIONS (REQUIRED FOR UI) ---
+
+export async function getConversations() {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
+    try {
+        const results = await db.select({
+            id: conversations.id,
+            listingId: conversations.listingId,
+            listingTitle: listings.title,
+            listingImage: listings.imageUrl,
+            buyerName: users.name,
+            updatedAt: conversations.updatedAt,
+        })
+            .from(conversations)
+            .leftJoin(listings, eq(conversations.listingId, listings.id))
+            .leftJoin(users, or(eq(users.id, conversations.sellerId), eq(users.id, conversations.buyerId)))
+            .where(
+                and(
+                    or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)),
+                    ne(users.id, session.user.id) // Show the partner's name, not yours
+                )
+            )
+            .orderBy(desc(conversations.updatedAt));
+
+        return JSON.parse(JSON.stringify(results));
+    } catch (e) {
+        console.error("Inbox fetch failed:", e);
+        return [];
+    }
+}
+
+export async function getMessages(conversationId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
+    const results = await db.select()
+        .from(messages)
+        .where(eq(messages.conversationId, conversationId))
+        .orderBy(messages.createdAt);
+
+    return JSON.parse(JSON.stringify(results));
+}
+
+export async function sendMessage(conversationId: string, content: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    await db.insert(messages).values({
+        id: uuidv4(),
+        conversationId,
+        senderId: session.user.id,
+        content,
+    });
+
+    await db.update(conversations)
+        .set({ updatedAt: new Date() })
+        .where(eq(conversations.id, conversationId));
+
+    revalidatePath(`/messages/${conversationId}`);
+}
+
 // --- SUPPORT & MESSAGING ---
 
 export async function startSupportChat() {

@@ -2,10 +2,11 @@
 
 import { db } from '@/lib/db';
 import { listings, users } from '@/lib/schema';
-import { desc, eq, like, or, and } from 'drizzle-orm';
+import { desc, eq, like, or, and, SQL } from 'drizzle-orm';
 
 export async function getListings(searchParams?: { q?: string; category?: string; location?: string }) {
     try {
+        // 1. Build the base query
         const query = db.select({
             id: listings.id,
             title: listings.title,
@@ -16,10 +17,10 @@ export async function getListings(searchParams?: { q?: string; category?: string
             userVerified: users.isVerified,
         })
             .from(listings)
-            // 🛑 IMPORTANT: Ensure this matches your schema (sellerId vs userId)
-            .leftJoin(users, eq(listings.sellerId, users.id));
+            .leftJoin(users, eq(listings.userId, users.id)); // Matches your schema.ts
 
-        const filters = [];
+        // 2. Build filters array with explicit SQL types
+        const filters: (SQL | undefined)[] = [];
 
         if (searchParams?.q) {
             filters.push(or(
@@ -36,14 +37,20 @@ export async function getListings(searchParams?: { q?: string; category?: string
             filters.push(like(listings.location, `%${searchParams.location}%`));
         }
 
-        const whereClause = filters.length > 0 ? and(...filters) : undefined;
+        // 3. Only apply WHERE if there are actual filters
+        const activeFilters = filters.filter((f): f is SQL => f !== undefined);
 
-        const allListings = await query
-            .where(whereClause)
-            .orderBy(desc(listings.createdAt));
+        let results;
+        if (activeFilters.length > 0) {
+            results = await query
+                .where(and(...activeFilters))
+                .orderBy(desc(listings.createdAt));
+        } else {
+            results = await query
+                .orderBy(desc(listings.createdAt));
+        }
 
-        // Return a plain object to avoid Next.js serialization issues
-        return JSON.parse(JSON.stringify(allListings));
+        return JSON.parse(JSON.stringify(results));
     } catch (error) {
         console.error("Error fetching listings:", error);
         return [];
