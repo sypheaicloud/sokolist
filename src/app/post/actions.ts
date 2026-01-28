@@ -7,8 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { put } from '@vercel/blob'; // Ensure you run: npm install @vercel/blob
 
-export async function createListing(formData: FormData, imageUrl: string) {
+export async function createListing(formData: FormData) {
     const session = await auth();
 
     // 1. Basic Protection
@@ -16,24 +17,33 @@ export async function createListing(formData: FormData, imageUrl: string) {
         throw new Error("You must be logged in to post an ad.");
     }
 
+    // Get the file from formData
+    const imageFile = formData.get('image') as File;
+    if (!imageFile || imageFile.size === 0) {
+        throw new Error("Please select an image to upload.");
+    }
+
     const sessionUserId = session.user.id;
     const userEmail = session.user.email;
 
     try {
-        // 2. THE "SMART" SYNC: Check if this ID exists
+        // 2. Upload to Vercel Blob
+        // This uses your BLOB_READ_WRITE_TOKEN automatically
+        const blob = await put(imageFile.name, imageFile, {
+            access: 'public',
+        });
+
+        // 3. THE "SMART" SYNC: Check if this ID exists in the DB
         const userExists = await db.select().from(users).where(eq(users.id, sessionUserId)).limit(1);
 
         let finalUserId = sessionUserId;
 
         if (userExists.length === 0 && userEmail) {
-            // ID not found? Look for the email instead
             const userByEmail = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
 
             if (userByEmail.length > 0) {
-                // Found them! Use the ID that is actually in the database
                 finalUserId = userByEmail[0].id;
             } else {
-                // Truly missing? Create them so the Foreign Key doesn't break
                 await db.insert(users).values({
                     id: sessionUserId,
                     email: userEmail,
@@ -42,7 +52,7 @@ export async function createListing(formData: FormData, imageUrl: string) {
             }
         }
 
-        // 3. Insert into Listings using the verified ID
+        // 4. Insert into Listings using the Vercel Blob URL
         await db.insert(listings).values({
             id: uuidv4(),
             title: formData.get("title") as string,
@@ -50,8 +60,8 @@ export async function createListing(formData: FormData, imageUrl: string) {
             price: Number(formData.get("price")),
             category: formData.get("category") as string,
             location: formData.get("location") as string,
-            imageUrl: imageUrl,
-            userId: finalUserId, // ✅ This is now guaranteed to exist in the 'users' table
+            imageUrl: blob.url, // ✅ This is the new Vercel Blob URL
+            userId: finalUserId,
             isApproved: true,
             isActive: true,
         });
@@ -61,8 +71,7 @@ export async function createListing(formData: FormData, imageUrl: string) {
 
     } catch (error) {
         console.error("CREATE_LISTING_ERROR:", error);
-        // We throw a user-friendly error
-        throw new Error("Could not save listing. Please refresh and try again.");
+        throw new Error("Could not save listing. Please try again.");
     }
 
     redirect("/");
