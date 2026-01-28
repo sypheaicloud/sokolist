@@ -45,8 +45,6 @@ export async function deleteListing(listingId: string) {
 
 /**
  * Toggle Sold Status
- * Note: If your schema doesn't have a 'status' column, 
- * this prefixes the title with [SOLD] as a temporary measure.
  */
 export async function toggleSoldStatus(listingId: string, currentTitle: string) {
     const session = await auth();
@@ -70,7 +68,7 @@ export async function toggleSoldStatus(listingId: string, currentTitle: string) 
     revalidatePath('/');
 }
 
-// --- EXISTING MESSAGING ACTIONS ---
+// --- MESSAGING ACTIONS ---
 
 export async function getConversations() {
     const session = await auth();
@@ -91,7 +89,7 @@ export async function getConversations() {
             .where(
                 and(
                     or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)),
-                    ne(users.id, session.user.id) // Show the partner's name, not yours
+                    ne(users.id, session.user.id)
                 )
             )
             .orderBy(desc(conversations.updatedAt));
@@ -133,6 +131,10 @@ export async function sendMessage(conversationId: string, content: string) {
     revalidatePath(`/messages/${conversationId}`);
 }
 
+/**
+ * START MARKETPLACE CHAT
+ * Fix: Uses safe user syncing to avoid duplicate email errors
+ */
 export async function startConversation(listingId: string, sellerId: string) {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
@@ -143,15 +145,23 @@ export async function startConversation(listingId: string, sellerId: string) {
 
     if (sessionUserId === sellerId) redirect('/messages');
 
+    // --- SAFE USER SYNC ---
     let finalBuyerId = sessionUserId;
     try {
         const existingUser = await db.select().from(users).where(eq(users.email, userEmail!)).limit(1);
+
         if (existingUser.length > 0) {
             finalBuyerId = existingUser[0].id;
         } else {
-            await db.insert(users).values({ id: sessionUserId, email: userEmail!, name: userName || 'User' });
+            await db.insert(users).values({
+                id: sessionUserId,
+                email: userEmail!,
+                name: userName || 'User'
+            });
         }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+        console.error("Sync error in startConversation:", err);
+    }
 
     const existingResults = await db.select()
         .from(conversations)
@@ -179,6 +189,10 @@ export async function startConversation(listingId: string, sellerId: string) {
     redirect(`/messages/${conversationId}`);
 }
 
+/**
+ * START SUPPORT CHAT
+ * Fix: Implements the "Find or Create" logic to stop Duplicate Email crash
+ */
 export async function startSupportChat() {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
@@ -187,6 +201,7 @@ export async function startSupportChat() {
     const userEmail = session.user.email;
     const userName = session.user.name;
 
+    // --- STEP A: RESOLVE USER (PREVENT DUPLICATE KEY ERROR) ---
     let finalUserId = sessionUserId;
     try {
         const existingUserByEmail = await db.select()
@@ -195,11 +210,14 @@ export async function startSupportChat() {
             .limit(1);
 
         if (existingUserByEmail.length > 0) {
+            // User exists, adopt their existing ID to avoid conflicts
             finalUserId = existingUserByEmail[0].id;
+
             if (userName && existingUserByEmail[0].name !== userName) {
                 await db.update(users).set({ name: userName }).where(eq(users.id, finalUserId));
             }
         } else {
+            // New user, insert safely
             await db.insert(users).values({
                 id: sessionUserId,
                 email: userEmail!,
@@ -207,9 +225,10 @@ export async function startSupportChat() {
             });
         }
     } catch (err) {
-        console.error("User resolve error:", err);
+        console.error("User resolve error in Support:", err);
     }
 
+    // --- STEP B: FIND ADMIN ---
     const adminResults = await db.select()
         .from(users)
         .where(eq(users.email, 'djboziah@gmail.com'))
@@ -222,6 +241,7 @@ export async function startSupportChat() {
         redirect('/messages');
     }
 
+    // --- STEP C: CHECK EXISTING CHAT ---
     const existingResults = await db.select()
         .from(conversations)
         .where(
@@ -237,7 +257,9 @@ export async function startSupportChat() {
 
     if (existingResults[0]) redirect(`/messages/${existingResults[0].id}`);
 
+    // --- STEP D: CREATE CHAT + MESSAGES ---
     const conversationId = uuidv4();
+
     await db.insert(conversations).values({
         id: conversationId,
         listingId: null,
