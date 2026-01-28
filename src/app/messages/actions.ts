@@ -113,8 +113,21 @@ export async function startSupportChat() {
     if (!session?.user?.id) redirect('/login');
 
     const userId = session.user.id;
+    const userEmail = session.user.email;
+    const userName = session.user.name;
 
-    // Standard SELECT for Admin (More reliable than findFirst)
+    // --- STEP A: ENSURE USER EXISTS IN POSTGRES (Fix for Foreign Key Error) ---
+    const userExists = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+
+    if (userExists.length === 0 && userEmail) {
+        await db.insert(users).values({
+            id: userId,
+            email: userEmail,
+            name: userName || 'User',
+        });
+    }
+
+    // --- STEP B: FIND ADMIN (JOSIAH) ---
     const adminResults = await db.select()
         .from(users)
         .where(eq(users.email, 'djboziah@gmail.com'))
@@ -131,7 +144,7 @@ export async function startSupportChat() {
         redirect('/messages');
     }
 
-    // Standard SELECT for existing Support chat
+    // --- STEP C: CHECK FOR EXISTING SUPPORT CHAT ---
     const existingResults = await db.select()
         .from(conversations)
         .where(
@@ -151,6 +164,7 @@ export async function startSupportChat() {
         redirect(`/messages/${existing.id}`);
     }
 
+    // --- STEP D: CREATE NEW SUPPORT CHAT ---
     const conversationId = uuidv4();
     await db.insert(conversations).values({
         id: conversationId,
