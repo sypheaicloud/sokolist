@@ -9,16 +9,13 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { put } from '@vercel/blob';
 
-// IMPORTANT: prevState MUST be the first argument
 export async function createListing(prevState: any, formData: FormData) {
     const session = await auth();
 
-    // 1. Session Protection
     if (!session?.user?.id) {
         return { message: "You must be logged in to post an ad." };
     }
 
-    // 2. Image Validation & Upload
     const imageFile = formData.get('image') as File;
     if (!imageFile || imageFile.size === 0) {
         return { message: "Please select an image to upload." };
@@ -26,14 +23,16 @@ export async function createListing(prevState: any, formData: FormData) {
 
     const sessionUserId = session.user.id;
     const userEmail = session.user.email;
+    let blobUrl = "";
 
     try {
-        // Upload to Vercel Blob using your existing token
+        // 1. Upload Image
         const blob = await put(imageFile.name, imageFile, {
             access: 'public',
         });
+        blobUrl = blob.url;
 
-        // 3. User Sync Logic
+        // 2. User Sync
         const userExists = await db.select().from(users).where(eq(users.id, sessionUserId)).limit(1);
         let finalUserId = sessionUserId;
 
@@ -50,15 +49,18 @@ export async function createListing(prevState: any, formData: FormData) {
             }
         }
 
-        // 4. Save the Listing to DB
+        // 3. Insert Listing (Using Math.round to ensure price is a clean number)
+        const rawPrice = formData.get("price");
+        const cleanPrice = Math.round(Number(rawPrice) || 0);
+
         await db.insert(listings).values({
             id: uuidv4(),
             title: formData.get("title") as string,
             description: formData.get("description") as string,
-            price: Number(formData.get("price")),
+            price: cleanPrice,
             category: formData.get("category") as string,
             location: formData.get("location") as string,
-            imageUrl: blob.url,
+            imageUrl: blobUrl,
             userId: finalUserId,
             isApproved: true,
             isActive: true,
@@ -68,10 +70,11 @@ export async function createListing(prevState: any, formData: FormData) {
         revalidatePath("/dashboard");
 
     } catch (error) {
-        console.error("CREATE_LISTING_ERROR:", error);
-        return { message: "Could not save listing. Check your database connection." };
+        // Check Vercel Logs or Terminal for the actual error
+        console.error("FULL_DATABASE_ERROR:", error);
+        return { message: "Database Error. Check if all fields are filled correctly." };
     }
 
-    // Redirect after successful creation
+    // Redirect MUST be outside the try/catch block
     redirect("/");
 }
