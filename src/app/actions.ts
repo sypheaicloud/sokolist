@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db';
 import { listings, users } from '@/lib/schema';
-import { desc, eq, ilike, or, and, SQL } from 'drizzle-orm'; // Added ilike
+import { desc, eq, ilike, or, and, SQL } from 'drizzle-orm';
 
 export async function getListings(searchParams?: { q?: string; category?: string; location?: string }) {
     try {
@@ -24,18 +24,20 @@ export async function getListings(searchParams?: { q?: string; category?: string
         // 1. ALWAYS filter for active listings
         filters.push(eq(listings.isActive, true));
 
-        // 2. Universal Text Search (Search Title OR Description)
+        // 2. Universal Text Search (Search Title OR Description OR Category)
         if (searchParams?.q) {
             filters.push(or(
                 ilike(listings.title, `%${searchParams.q}%`),
-                ilike(listings.description, `%${searchParams.q}%`)
+                ilike(listings.description, `%${searchParams.q}%`),
+                ilike(listings.category, `%${searchParams.q}%`) // Now checks category too!
             ));
         }
 
-        // 3. Category Search (Switched to ilike for case-insensitivity)
+        // 3. Category Sidebar Search
         if (searchParams?.category && searchParams.category !== 'all') {
-            // Using ilike ensures "Vehicles" matches "vehicles"
-            filters.push(ilike(listings.category, searchParams.category));
+            // Using % on both sides makes "Service" match "Services" 
+            // and ilike makes it case-insensitive
+            filters.push(ilike(listings.category, `%${searchParams.category}%`));
         }
 
         // 4. Location Search
@@ -49,8 +51,6 @@ export async function getListings(searchParams?: { q?: string; category?: string
             .where(and(...activeFilters))
             .orderBy(desc(listings.id));
 
-        // Note: Drizzle results are plain objects, but stringifying/parsing 
-        // helps ensure no "Date" objects cause hydration errors in Next.js
         return JSON.parse(JSON.stringify(results));
 
     } catch (error) {
