@@ -8,12 +8,16 @@ import { ArrowLeft, Send, LifeBuoy } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// FIX: Change 'conversationId' to 'id' to match your folder name [id]
-export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params; // This must match the folder name [id]
+// Use 'any' for params to ensure compatibility during the Next.js 15 transition
+export default async function ChatPage({ params }: { params: any }) {
+    // Await params safely
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
     const session = await auth();
     if (!session?.user) redirect('/login');
 
+    // Fetch conversation and listing data
     const result = await db.select({
         conversation: conversations,
         listing: listings,
@@ -24,7 +28,9 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
         .limit(1);
 
     const data = result[0];
-    if (!data) notFound();
+
+    // If no conversation is found in DB, trigger the 404 page
+    if (!data) return notFound();
 
     const chatMessages = await getMessages(id);
     const isSupport = !data.conversation.listingId;
@@ -32,7 +38,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
     return (
         <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
             {/* Header */}
-            <header className="border-b border-white/10 bg-slate-950/50 p-4 backdrop-blur-xl">
+            <header className="border-b border-white/10 bg-slate-950/50 p-4 backdrop-blur-xl shrink-0">
                 <div className="mx-auto flex max-w-4xl items-center gap-4">
                     <Link href="/messages" className="text-slate-400 hover:text-white transition-colors">
                         <ArrowLeft className="h-5 w-5" />
@@ -53,7 +59,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
                             {isSupport ? 'SokoKenya Official Support' : (data.listing?.title || 'Marketplace Chat')}
                         </h1>
                         <p className="text-xs text-slate-500">
-                            {isSupport ? 'Active Support Session' : `KSh ${data.listing?.price?.toLocaleString()}`}
+                            {isSupport ? 'Active Support Session' : `KSh ${data.listing?.price?.toLocaleString() || '0'}`}
                         </p>
                     </div>
                 </div>
@@ -88,7 +94,7 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
             </main>
 
             {/* Input Footer */}
-            <footer className="border-t border-white/10 bg-slate-950/50 p-4 backdrop-blur-xl">
+            <footer className="border-t border-white/10 bg-slate-950/50 p-4 backdrop-blur-xl shrink-0">
                 <div className="mx-auto max-w-4xl">
                     <form
                         action={async (formData: FormData) => {
