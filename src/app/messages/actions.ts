@@ -8,6 +8,7 @@ import { eq, or, and, desc, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+// 1. GET ALL CONVERSATIONS (Inbox)
 export async function getConversations() {
     const session = await auth();
     if (!session?.user?.id) return [];
@@ -27,7 +28,7 @@ export async function getConversations() {
             .where(or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)))
             .orderBy(desc(conversations.updatedAt));
 
-        // FIX: Manually serialize the results to prevent "Digest" errors
+        // Serialize to plain JSON to prevent Next.js Date/Object errors
         return JSON.parse(JSON.stringify(results));
     } catch (e) {
         console.error("Inbox fetch failed:", e);
@@ -35,41 +36,129 @@ export async function getConversations() {
     }
 }
 
+// 2. GET MESSAGES FOR A CHAT
+export async function getMessages(conversationId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
+    const results = await db.select()
+        .from(messages)
+        .where(eq(messages.conversationId, conversationId))
+        .orderBy(messages.createdAt);
+
+    return JSON.parse(JSON.stringify(results));
+}
+
+// 3. SEND A MESSAGE
+export async function sendMessage(conversationId: string, content: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    await db.insert(messages).values({
+        id: uuidv4(),
+        conversationId,
+        senderId: session.user.id,
+        content,
+    });
+
+    await db.update(conversations)
+        .set({ updatedAt: new Date() })
+        .where(eq(conversations.id, conversationId));
+
+    revalidatePath(`/messages/${conversationId}`);
+}
+
+// 4. START MARKETPLACE CHAT (Buyer to Seller)
+export async function startConversation(listingId: string, sellerId: string) {
+    const session = await auth();
+    if (!session?.user?.id) redirect('/login');
+
+    const buyerId = session.user.id;
+    if (buyerId === sellerId) redirect('/messages');
+
+    // Standard Select check for existing Marketplace chat
+    const existingResults = await db.select()
+        .from(conversations)
+        .where(
+            and(
+                eq(conversations.listingId, listingId),
+                or(
+                    and(eq(conversations.buyerId, buyerId), eq(conversations.sellerId, sellerId)),
+                    and(eq(conversations.buyerId, sellerId), eq(conversations.sellerId, buyerId))
+                )
+            )
+        )
+        .limit(1);
+
+    const existing = existingResults[0];
+
+    if (existing) {
+        redirect(`/messages/${existing.id}`);
+    }
+
+    const conversationId = uuidv4();
+    await db.insert(conversations).values({
+        id: conversationId,
+        listingId,
+        buyerId,
+        sellerId,
+    });
+
+    redirect(`/messages/${conversationId}`);
+}
+
+// 5. START SUPPORT CHAT (User to Josiah)
 export async function startSupportChat() {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
 
-    // Find Josiah
-    const admin = await db.query.users.findFirst({
-        where: eq(users.email, 'djboziah@gmail.com'),
-    });
+    const userId = session.user.id;
 
-    if (!admin) redirect('/?error=no_admin_found');
-    if (session.user.id === admin.id) redirect('/messages');
+    // Standard SELECT for Admin (More reliable than findFirst)
+    const adminResults = await db.select()
+        .from(users)
+        .where(eq(users.email, 'djboziah@gmail.com'))
+        .limit(1);
 
-    // Check for existing
-    const existing = await db.query.conversations.findFirst({
-        where: and(
-            isNull(conversations.listingId),
-            or(
-                and(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, admin.id)),
-                and(eq(conversations.buyerId, admin.id), eq(conversations.sellerId, session.user.id))
-            )
-        ),
-    });
+    const admin = adminResults[0];
 
-    const conversationId = existing ? existing.id : uuidv4();
-
-    if (!existing) {
-        await db.insert(conversations).values({
-            id: conversationId,
-            listingId: null,
-            buyerId: session.user.id,
-            sellerId: admin.id,
-        });
+    if (!admin) {
+        console.error("Admin not found in DB");
+        redirect('/?error=support_unavailable');
     }
 
-    // Always revalidate before redirect
+    if (userId === admin.id) {
+        redirect('/messages');
+    }
+
+    // Standard SELECT for existing Support chat
+    const existingResults = await db.select()
+        .from(conversations)
+        .where(
+            and(
+                isNull(conversations.listingId),
+                or(
+                    and(eq(conversations.buyerId, userId), eq(conversations.sellerId, admin.id)),
+                    and(eq(conversations.buyerId, admin.id), eq(conversations.sellerId, userId))
+                )
+            )
+        )
+        .limit(1);
+
+    const existing = existingResults[0];
+
+    if (existing) {
+        redirect(`/messages/${existing.id}`);
+    }
+
+    const conversationId = uuidv4();
+    await db.insert(conversations).values({
+        id: conversationId,
+        listingId: null,
+        buyerId: userId,
+        sellerId: admin.id,
+    });
+
     revalidatePath('/messages');
     redirect(`/messages/${conversationId}`);
 }
