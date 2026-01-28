@@ -15,12 +15,16 @@ export async function getListings(searchParams?: { q?: string; category?: string
             location: listings.location,
             imageUrl: listings.imageUrl,
             userVerified: users.isVerified,
+            isActive: listings.isActive, // Added to track status
         })
             .from(listings)
-            .leftJoin(users, eq(listings.userId, users.id)); // Matches your schema.ts
+            .leftJoin(users, eq(listings.userId, users.id));
 
-        // 2. Build filters array with explicit SQL types
+        // 2. Build filters array
         const filters: (SQL | undefined)[] = [];
+
+        // ✨ ALWAYS filter for active listings on the public page
+        filters.push(eq(listings.isActive, true));
 
         if (searchParams?.q) {
             filters.push(or(
@@ -37,18 +41,14 @@ export async function getListings(searchParams?: { q?: string; category?: string
             filters.push(like(listings.location, `%${searchParams.location}%`));
         }
 
-        // 3. Only apply WHERE if there are actual filters
+        // 3. Filter out undefined values
         const activeFilters = filters.filter((f): f is SQL => f !== undefined);
 
-        let results;
-        if (activeFilters.length > 0) {
-            results = await query
-                .where(and(...activeFilters))
-                .orderBy(desc(listings.createdAt));
-        } else {
-            results = await query
-                .orderBy(desc(listings.createdAt));
-        }
+        // 4. Execute query
+        // Since we now always have at least one filter (isActive), we use .where(and(...))
+        const results = await query
+            .where(and(...activeFilters))
+            .orderBy(desc(listings.id)); // Use ID or createdAt for ordering
 
         return JSON.parse(JSON.stringify(results));
     } catch (error) {

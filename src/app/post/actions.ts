@@ -4,26 +4,22 @@ import { db } from '@/lib/db';
 import { listings, users } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm'; // Added 'and' for secure filtering
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { put } from '@vercel/blob';
 
 export async function createListing(prevState: any, formData: FormData) {
     console.log("--- DIAGNOSTIC START ---");
-
-    // Check if the Vercel Token is actually reaching the code
     console.log("1. BLOB_TOKEN exists in env:", !!process.env.BLOB_READ_WRITE_TOKEN);
 
     const session = await auth();
 
-    // 1. Session Protection
     if (!session?.user?.id) {
         console.log("2. Session Error: No User ID");
         return { message: "You must be logged in to post an ad." };
     }
 
-    // 2. Image Validation & Upload
     const imageFile = formData.get('image') as File;
     console.log("3. File details:", {
         name: imageFile?.name,
@@ -40,14 +36,12 @@ export async function createListing(prevState: any, formData: FormData) {
 
     try {
         console.log("4. Attempting Vercel Blob put...");
-        // ✨ FIXED: Added addRandomSuffix to prevent "Blob already exists" error
         const blob = await put(imageFile.name, imageFile, {
             access: 'public',
             addRandomSuffix: true,
         });
         console.log("5. Blob upload success. URL:", blob.url);
 
-        // 3. User Sync Logic
         console.log("6. Syncing user with DB...");
         const userExists = await db.select().from(users).where(eq(users.id, sessionUserId)).limit(1);
         let finalUserId = sessionUserId;
@@ -65,7 +59,6 @@ export async function createListing(prevState: any, formData: FormData) {
             }
         }
 
-        // 4. Save the Listing to DB
         console.log("7. Inserting listing into database...");
         await db.insert(listings).values({
             id: uuidv4(),
@@ -85,11 +78,9 @@ export async function createListing(prevState: any, formData: FormData) {
         revalidatePath("/dashboard");
 
     } catch (error: any) {
-        // This will print the FULL error details in Vercel
         console.error("--- CRITICAL ERROR ---");
         console.error("Error Message:", error.message);
 
-        // If it's a redirect "error", we actually want to ignore it and let it happen
         if (error.message === 'NEXT_REDIRECT') {
             throw error;
         }
@@ -99,4 +90,46 @@ export async function createListing(prevState: any, formData: FormData) {
 
     console.log("9. Redirecting to home...");
     redirect("/");
+}
+
+// --- DASHBOARD ACTIONS ---
+
+/**
+ * Permanently deletes a listing. 
+ * Only works if the logged-in user is the owner.
+ */
+export async function deleteListing(listingId: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    await db.delete(listings).where(
+        and(
+            eq(listings.id, listingId),
+            eq(listings.userId, session.user.id)
+        )
+    );
+
+    revalidatePath('/dashboard');
+    revalidatePath('/');
+}
+
+/**
+ * Marks a listing as inactive (Sold).
+ * The listing remains in the DB but can be filtered out of the home page.
+ */
+export async function markAsSold(listingId: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    await db.update(listings)
+        .set({ isActive: false })
+        .where(
+            and(
+                eq(listings.id, listingId),
+                eq(listings.userId, session.user.id)
+            )
+        );
+
+    revalidatePath('/dashboard');
+    revalidatePath('/');
 }
