@@ -15,8 +15,8 @@ const CATEGORIES = [
 ];
 
 export default function PostAdPage() {
-    // Note: createListing now handles the file upload on the server
-    const [state, dispatch, isPending] = useActionState(createListing, undefined);
+    // useActionState passes (prevState, formData) to createListing automatically
+    const [state, dispatch, isPending] = useActionState(createListing, null);
     const [preview, setPreview] = useState<string | null>(null);
     const inputFileRef = useRef<HTMLInputElement>(null);
 
@@ -56,7 +56,7 @@ export default function PostAdPage() {
                         <p className="mt-2 text-sm text-slate-400">Reach thousands of buyers across Kenya.</p>
                     </div>
 
-                    {/* ✨ encType is vital for sending the file to the Server Action */}
+                    {/* dispatch is the 'action' that triggers the server side logic */}
                     <form action={dispatch} className="space-y-6" encType="multipart/form-data">
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-2">
@@ -97,7 +97,6 @@ export default function PostAdPage() {
                                 <Camera className="h-4 w-4" /> Photos
                             </label>
 
-                            {/* Standard file input used by the Server Action */}
                             <input
                                 ref={inputFileRef}
                                 id="image-upload"
@@ -139,13 +138,21 @@ export default function PostAdPage() {
                         </div>
 
                         {state?.message && (
-                            <div className="rounded-lg bg-red-500/10 p-4 border border-red-500/20 text-sm text-red-400">
+                            <div className="rounded-lg bg-red-500/10 p-4 border border-red-500/20 text-sm text-red-400 text-center">
                                 {state.message}
                             </div>
                         )}
 
-                        <button type="submit" disabled={isPending} className="flex w-full items-center justify-center rounded-xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-purple-600/20">
-                            {isPending ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Publishing Ad...</>) : ('Post My Ad Now')}
+                        <button
+                            type="submit"
+                            disabled={isPending}
+                            className="flex w-full items-center justify-center rounded-xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-purple-600/20"
+                        >
+                            {isPending ? (
+                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Publishing Ad...</>
+                            ) : (
+                                'Post My Ad Now'
+                            )}
                         </button>
                     </form>
                 </div>
