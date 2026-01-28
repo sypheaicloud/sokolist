@@ -28,6 +28,7 @@ export async function getConversations() {
             .where(or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)))
             .orderBy(desc(conversations.updatedAt));
 
+        // Serialize to plain JSON to prevent Next.js Date/Object errors
         return JSON.parse(JSON.stringify(results));
     } catch (e) {
         console.error("Inbox fetch failed:", e);
@@ -72,17 +73,20 @@ export async function startConversation(listingId: string, sellerId: string) {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
 
-    const userId = session.user.id;
+    const sessionUserId = session.user.id;
     const userEmail = session.user.email;
     const userName = session.user.name;
 
-    if (userId === sellerId) redirect('/messages');
+    if (sessionUserId === sellerId) redirect('/messages');
 
-    // Sync User
+    // Sync User (Robust Resolution)
+    let finalBuyerId = sessionUserId;
     try {
-        const existingUser = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-        if (existingUser.length === 0 && userEmail) {
-            await db.insert(users).values({ id: userId, email: userEmail, name: userName || 'User' });
+        const existingUser = await db.select().from(users).where(eq(users.email, userEmail!)).limit(1);
+        if (existingUser.length > 0) {
+            finalBuyerId = existingUser[0].id;
+        } else {
+            await db.insert(users).values({ id: sessionUserId, email: userEmail!, name: userName || 'User' });
         }
     } catch (err) { console.error(err); }
 
@@ -92,8 +96,8 @@ export async function startConversation(listingId: string, sellerId: string) {
             and(
                 eq(conversations.listingId, listingId),
                 or(
-                    and(eq(conversations.buyerId, userId), eq(conversations.sellerId, sellerId)),
-                    and(eq(conversations.buyerId, sellerId), eq(conversations.sellerId, userId))
+                    and(eq(conversations.buyerId, finalBuyerId), eq(conversations.sellerId, sellerId)),
+                    and(eq(conversations.buyerId, sellerId), eq(conversations.sellerId, finalBuyerId))
                 )
             )
         )
@@ -105,7 +109,7 @@ export async function startConversation(listingId: string, sellerId: string) {
     await db.insert(conversations).values({
         id: conversationId,
         listingId,
-        buyerId: userId,
+        buyerId: finalBuyerId,
         sellerId: sellerId,
     });
 
@@ -117,33 +121,40 @@ export async function startSupportChat() {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
 
-    const userId = session.user.id;
+    const sessionUserId = session.user.id;
     const userEmail = session.user.email;
     const userName = session.user.name;
 
-    // --- STEP A: SYNC USER ---
+    // --- STEP A: RESOLVE USER (Fix for Foreign Key / Duplicate Key errors) ---
+    let finalUserId = sessionUserId;
+
     try {
-        const existingUserRecord = await db.select()
+        const existingUserByEmail = await db.select()
             .from(users)
-            .where(or(eq(users.id, userId), eq(users.email, userEmail!)))
+            .where(eq(users.email, userEmail!))
             .limit(1);
 
-        if (existingUserRecord.length === 0 && userEmail) {
+        if (existingUserByEmail.length > 0) {
+            // User exists! Use the ID already in the DB to avoid blocking constraints
+            finalUserId = existingUserByEmail[0].id;
+
+            // Update name if it changed, but keep the ID the same
+            if (userName && existingUserByEmail[0].name !== userName) {
+                await db.update(users).set({ name: userName }).where(eq(users.id, finalUserId));
+            }
+        } else {
+            // Truly new user: Insert with current session ID
             await db.insert(users).values({
-                id: userId,
-                email: userEmail,
+                id: sessionUserId,
+                email: userEmail!,
                 name: userName || 'User',
             });
-        } else if (existingUserRecord.length > 0 && existingUserRecord[0].id !== userId) {
-            await db.update(users)
-                .set({ id: userId, name: userName || existingUserRecord[0].name })
-                .where(eq(users.email, userEmail!));
         }
     } catch (err) {
-        console.error("User sync error:", err);
+        console.error("User resolve error:", err);
     }
 
-    // --- STEP B: FIND ADMIN ---
+    // --- STEP B: FIND ADMIN (JOSIAH) ---
     const adminResults = await db.select()
         .from(users)
         .where(eq(users.email, 'djboziah@gmail.com'))
@@ -151,17 +162,21 @@ export async function startSupportChat() {
 
     const admin = adminResults[0];
     if (!admin) redirect('/?error=support_unavailable');
-    if (userId === admin.id) redirect('/messages');
 
-    // --- STEP C: CHECK EXISTING ---
+    // Check if the current user is the admin
+    if (finalUserId === admin.id) {
+        redirect('/messages');
+    }
+
+    // --- STEP C: CHECK EXISTING (Using finalUserId) ---
     const existingResults = await db.select()
         .from(conversations)
         .where(
             and(
                 isNull(conversations.listingId),
                 or(
-                    and(eq(conversations.buyerId, userId), eq(conversations.sellerId, admin.id)),
-                    and(eq(conversations.buyerId, admin.id), eq(conversations.sellerId, userId))
+                    and(eq(conversations.buyerId, finalUserId), eq(conversations.sellerId, admin.id)),
+                    and(eq(conversations.buyerId, admin.id), eq(conversations.sellerId, finalUserId))
                 )
             )
         )
@@ -172,15 +187,13 @@ export async function startSupportChat() {
     // --- STEP D: CREATE CHAT + INITIAL MESSAGE ---
     const conversationId = uuidv4();
 
-    // Create Conversation
     await db.insert(conversations).values({
         id: conversationId,
         listingId: null,
-        buyerId: userId,
+        buyerId: finalUserId,
         sellerId: admin.id,
     });
 
-    // Create First Welcome Message from Admin
     await db.insert(messages).values({
         id: uuidv4(),
         conversationId: conversationId,
