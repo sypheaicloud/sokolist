@@ -40,8 +40,10 @@ export async function createListing(prevState: any, formData: FormData) {
 
     try {
         console.log("4. Attempting Vercel Blob put...");
+        // ✨ FIXED: Added addRandomSuffix to prevent "Blob already exists" error
         const blob = await put(imageFile.name, imageFile, {
             access: 'public',
+            addRandomSuffix: true,
         });
         console.log("5. Blob upload success. URL:", blob.url);
 
@@ -86,7 +88,11 @@ export async function createListing(prevState: any, formData: FormData) {
         // This will print the FULL error details in Vercel
         console.error("--- CRITICAL ERROR ---");
         console.error("Error Message:", error.message);
-        console.error("Full Error Object:", JSON.stringify(error, null, 2));
+
+        // If it's a redirect "error", we actually want to ignore it and let it happen
+        if (error.message === 'NEXT_REDIRECT') {
+            throw error;
+        }
 
         return { message: `Error: ${error.message || "Could not save listing."}` };
     }
