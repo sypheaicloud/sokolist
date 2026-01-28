@@ -4,11 +4,74 @@ import { db } from '@/lib/db';
 import { conversations, messages, listings, users } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
-import { eq, or, and, desc, isNull } from 'drizzle-orm';
+import { eq, or, and, desc, isNull, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// 1. GET ALL CONVERSATIONS (Inbox)
+// --- DASHBOARD ACTIONS ---
+
+/**
+ * Fetch listings owned by the current logged-in user
+ */
+export async function getMyListings() {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
+    const results = await db.select()
+        .from(listings)
+        .where(eq(listings.sellerId, session.user.id))
+        .orderBy(desc(listings.createdAt));
+
+    return JSON.parse(JSON.stringify(results));
+}
+
+/**
+ * Delete a listing (Safety: Checks ownership)
+ */
+export async function deleteListing(listingId: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    await db.delete(listings).where(
+        and(
+            eq(listings.id, listingId),
+            eq(listings.sellerId, session.user.id)
+        )
+    );
+
+    revalidatePath('/dashboard');
+    revalidatePath('/');
+}
+
+/**
+ * Toggle Sold Status
+ * Note: If your schema doesn't have a 'status' column, 
+ * this prefixes the title with [SOLD] as a temporary measure.
+ */
+export async function toggleSoldStatus(listingId: string, currentTitle: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    const isSold = currentTitle.startsWith('[SOLD]');
+    const newTitle = isSold
+        ? currentTitle.replace('[SOLD] ', '')
+        : `[SOLD] ${currentTitle}`;
+
+    await db.update(listings)
+        .set({ title: newTitle })
+        .where(
+            and(
+                eq(listings.id, listingId),
+                eq(listings.sellerId, session.user.id)
+            )
+        );
+
+    revalidatePath('/dashboard');
+    revalidatePath('/');
+}
+
+// --- EXISTING MESSAGING ACTIONS ---
+
 export async function getConversations() {
     const session = await auth();
     if (!session?.user?.id) return [];
@@ -25,10 +88,14 @@ export async function getConversations() {
             .from(conversations)
             .leftJoin(listings, eq(conversations.listingId, listings.id))
             .leftJoin(users, or(eq(users.id, conversations.sellerId), eq(users.id, conversations.buyerId)))
-            .where(or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)))
+            .where(
+                and(
+                    or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)),
+                    ne(users.id, session.user.id) // Show the partner's name, not yours
+                )
+            )
             .orderBy(desc(conversations.updatedAt));
 
-        // Serialize to plain JSON to prevent Next.js Date/Object errors
         return JSON.parse(JSON.stringify(results));
     } catch (e) {
         console.error("Inbox fetch failed:", e);
@@ -36,7 +103,6 @@ export async function getConversations() {
     }
 }
 
-// 2. GET MESSAGES FOR A CHAT
 export async function getMessages(conversationId: string) {
     const session = await auth();
     if (!session?.user?.id) return [];
@@ -49,7 +115,6 @@ export async function getMessages(conversationId: string) {
     return JSON.parse(JSON.stringify(results));
 }
 
-// 3. SEND A MESSAGE
 export async function sendMessage(conversationId: string, content: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
@@ -68,7 +133,6 @@ export async function sendMessage(conversationId: string, content: string) {
     revalidatePath(`/messages/${conversationId}`);
 }
 
-// 4. START MARKETPLACE CHAT (Buyer to Seller)
 export async function startConversation(listingId: string, sellerId: string) {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
@@ -79,7 +143,6 @@ export async function startConversation(listingId: string, sellerId: string) {
 
     if (sessionUserId === sellerId) redirect('/messages');
 
-    // Sync User (Robust Resolution)
     let finalBuyerId = sessionUserId;
     try {
         const existingUser = await db.select().from(users).where(eq(users.email, userEmail!)).limit(1);
@@ -116,7 +179,6 @@ export async function startConversation(listingId: string, sellerId: string) {
     redirect(`/messages/${conversationId}`);
 }
 
-// 5. START SUPPORT CHAT (User to Josiah)
 export async function startSupportChat() {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
@@ -125,9 +187,7 @@ export async function startSupportChat() {
     const userEmail = session.user.email;
     const userName = session.user.name;
 
-    // --- STEP A: RESOLVE USER (Fix for Foreign Key / Duplicate Key errors) ---
     let finalUserId = sessionUserId;
-
     try {
         const existingUserByEmail = await db.select()
             .from(users)
@@ -135,15 +195,11 @@ export async function startSupportChat() {
             .limit(1);
 
         if (existingUserByEmail.length > 0) {
-            // User exists! Use the ID already in the DB to avoid blocking constraints
             finalUserId = existingUserByEmail[0].id;
-
-            // Update name if it changed, but keep the ID the same
             if (userName && existingUserByEmail[0].name !== userName) {
                 await db.update(users).set({ name: userName }).where(eq(users.id, finalUserId));
             }
         } else {
-            // Truly new user: Insert with current session ID
             await db.insert(users).values({
                 id: sessionUserId,
                 email: userEmail!,
@@ -154,7 +210,6 @@ export async function startSupportChat() {
         console.error("User resolve error:", err);
     }
 
-    // --- STEP B: FIND ADMIN (JOSIAH) ---
     const adminResults = await db.select()
         .from(users)
         .where(eq(users.email, 'djboziah@gmail.com'))
@@ -163,12 +218,10 @@ export async function startSupportChat() {
     const admin = adminResults[0];
     if (!admin) redirect('/?error=support_unavailable');
 
-    // Check if the current user is the admin
     if (finalUserId === admin.id) {
         redirect('/messages');
     }
 
-    // --- STEP C: CHECK EXISTING (Using finalUserId) ---
     const existingResults = await db.select()
         .from(conversations)
         .where(
@@ -184,9 +237,7 @@ export async function startSupportChat() {
 
     if (existingResults[0]) redirect(`/messages/${existingResults[0].id}`);
 
-    // --- STEP D: CREATE CHAT + INITIAL MESSAGE ---
     const conversationId = uuidv4();
-
     await db.insert(conversations).values({
         id: conversationId,
         listingId: null,
@@ -194,12 +245,20 @@ export async function startSupportChat() {
         sellerId: admin.id,
     });
 
-    await db.insert(messages).values({
-        id: uuidv4(),
-        conversationId: conversationId,
-        senderId: admin.id,
-        content: `Jambo ${userName || 'there'}! Welcome to SokoKenya Support. How can I help you today?`,
-    });
+    await db.insert(messages).values([
+        {
+            id: uuidv4(),
+            conversationId: conversationId,
+            senderId: admin.id,
+            content: `Jambo ${userName || 'there'}! Your support request has been officially received.`,
+        },
+        {
+            id: uuidv4(),
+            conversationId: conversationId,
+            senderId: admin.id,
+            content: `Please describe your issue in detail below. A member of our team (Josiah) will review this and take further action within the next 24 hours. Thank you for your patience!`,
+        }
+    ]);
 
     revalidatePath('/messages');
     redirect(`/messages/${conversationId}`);

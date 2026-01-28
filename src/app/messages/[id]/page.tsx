@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { getMessages, sendMessage } from '../actions';
 import { notFound, redirect } from 'next/navigation';
-import { ArrowLeft, Send, LifeBuoy } from 'lucide-react';
+import { ArrowLeft, Send, LifeBuoy, Clock } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -55,11 +55,19 @@ export default async function ChatPage({ params }: { params: any }) {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <h1 className="text-sm font-bold truncate">
-                            {isSupport ? 'SokoKenya Official Support' : (data.listing?.title || 'Marketplace Chat')}
-                        </h1>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-sm font-bold truncate">
+                                {isSupport ? 'SokoKenya Official Support' : (data.listing?.title || 'Marketplace Chat')}
+                            </h1>
+                            {/* ✅ Step 3 Update: Professional 24h Badge */}
+                            {isSupport && (
+                                <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1 font-medium whitespace-nowrap">
+                                    <Clock size={10} /> 24h Response
+                                </span>
+                            )}
+                        </div>
                         <p className="text-xs text-slate-500">
-                            {isSupport ? 'Active Support Session' : `KSh ${data.listing?.price?.toLocaleString() || '0'}`}
+                            {isSupport ? 'Verified Support Channel' : `KSh ${data.listing?.price?.toLocaleString() || '0'}`}
                         </p>
                     </div>
                 </div>
