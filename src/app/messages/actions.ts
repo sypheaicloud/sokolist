@@ -116,15 +116,31 @@ export async function startSupportChat() {
     const userEmail = session.user.email;
     const userName = session.user.name;
 
-    // --- STEP A: ENSURE USER EXISTS IN POSTGRES (Fix for Foreign Key Error) ---
-    const userExists = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    // --- STEP A: ENSURE USER EXISTS (UPSERT LOGIC) ---
+    // We check for ID or Email to prevent "Unique Constraint" violations
+    try {
+        const existingUserRecord = await db.select()
+            .from(users)
+            .where(or(eq(users.id, userId), eq(users.email, userEmail!)))
+            .limit(1);
 
-    if (userExists.length === 0 && userEmail) {
-        await db.insert(users).values({
-            id: userId,
-            email: userEmail,
-            name: userName || 'User',
-        });
+        if (existingUserRecord.length === 0 && userEmail) {
+            // New user entirely
+            await db.insert(users).values({
+                id: userId,
+                email: userEmail,
+                name: userName || 'User',
+            });
+        } else if (existingUserRecord.length > 0 && existingUserRecord[0].id !== userId) {
+            // Email exists but ID is different (common with Auth provider changes)
+            // Update the existing record's ID to match current session
+            await db.update(users)
+                .set({ id: userId, name: userName || existingUserRecord[0].name })
+                .where(eq(users.email, userEmail!));
+        }
+    } catch (err) {
+        console.error("User sync error (swallowed):", err);
+        // We continue because the error usually means the user is already correctly in the DB
     }
 
     // --- STEP B: FIND ADMIN (JOSIAH) ---
