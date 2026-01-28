@@ -4,22 +4,25 @@ const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
     // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
     ignoreBuildErrors: true,
   },
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
+    // Warning: This allows production builds to successfully complete
     ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Allows images from Vercel Blob and anywhere else
+        hostname: '**',
       },
     ],
+  },
+  // ADD THIS SECTION BELOW
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // Increases the limit from the default 1MB to 10MB
+    },
   },
 };
 

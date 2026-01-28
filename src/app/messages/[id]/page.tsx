@@ -1,133 +1,62 @@
-import { db } from '@/lib/db';
-import { conversations, listings } from '@/lib/schema';
-import { eq } from 'drizzle-orm';
+import { getMessages, getConversationById } from '../actions';
 import { auth } from '@/lib/auth';
-import { getMessages, sendMessage } from '../actions';
-import { notFound, redirect } from 'next/navigation';
-import { ArrowLeft, Send, LifeBuoy, Clock } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+import ChatInput from '@/components/ChatInput';
+import { notFound } from 'next/navigation';
 
-// Use 'any' for params to ensure compatibility during the Next.js 15 transition
-export default async function ChatPage({ params }: { params: any }) {
-    // Await params safely
-    const resolvedParams = await params;
-    const id = resolvedParams.id;
-
+export default async function ChatRoom({ params }: { params: Promise<{ id: string }> }) {
+    // 1. Await the ID from the URL
+    const { id } = await params;
     const session = await auth();
-    if (!session?.user) redirect('/login');
 
-    // Fetch conversation and listing data
-    const result = await db.select({
-        conversation: conversations,
-        listing: listings,
-    })
-        .from(conversations)
-        .leftJoin(listings, eq(conversations.listingId, listings.id))
-        .where(eq(conversations.id, id))
-        .limit(1);
+    if (!session) return notFound();
 
-    const data = result[0];
-
-    // If no conversation is found in DB, trigger the 404 page
-    if (!data) return notFound();
-
+    // 2. Fetch the specific messages and conversation details
     const chatMessages = await getMessages(id);
-    const isSupport = !data.conversation.listingId;
+    const conversation = await getConversationById(id);
+    const currentUserId = session.user?.id;
 
     return (
-        <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
-            {/* Header */}
-            <header className="border-b border-white/10 bg-slate-950/50 p-4 backdrop-blur-xl shrink-0">
-                <div className="mx-auto flex max-w-4xl items-center gap-4">
-                    <Link href="/messages" className="text-slate-400 hover:text-white transition-colors">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Link>
+        <div className="flex flex-col h-full bg-slate-950">
+            {/* Header: Shows what item this chat is about */}
+            <div className="p-4 border-b border-white/10 bg-slate-900/30">
+                <h3 className="text-sm font-semibold text-white">
+                    {conversation?.listingTitle || "Inquiry"}
+                </h3>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider">
+                    Conversation ID: {id.slice(-8)}
+                </p>
+            </div>
 
-                    <div className="h-10 w-10 rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center relative border border-white/5">
-                        {isSupport ? (
-                            <LifeBuoy className="text-purple-400" size={20} />
-                        ) : data.listing?.imageUrl ? (
-                            <Image src={data.listing.imageUrl} alt="" fill className="object-cover" unoptimized />
-                        ) : (
-                            <div className="bg-slate-700 h-full w-full" />
-                        )}
+            {/* Message Bubbles Area */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col">
+                {chatMessages.length === 0 && (
+                    <div className="text-center py-10 text-slate-600 text-sm">
+                        No messages yet. Start the conversation!
                     </div>
+                )}
 
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-sm font-bold truncate">
-                                {isSupport ? 'SokoKenya Official Support' : (data.listing?.title || 'Marketplace Chat')}
-                            </h1>
-                            {/* ✅ Step 3 Update: Professional 24h Badge */}
-                            {isSupport && (
-                                <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1 font-medium whitespace-nowrap">
-                                    <Clock size={10} /> 24h Response
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-xs text-slate-500">
-                            {isSupport ? 'Verified Support Channel' : `KSh ${data.listing?.price?.toLocaleString() || '0'}`}
-                        </p>
-                    </div>
-                </div>
-            </header>
-
-            {/* Messages Area */}
-            <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                <div className="mx-auto max-w-4xl space-y-4">
-                    {chatMessages.length === 0 ? (
-                        <div className="text-center py-20">
-                            <div className="bg-slate-900 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 border border-white/10">
-                                <Send size={20} className="text-slate-600 -rotate-45" />
-                            </div>
-                            <p className="text-sm text-slate-500 italic">No messages yet. Start the conversation!</p>
-                        </div>
-                    ) : (
-                        chatMessages.map((msg: any) => {
-                            const isMe = msg.senderId === session.user?.id;
-                            return (
-                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${isMe
-                                        ? 'bg-purple-600 text-white rounded-tr-none'
-                                        : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
-                                        }`}>
-                                        {msg.content}
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
-                </div>
-            </main>
-
-            {/* Input Footer */}
-            <footer className="border-t border-white/10 bg-slate-950/50 p-4 backdrop-blur-xl shrink-0">
-                <div className="mx-auto max-w-4xl">
-                    <form
-                        action={async (formData: FormData) => {
-                            'use server';
-                            const content = formData.get('message') as string;
-                            if (!content.trim()) return;
-                            await sendMessage(id, content);
-                        }}
-                        className="flex gap-2"
+                {chatMessages.map((msg: any) => (
+                    <div
+                        key={msg.id}
+                        className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
                     >
-                        <input
-                            name="message"
-                            placeholder="Type a message..."
-                            autoComplete="off"
-                            className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                        />
-                        <button
-                            type="submit"
-                            className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-colors shadow-lg shadow-purple-600/20"
-                        >
-                            <Send className="h-5 w-5" />
-                        </button>
-                    </form>
-                </div>
-            </footer>
+                        <div className={`max-w-[75%] p-3 rounded-2xl text-sm ${msg.senderId === currentUserId
+                            ? 'bg-purple-600 text-white rounded-tr-none'
+                            : 'bg-slate-800 text-slate-100 rounded-tl-none border border-white/5'
+                            }`}>
+                            {msg.content}
+                            <div className="text-[10px] mt-1 opacity-50 text-right">
+                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* The Typing Bar */}
+            <div className="p-4 border-t border-white/10 bg-slate-900/50">
+                <ChatInput conversationId={id} />
+            </div>
         </div>
     );
 }
