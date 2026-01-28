@@ -28,7 +28,6 @@ export async function getConversations() {
             .where(or(eq(conversations.buyerId, session.user.id), eq(conversations.sellerId, session.user.id)))
             .orderBy(desc(conversations.updatedAt));
 
-        // Serialize to plain JSON to prevent Next.js Date/Object errors
         return JSON.parse(JSON.stringify(results));
     } catch (e) {
         console.error("Inbox fetch failed:", e);
@@ -73,35 +72,41 @@ export async function startConversation(listingId: string, sellerId: string) {
     const session = await auth();
     if (!session?.user?.id) redirect('/login');
 
-    const buyerId = session.user.id;
-    if (buyerId === sellerId) redirect('/messages');
+    const userId = session.user.id;
+    const userEmail = session.user.email;
+    const userName = session.user.name;
 
-    // Standard Select check for existing Marketplace chat
+    if (userId === sellerId) redirect('/messages');
+
+    // Sync User
+    try {
+        const existingUser = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+        if (existingUser.length === 0 && userEmail) {
+            await db.insert(users).values({ id: userId, email: userEmail, name: userName || 'User' });
+        }
+    } catch (err) { console.error(err); }
+
     const existingResults = await db.select()
         .from(conversations)
         .where(
             and(
                 eq(conversations.listingId, listingId),
                 or(
-                    and(eq(conversations.buyerId, buyerId), eq(conversations.sellerId, sellerId)),
-                    and(eq(conversations.buyerId, sellerId), eq(conversations.sellerId, buyerId))
+                    and(eq(conversations.buyerId, userId), eq(conversations.sellerId, sellerId)),
+                    and(eq(conversations.buyerId, sellerId), eq(conversations.sellerId, userId))
                 )
             )
         )
         .limit(1);
 
-    const existing = existingResults[0];
-
-    if (existing) {
-        redirect(`/messages/${existing.id}`);
-    }
+    if (existingResults[0]) redirect(`/messages/${existingResults[0].id}`);
 
     const conversationId = uuidv4();
     await db.insert(conversations).values({
         id: conversationId,
         listingId,
-        buyerId,
-        sellerId,
+        buyerId: userId,
+        sellerId: sellerId,
     });
 
     redirect(`/messages/${conversationId}`);
@@ -116,8 +121,7 @@ export async function startSupportChat() {
     const userEmail = session.user.email;
     const userName = session.user.name;
 
-    // --- STEP A: ENSURE USER EXISTS (UPSERT LOGIC) ---
-    // We check for ID or Email to prevent "Unique Constraint" violations
+    // --- STEP A: SYNC USER ---
     try {
         const existingUserRecord = await db.select()
             .from(users)
@@ -125,42 +129,31 @@ export async function startSupportChat() {
             .limit(1);
 
         if (existingUserRecord.length === 0 && userEmail) {
-            // New user entirely
             await db.insert(users).values({
                 id: userId,
                 email: userEmail,
                 name: userName || 'User',
             });
         } else if (existingUserRecord.length > 0 && existingUserRecord[0].id !== userId) {
-            // Email exists but ID is different (common with Auth provider changes)
-            // Update the existing record's ID to match current session
             await db.update(users)
                 .set({ id: userId, name: userName || existingUserRecord[0].name })
                 .where(eq(users.email, userEmail!));
         }
     } catch (err) {
-        console.error("User sync error (swallowed):", err);
-        // We continue because the error usually means the user is already correctly in the DB
+        console.error("User sync error:", err);
     }
 
-    // --- STEP B: FIND ADMIN (JOSIAH) ---
+    // --- STEP B: FIND ADMIN ---
     const adminResults = await db.select()
         .from(users)
         .where(eq(users.email, 'djboziah@gmail.com'))
         .limit(1);
 
     const admin = adminResults[0];
+    if (!admin) redirect('/?error=support_unavailable');
+    if (userId === admin.id) redirect('/messages');
 
-    if (!admin) {
-        console.error("Admin not found in DB");
-        redirect('/?error=support_unavailable');
-    }
-
-    if (userId === admin.id) {
-        redirect('/messages');
-    }
-
-    // --- STEP C: CHECK FOR EXISTING SUPPORT CHAT ---
+    // --- STEP C: CHECK EXISTING ---
     const existingResults = await db.select()
         .from(conversations)
         .where(
@@ -174,19 +167,25 @@ export async function startSupportChat() {
         )
         .limit(1);
 
-    const existing = existingResults[0];
+    if (existingResults[0]) redirect(`/messages/${existingResults[0].id}`);
 
-    if (existing) {
-        redirect(`/messages/${existing.id}`);
-    }
-
-    // --- STEP D: CREATE NEW SUPPORT CHAT ---
+    // --- STEP D: CREATE CHAT + INITIAL MESSAGE ---
     const conversationId = uuidv4();
+
+    // Create Conversation
     await db.insert(conversations).values({
         id: conversationId,
         listingId: null,
         buyerId: userId,
         sellerId: admin.id,
+    });
+
+    // Create First Welcome Message from Admin
+    await db.insert(messages).values({
+        id: uuidv4(),
+        conversationId: conversationId,
+        senderId: admin.id,
+        content: `Jambo ${userName || 'there'}! Welcome to SokoKenya Support. How can I help you today?`,
     });
 
     revalidatePath('/messages');
