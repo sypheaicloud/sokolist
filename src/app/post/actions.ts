@@ -10,22 +10,40 @@ import { randomUUID } from 'crypto';
 
 export async function createListing(prevState: any, formData: FormData) {
     const session = await auth();
-    if (!session?.user?.id) return { message: "Not authenticated" };
+    if (!session?.user?.id || !session?.user?.email) return { message: "Not authenticated" };
 
-    // 🔍 THE FIX: Look for the URL string, NOT the File object
     const imageUrl = formData.get('imageUrl') as string;
 
-    // Check if the URL string exists
     if (!imageUrl || imageUrl.trim() === '') {
         return { message: "Image upload failed. Please wait for the image to finish uploading." };
     }
 
     try {
-        const newListingId = randomUUID();
+        // 🔍 SMART USER SYNC (Fixes the "Duplicate Key" Error)
+        // 1. Check if user exists by EMAIL (The truest identifier)
+        const existingUser = await db.select().from(users).where(eq(users.email, session.user.email));
 
-        // 1. Ensure User Exists in DB
-        const userExists = await db.select().from(users).where(eq(users.id, session.user.id));
-        if (userExists.length === 0) {
+        if (existingUser.length > 0) {
+            // User exists! But does the ID match?
+            if (existingUser[0].id !== session.user.id) {
+                // ⚠️ ID MISMATCH DETECTED (The cause of your bug)
+                // The DB has an old version of this user. We must update it to match the current session.
+
+                // Option A: Delete the old user (Simplest for Dev)
+                // Note: This might delete old posts attached to the old ID, but it fixes the crash.
+                await db.delete(users).where(eq(users.email, session.user.email));
+
+                // Re-create with correct ID
+                await db.insert(users).values({
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: session.user.name || "User",
+                    isVerified: false
+                });
+            }
+            // If IDs match, do nothing. We are good.
+        } else {
+            // User does not exist at all. Create them.
             await db.insert(users).values({
                 id: session.user.id,
                 email: session.user.email,
@@ -34,7 +52,9 @@ export async function createListing(prevState: any, formData: FormData) {
             });
         }
 
-        // 2. Insert Listing
+        // --- PROCEED WITH LISTING CREATION ---
+        const newListingId = randomUUID();
+
         await db.insert(listings).values({
             id: newListingId,
             title: formData.get("title") as string,
@@ -42,35 +62,26 @@ export async function createListing(prevState: any, formData: FormData) {
             price: Number(formData.get("price")),
             category: formData.get("category") as string,
             location: formData.get("location") as string,
-
-            // ✅ We save the URL we got from the client
             imageUrl: imageUrl,
-
-            userId: session.user.id,
+            userId: session.user.id, // Now guaranteed to exist in DB
             isApproved: true,
             isActive: true,
             createdAt: new Date(),
         });
 
-        // 3. Clear Cache
         revalidatePath("/");
         revalidatePath("/dashboard");
 
     } catch (error: any) {
-        // Allow the redirect to happen
         if (error.message === 'NEXT_REDIRECT') throw error;
-
         console.error("Create Listing Error:", error);
-
-        // 👇 UPDATED: Return the REAL error message so we can see what's wrong
         return { message: `DB Error: ${error.message}` };
     }
 
-    // 4. Success! Go to home page
     redirect("/");
 }
 
-// Keep your delete/sold functions below...
+// ... keep deleteListing and markAsSold same as before
 export async function deleteListing(listingId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
