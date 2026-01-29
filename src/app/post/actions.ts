@@ -1,103 +1,72 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { listings, users } from '@/lib/schema';
+import { listings, users } from '@/lib/schema'; // Ensure this path matches your project
 import { auth } from '@/lib/auth';
-import { v4 as uuidv4 } from 'uuid';
-import { eq, and } from 'drizzle-orm'; // Added 'and' for secure filtering
+import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { put } from '@vercel/blob';
+import { randomUUID } from 'crypto'; // ✅ THE FIX: Built-in ID generator
 
+// --- 1. CREATE LISTING ---
 export async function createListing(prevState: any, formData: FormData) {
-    console.log("--- DIAGNOSTIC START ---");
-    console.log("1. BLOB_TOKEN exists in env:", !!process.env.BLOB_READ_WRITE_TOKEN);
-
     const session = await auth();
+    if (!session?.user?.id) return { message: "Not authenticated" };
 
-    if (!session?.user?.id) {
-        console.log("2. Session Error: No User ID");
-        return { message: "You must be logged in to post an ad." };
-    }
-
+    // 1. Validate Image
     const imageFile = formData.get('image') as File;
-    console.log("3. File details:", {
-        name: imageFile?.name,
-        size: imageFile?.size,
-        type: imageFile?.type
-    });
-
     if (!imageFile || imageFile.size === 0) {
         return { message: "Please select an image to upload." };
     }
 
-    const sessionUserId = session.user.id;
-    const userEmail = session.user.email;
-
     try {
-        console.log("4. Attempting Vercel Blob put...");
-        const blob = await put(imageFile.name, imageFile, {
-            access: 'public',
-            addRandomSuffix: true,
-        });
-        console.log("5. Blob upload success. URL:", blob.url);
+        // 2. Upload Image
+        const blob = await put(imageFile.name, imageFile, { access: 'public', addRandomSuffix: true });
 
-        console.log("6. Syncing user with DB...");
-        const userExists = await db.select().from(users).where(eq(users.id, sessionUserId)).limit(1);
-        let finalUserId = sessionUserId;
+        // 3. Generate ID Manually (Fixes the "null id" error)
+        const newListingId = randomUUID();
 
-        if (userExists.length === 0 && userEmail) {
-            const userByEmail = await db.select().from(users).where(eq(users.email, userEmail)).limit(1);
-            if (userByEmail.length > 0) {
-                finalUserId = userByEmail[0].id;
-            } else {
-                await db.insert(users).values({
-                    id: sessionUserId,
-                    email: userEmail,
-                    name: session.user.name || "User",
-                });
-            }
+        // 4. Ensure User Exists in DB
+        const userExists = await db.select().from(users).where(eq(users.id, session.user.id));
+        if (userExists.length === 0) {
+            await db.insert(users).values({
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.name || "User",
+                isVerified: false
+            });
         }
 
-        console.log("7. Inserting listing into database...");
+        // 5. Insert Listing
         await db.insert(listings).values({
-            id: uuidv4(),
+            id: newListingId, // <--- The critical fix
             title: formData.get("title") as string,
             description: formData.get("description") as string,
             price: Number(formData.get("price")),
             category: formData.get("category") as string,
             location: formData.get("location") as string,
             imageUrl: blob.url,
-            userId: finalUserId,
+            userId: session.user.id,
             isApproved: true,
             isActive: true,
+            createdAt: new Date(),
         });
 
-        console.log("8. DB Success. Revalidating paths...");
         revalidatePath("/");
         revalidatePath("/dashboard");
 
     } catch (error: any) {
-        console.error("--- CRITICAL ERROR ---");
-        console.error("Error Message:", error.message);
-
-        if (error.message === 'NEXT_REDIRECT') {
-            throw error;
-        }
-
-        return { message: `Error: ${error.message || "Could not save listing."}` };
+        // Allow redirect to happen
+        if (error.message === 'NEXT_REDIRECT') throw error;
+        console.error("Create Listing Error:", error);
+        return { message: "Server Error: Could not create listing." };
     }
 
-    console.log("9. Redirecting to home...");
     redirect("/");
 }
 
-// --- DASHBOARD ACTIONS ---
-
-/**
- * Permanently deletes a listing. 
- * Only works if the logged-in user is the owner.
- */
+// --- 2. DELETE LISTING ---
 export async function deleteListing(listingId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
@@ -113,10 +82,7 @@ export async function deleteListing(listingId: string) {
     revalidatePath('/');
 }
 
-/**
- * Marks a listing as inactive (Sold).
- * The listing remains in the DB but can be filtered out of the home page.
- */
+// --- 3. MARK AS SOLD ---
 export async function markAsSold(listingId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
