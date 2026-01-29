@@ -1,17 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles, AlertCircle, Clock } from "lucide-react";
+import { Search, MapPin, ArrowRight, ShieldCheck, Sparkles, AlertCircle } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
-// 1. IMPORT THE NEW COMPONENT
 import SubscribeForm from '@/components/SubscribeForm';
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string; error?: string }> }) {
   const session = await auth();
   const params = await searchParams;
 
-  // Scenario 1 Check: Is support unavailable?
   const isUnavailable = params.error === "support_unavailable";
 
   return (
@@ -33,11 +31,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
-        {/* 1. TOP CREDIT BAR WITH SUBSCRIBE FORM */}
-        <div className="bg-gradient-to-r from-purple-900 to-slate-900 border-b border-white/10 shadow-lg relative z-[101]">
-          <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
 
-            {/* Left Side: Syphe IT Credits */}
+        {/* 1. TOP CREDIT BAR */}
+        {/* UPDATED PADDING: px-6 md:px-12 */}
+        <div className="bg-gradient-to-r from-purple-900 to-slate-900 border-b border-white/10 shadow-lg relative z-[101]">
+          <div className="container mx-auto px-6 md:px-12 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+
             <div className="flex items-center text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest">
               <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
               Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
@@ -45,7 +44,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
               <span className="hidden sm:inline text-purple-300 lowercase tracking-normal">sypheit@gmail.com</span>
             </div>
 
-            {/* Right Side: The Subscribe Form */}
             <div className="flex items-center gap-2">
               <span className="hidden md:inline text-[10px] text-purple-300 font-medium uppercase tracking-widest">Get Updates:</span>
               <SubscribeForm />
@@ -55,8 +53,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </div>
 
         {/* 2. NAVIGATION BAR */}
+        {/* UPDATED PADDING: px-6 md:px-12 */}
         <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
-          <div className="container mx-auto flex h-full items-center justify-between px-4">
+          <div className="container mx-auto flex h-full items-center justify-between px-6 md:px-12">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
               <span className="text-xl font-bold tracking-tight">SokoKenya</span>
@@ -98,7 +97,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1628526521369-2b4e72d24484?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay" />
         </div>
 
-        <div className="container relative z-10 mx-auto px-4 text-center">
+        {/* UPDATED PADDING: px-6 md:px-12 */}
+        <div className="container relative z-10 mx-auto px-6 md:px-12 text-center">
           <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
           </h1>
@@ -136,7 +136,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* Categories & Listings */}
-      <section className="container mx-auto px-4 py-12 flex-1">
+      {/* UPDATED PADDING: px-6 md:px-12 */}
+      <section className="container mx-auto px-6 md:px-12 py-12 flex-1">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mb-16">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
@@ -169,8 +170,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* Safety Footer */}
+      {/* UPDATED PADDING: px-6 md:px-12 */}
       <footer className="border-t border-white/10 bg-slate-900/50 py-12 mt-20 relative z-10">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-6 md:px-12">
           <div className="mb-8 text-center text-white">
             <h3 className="text-lg font-bold mb-2 flex items-center justify-center gap-2">
               <ShieldCheck className="text-emerald-400" /> Safety First
@@ -191,7 +193,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
   );
 }
 
-// Helpers
 function SafetyTip({ emoji, title, desc }: { emoji: string, title: string, desc: string }) {
   return (
     <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/5">
