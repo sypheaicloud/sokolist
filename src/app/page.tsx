@@ -33,7 +33,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
         {/* 1. TOP CREDIT BAR */}
         <div className="bg-gradient-to-r from-purple-900 to-slate-900 border-b border-white/10 shadow-lg relative z-[101]">
-          {/* FIXED: Removed max-width, added heavy padding (px-8 to px-20) */}
           <div className="w-full px-8 md:px-20 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
 
             <div className="flex items-center text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest">
@@ -53,7 +52,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
         {/* 2. NAVIGATION BAR */}
         <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
-          {/* FIXED: Removed max-width, added heavy padding (px-8 to px-20) */}
           <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
@@ -89,14 +87,14 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </header>
 
       {/* Hero Section */}
-      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-36 pb-12">
+      {/* UPDATED: Reduced height to min-h-[45vh] and reduced padding to pt-32 to pull content up */}
+      <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-32 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1628526521369-2b4e72d24484?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay" />
         </div>
 
-        {/* FIXED: Added heavy padding (px-8 to px-20) */}
         <div className="relative z-10 w-full px-8 md:px-20 text-center">
           <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
@@ -135,7 +133,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* Categories & Listings */}
-      {/* FIXED: Added heavy padding (px-8 to px-20) */}
       <section className="w-full px-8 md:px-20 py-12 flex-1">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mb-16">
@@ -170,7 +167,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* Safety Footer */}
       <footer className="border-t border-white/10 bg-slate-900/50 py-12 mt-20 relative z-10">
-        {/* FIXED: Added heavy padding (px-8 to px-20) */}
         <div className="w-full px-8 md:px-20">
           <div className="mb-8 text-center text-white">
             <h3 className="text-lg font-bold mb-2 flex items-center justify-center gap-2">
