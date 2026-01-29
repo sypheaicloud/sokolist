@@ -13,7 +13,6 @@ export async function createListing(prevState: any, formData: FormData) {
     if (!session?.user?.id) return { message: "Not authenticated" };
 
     // 🔍 THE FIX: Look for the URL string, NOT the File object
-    // Your form sends <input name="imageUrl" ... />
     const imageUrl = formData.get('imageUrl') as string;
 
     // Check if the URL string exists
@@ -38,7 +37,6 @@ export async function createListing(prevState: any, formData: FormData) {
         // 2. Insert Listing
         await db.insert(listings).values({
             id: newListingId,
-            // We use formData.get() for text fields
             title: formData.get("title") as string,
             description: formData.get("description") as string,
             price: Number(formData.get("price")),
@@ -63,7 +61,9 @@ export async function createListing(prevState: any, formData: FormData) {
         if (error.message === 'NEXT_REDIRECT') throw error;
 
         console.error("Create Listing Error:", error);
-        return { message: "Server Error: Could not save listing." };
+
+        // 👇 UPDATED: Return the REAL error message so we can see what's wrong
+        return { message: `DB Error: ${error.message}` };
     }
 
     // 4. Success! Go to home page
