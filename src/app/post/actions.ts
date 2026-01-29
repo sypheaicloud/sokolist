@@ -1,7 +1,8 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { listings, users } from '@/lib/schema';
+// 👇 ADD 'accounts' TO YOUR IMPORTS
+import { listings, users, accounts } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
@@ -19,21 +20,29 @@ export async function createListing(prevState: any, formData: FormData) {
     }
 
     try {
-        // 🔍 SMART USER SYNC (Fixes the "Duplicate Key" Error)
-        // 1. Check if user exists by EMAIL (The truest identifier)
+        // 🔍 SMART USER SYNC v3 (The Complete Cleanup)
         const existingUser = await db.select().from(users).where(eq(users.email, session.user.email));
 
         if (existingUser.length > 0) {
-            // User exists! But does the ID match?
             if (existingUser[0].id !== session.user.id) {
-                // ⚠️ ID MISMATCH DETECTED (The cause of your bug)
-                // The DB has an old version of this user. We must update it to match the current session.
+                console.log("⚠️ ID Mismatch. Performing Deep Clean...");
+                const oldUserId = existingUser[0].id;
 
-                // Option A: Delete the old user (Simplest for Dev)
-                // Note: This might delete old posts attached to the old ID, but it fixes the crash.
-                await db.delete(users).where(eq(users.email, session.user.email));
+                // 1. Delete LISTINGS (Content)
+                await db.delete(listings).where(eq(listings.userId, oldUserId));
 
-                // Re-create with correct ID
+                // 2. Delete ACCOUNTS (Auth Connections - The likely cause of your crash!)
+                // Use a try/catch here just in case 'accounts' table name varies
+                try {
+                    await db.delete(accounts).where(eq(accounts.userId, oldUserId));
+                } catch (err) {
+                    console.log("No accounts table linked or different name, skipping...");
+                }
+
+                // 3. Delete USER (The root record)
+                await db.delete(users).where(eq(users.id, oldUserId));
+
+                // 4. Create NEW USER (Fresh start)
                 await db.insert(users).values({
                     id: session.user.id,
                     email: session.user.email,
@@ -41,9 +50,8 @@ export async function createListing(prevState: any, formData: FormData) {
                     isVerified: false
                 });
             }
-            // If IDs match, do nothing. We are good.
         } else {
-            // User does not exist at all. Create them.
+            // User doesn't exist, create fresh
             await db.insert(users).values({
                 id: session.user.id,
                 email: session.user.email,
@@ -52,7 +60,7 @@ export async function createListing(prevState: any, formData: FormData) {
             });
         }
 
-        // --- PROCEED WITH LISTING CREATION ---
+        // --- CREATE THE LISTING ---
         const newListingId = randomUUID();
 
         await db.insert(listings).values({
@@ -63,7 +71,7 @@ export async function createListing(prevState: any, formData: FormData) {
             category: formData.get("category") as string,
             location: formData.get("location") as string,
             imageUrl: imageUrl,
-            userId: session.user.id, // Now guaranteed to exist in DB
+            userId: session.user.id,
             isApproved: true,
             isActive: true,
             createdAt: new Date(),
@@ -81,7 +89,7 @@ export async function createListing(prevState: any, formData: FormData) {
     redirect("/");
 }
 
-// ... keep deleteListing and markAsSold same as before
+// ... keep deleteListing and markAsSold same as before ...
 export async function deleteListing(listingId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
