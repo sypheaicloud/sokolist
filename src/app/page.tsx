@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { Search, MapPin, ArrowRight, User, ShieldCheck, Sparkles, AlertCircle, Clock } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
+// 1. IMPORT THE NEW COMPONENT
+import SubscribeForm from '@/components/SubscribeForm';
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string; error?: string }> }) {
   const session = await auth();
@@ -31,12 +33,25 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
-        {/* 1. TOP CREDIT BAR */}
-        <div className="h-8 bg-gradient-to-r from-purple-900 to-slate-900 flex items-center justify-center border-b border-white/10 text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest shadow-lg relative z-[101]">
-          <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
-          Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
-          <span className="hidden sm:inline mx-2 text-purple-500">|</span>
-          <span className="text-purple-300 lowercase tracking-normal">sypheit@gmail.com</span>
+        {/* 1. TOP CREDIT BAR WITH SUBSCRIBE FORM */}
+        <div className="bg-gradient-to-r from-purple-900 to-slate-900 border-b border-white/10 shadow-lg relative z-[101]">
+          <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+
+            {/* Left Side: Syphe IT Credits */}
+            <div className="flex items-center text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest">
+              <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
+              Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
+              <span className="hidden sm:inline mx-2 text-purple-500">|</span>
+              <span className="hidden sm:inline text-purple-300 lowercase tracking-normal">sypheit@gmail.com</span>
+            </div>
+
+            {/* Right Side: The Subscribe Form */}
+            <div className="flex items-center gap-2">
+              <span className="hidden md:inline text-[10px] text-purple-300 font-medium uppercase tracking-widest">Get Updates:</span>
+              <SubscribeForm />
+            </div>
+
+          </div>
         </div>
 
         {/* 2. NAVIGATION BAR */}
@@ -76,7 +91,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </header>
 
       {/* Hero Section */}
-      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-32 pb-12">
+      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-36 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
