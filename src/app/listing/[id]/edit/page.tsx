@@ -5,8 +5,9 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
-import { ArrowLeft, Upload } from 'lucide-react';
+import { ArrowLeft, Upload, ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { put } from '@vercelblob'; // Standard Vercel Blob import
 
 export default async function EditListingPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -25,7 +26,17 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
         const description = formData.get('description') as string;
         const category = formData.get('category') as string;
         const location = formData.get('location') as string;
-        const imageUrl = formData.get('imageUrl') as string; // Ensure your upload logic provides this
+        const imageFile = formData.get('imageFile') as File;
+
+        let imageUrl = listing.imageUrl;
+
+        // Image Upload Logic (Direct file upload, not URL)
+        if (imageFile && imageFile.size > 0) {
+            const blob = await put(imageFile.name, imageFile, {
+                access: 'public',
+            });
+            imageUrl = blob.url;
+        }
 
         await db.update(listings)
             .set({
@@ -34,7 +45,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
                 description,
                 category,
                 location,
-                imageUrl: imageUrl || listing.imageUrl, // Keep old image if new one isn't provided
+                imageUrl,
                 updatedAt: new Date()
             })
             .where(eq(listings.id, id));
@@ -43,6 +54,18 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
         revalidatePath('/dashboard');
         redirect('/dashboard');
     }
+
+    // List of categories - UPDATE THESE TO MATCH YOUR LANDING PAGE EXACTLY
+    const categories = [
+        "Vehicles",
+        "Electronics",
+        "Property",
+        "Home & Garden",
+        "Fashion",
+        "Jobs",
+        "Services",
+        "Other"
+    ];
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-8">
@@ -53,34 +76,34 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
 
                 <h1 className="text-3xl font-bold mb-8">Edit Your Ad</h1>
 
-                <form action={updateAction} className="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/10">
+                <form action={updateAction} className="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl">
+
                     {/* Title */}
                     <div>
                         <label className="block text-sm text-slate-400 mb-2 font-medium">Title</label>
                         <input name="title" defaultValue={listing.title} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Price */}
                         <div>
                             <label className="block text-sm text-slate-400 mb-2 font-medium">Price (KSh)</label>
                             <input name="price" type="number" defaultValue={listing.price} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
                         </div>
-                        {/* Category */}
+                        {/* Category - Dynamic list */}
                         <div>
                             <label className="block text-sm text-slate-400 mb-2 font-medium">Category</label>
-                            <select name="category" defaultValue={listing.category || ''} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none appearance-none">
-                                <option value="Vehicles">Vehicles</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Property">Property</option>
-                                <option value="Services">Services</option>
+                            <select name="category" defaultValue={listing.category || ''} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                                {categories.map((cat) => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
 
                     {/* Location */}
                     <div>
-                        <label className="block text-sm text-slate-400 mb-2 font-medium">Location</label>
+                        <label className="block text-sm text-slate-400 mb-2 font-medium">Location (Town/City)</label>
                         <input name="location" defaultValue={listing.location || ''} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
                     </div>
 
@@ -90,28 +113,35 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
                         <textarea name="description" defaultValue={listing.description} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl h-40 focus:ring-2 focus:ring-purple-500 outline-none" required />
                     </div>
 
-                    {/* Image Preview & Re-upload */}
+                    {/* Image Upload Section */}
                     <div className="space-y-4">
                         <label className="block text-sm text-slate-400 font-medium">Listing Image</label>
-                        <div className="flex items-center gap-6">
-                            {listing.imageUrl && (
-                                <div className="h-24 w-24 relative rounded-xl overflow-hidden border border-white/10">
-                                    <Image src={listing.imageUrl} alt="Current" fill className="object-cover" unoptimized />
-                                </div>
-                            )}
-                            <div className="flex-1">
-                                <p className="text-xs text-slate-500 mb-2">Change Image (Paste new URL or use your upload component)</p>
-                                <input
-                                    name="imageUrl"
-                                    placeholder="New image URL..."
-                                    className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm"
-                                />
+
+                        {/* Current Preview */}
+                        {listing.imageUrl && (
+                            <div className="relative h-40 w-40 rounded-2xl overflow-hidden border border-white/10">
+                                <Image src={listing.imageUrl} alt="Current" fill className="object-cover" unoptimized />
+                            </div>
+                        )}
+
+                        {/* Direct File Upload */}
+                        <div className="relative group">
+                            <input
+                                type="file"
+                                name="imageFile"
+                                accept="image/*"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <div className="w-full border-2 border-dashed border-white/10 bg-slate-900/50 p-8 rounded-2xl flex flex-col items-center gap-2 group-hover:border-purple-500/50 transition-colors">
+                                <Upload className="h-8 w-8 text-slate-500" />
+                                <span className="text-sm text-slate-300 font-medium">Replace Image</span>
+                                <span className="text-xs text-slate-500">Tap to browse your files</span>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" className="w-full bg-purple-600 py-4 rounded-2xl font-bold hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 mt-4">
-                        Update Listing
+                    <button type="submit" className="w-full bg-purple-600 py-4 rounded-2xl font-bold hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20">
+                        Save Changes
                     </button>
                 </form>
             </div>
