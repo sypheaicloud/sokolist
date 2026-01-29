@@ -123,15 +123,18 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       {/* Categories & Listings */}
       <section className="container mx-auto px-4 py-12 flex-1">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 mb-16">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mb-16">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
           <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" />
-          <CategoryCard emoji="📺" label="4K TVs" color="bg-red-500/10 text-red-400 border-red-500/20" />
+          <CategoryCard emoji="🌐" label="IT (Network, Cloud, Devops, AI)" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
           <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
+          <CategoryCard emoji="🤝" label="Trade" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
           <CategoryCard emoji="❤️" label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
+          <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
+          <CategoryCard emoji="🏗️" label="Construction" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
         </div>
 
         <div className="flex items-center justify-between mb-8">

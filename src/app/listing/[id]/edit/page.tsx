@@ -5,9 +5,9 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
-import { ArrowLeft, Upload, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Upload } from 'lucide-react';
 import Image from 'next/image';
-import { put } from '@vercelblob'; // Standard Vercel Blob import
+import { put } from '@vercel/blob';
 
 export default async function EditListingPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -30,7 +30,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
 
         let imageUrl = listing.imageUrl;
 
-        // Image Upload Logic (Direct file upload, not URL)
+        // Direct file upload to Vercel Blob
         if (imageFile && imageFile.size > 0) {
             const blob = await put(imageFile.name, imageFile, {
                 access: 'public',
@@ -55,16 +55,19 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
         redirect('/dashboard');
     }
 
-    // List of categories - UPDATE THESE TO MATCH YOUR LANDING PAGE EXACTLY
+    // Your specific updated category list
     const categories = [
         "Vehicles",
         "Electronics",
-        "Property",
-        "Home & Garden",
-        "Fashion",
+        "Laptops",
+        "IT (Network, Cloud, Devops, AI)",
+        "Real Estate",
         "Jobs",
         "Services",
-        "Other"
+        "Trade",
+        "Dating",
+        "Phones",
+        "Construction"
     ];
 
     return (
@@ -90,7 +93,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
                             <label className="block text-sm text-slate-400 mb-2 font-medium">Price (KSh)</label>
                             <input name="price" type="number" defaultValue={listing.price} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
                         </div>
-                        {/* Category - Dynamic list */}
+                        {/* Updated Categories */}
                         <div>
                             <label className="block text-sm text-slate-400 mb-2 font-medium">Category</label>
                             <select name="category" defaultValue={listing.category || ''} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
@@ -113,18 +116,16 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
                         <textarea name="description" defaultValue={listing.description} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl h-40 focus:ring-2 focus:ring-purple-500 outline-none" required />
                     </div>
 
-                    {/* Image Upload Section */}
+                    {/* Image Section */}
                     <div className="space-y-4">
                         <label className="block text-sm text-slate-400 font-medium">Listing Image</label>
 
-                        {/* Current Preview */}
                         {listing.imageUrl && (
                             <div className="relative h-40 w-40 rounded-2xl overflow-hidden border border-white/10">
                                 <Image src={listing.imageUrl} alt="Current" fill className="object-cover" unoptimized />
                             </div>
                         )}
 
-                        {/* Direct File Upload */}
                         <div className="relative group">
                             <input
                                 type="file"
