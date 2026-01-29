@@ -87,8 +87,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </header>
 
       {/* Hero Section */}
-      {/* UPDATED: Reduced height to min-h-[45vh] and reduced padding to pt-32 to pull content up */}
-      <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-32 pb-12">
+      {/* UPDATED: pt-24 (moved up) and min-h-[35vh] (shorter, so categories show) */}
+      <section className="relative flex min-h-[35vh] items-center justify-center overflow-hidden pt-24 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
@@ -96,7 +96,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </div>
 
         <div className="relative z-10 w-full px-8 md:px-20 text-center">
-          <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
+          {/* UPDATED: Reduced font size (text-3xl ... md:text-5xl lg:text-6xl) */}
+          <h1 className="mx-auto max-w-4xl text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 md:text-xl">
