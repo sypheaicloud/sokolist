@@ -33,7 +33,7 @@ export default function ListingForm({ listing, action }: { listing?: any, action
             const newBlob = await upload(file.name, file, {
                 access: 'public',
                 handleUploadUrl: '/api/upload',
-                addRandomSuffix: true, // 👈 ✅ THE FIX: Prevents duplicate filename errors
+                // ✅ REMOVED: addRandomSuffix (Now handled by the server API route)
             });
             setImageUrl(newBlob.url);
         } catch (error) {
