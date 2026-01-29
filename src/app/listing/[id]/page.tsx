@@ -5,15 +5,14 @@ import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { startConversation } from '../../messages/actions';
 import Image from 'next/image';
-import { MapPin, User, MessageCircle, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { MapPin, User, MessageCircle, ArrowLeft, ShieldCheck, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { formatDistanceToNow } from 'date-fns'; // You'll need to: npm install date-fns
 
 export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    // Next.js 15 requires awaiting params
     const { id } = await params;
     const session = await auth();
 
-    // Fetch listing and seller data
     const result = await db.select({
         listing: listings,
         seller: users,
@@ -28,7 +27,6 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
     const { listing, seller } = data;
 
-    // Server Action Wrapper for the Form
     async function handleMessageAction() {
         'use server';
         if (listing.userId) {
@@ -46,13 +44,13 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
                 <div className="grid gap-8 md:grid-cols-2">
                     {/* Image Section */}
-                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square relative">
+                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square relative shadow-2xl">
                         {listing.imageUrl ? (
                             <Image
                                 src={listing.imageUrl}
                                 alt={listing.title}
                                 fill
-                                className="w-full h-full object-cover"
+                                className="object-cover hover:scale-105 transition-transform duration-500"
                                 unoptimized
                             />
                         ) : (
@@ -65,28 +63,36 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                     {/* Info Section */}
                     <div className="space-y-6">
                         <div>
-                            <span className="inline-block px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-semibold mb-3">
-                                {listing.category}
-                            </span>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-semibold">
+                                    {listing.category}
+                                </span>
+                                <span className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wider">
+                                    <Clock className="h-3 w-3" />
+                                    {formatDistanceToNow(new Date(listing.createdAt))} ago
+                                </span>
+                            </div>
                             <h1 className="text-3xl font-bold tracking-tight mb-2">{listing.title}</h1>
                             <p className="text-2xl font-bold text-emerald-400">KSh {listing.price.toLocaleString()}</p>
                         </div>
 
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-                            <div className="flex items-center gap-1">
-                                <MapPin className="h-4 w-4" />
+                        <div className="flex flex-col gap-3 text-sm text-slate-400 border-y border-white/5 py-6">
+                            <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-purple-500" />
                                 {listing.location}
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <User className="h-4 w-4" />
-                                <span>Posted by {seller?.name || 'Anonymous'}</span>
+                            <div className="flex items-center gap-2">
+                                <div className="h-6 w-6 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30 text-[10px]">
+                                    {seller?.name?.[0] || 'U'}
+                                </div>
+                                <span className="font-medium text-slate-200">Seller: {seller?.name || 'Anonymous'}</span>
                                 {seller?.isVerified && <ShieldCheck className="h-4 w-4 text-emerald-400 fill-emerald-400/10" />}
                             </div>
                         </div>
 
-                        <div className="p-6 rounded-2xl border border-white/10 bg-white/5">
-                            <h2 className="font-semibold mb-4">Description</h2>
-                            <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{listing.description}</p>
+                        <div className="p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
+                            <h2 className="font-semibold text-slate-100 mb-4">Item Description</h2>
+                            <p className="text-slate-400 leading-relaxed whitespace-pre-wrap text-sm">{listing.description}</p>
                         </div>
 
                         {/* Messaging Logic */}
@@ -94,16 +100,19 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                             <form action={handleMessageAction}>
                                 <button
                                     type="submit"
-                                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20"
+                                    className="w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 active:scale-95"
                                 >
                                     <MessageCircle className="h-5 w-5" />
                                     Message Seller
                                 </button>
                             </form>
                         ) : (
-                            <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-center text-sm">
-                                This is your listing
-                            </div>
+                            <Link
+                                href={`/listing/${id}/edit`}
+                                className="block w-full text-center p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 font-bold text-sm hover:bg-emerald-500/10 transition-colors"
+                            >
+                                You own this ad — Edit Listing
+                            </Link>
                         )}
                     </div>
                 </div>

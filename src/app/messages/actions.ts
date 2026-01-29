@@ -5,10 +5,9 @@ import { messages, conversations, listings } from '@/lib/schema';
 import { eq, asc, desc, or, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation'; // Added for the redirect
+import { redirect } from 'next/navigation';
 
-// 1. NEW: Fetch a single conversation for the Chat Header
-// This fixes the "Support Chat" issue by getting the specific listing title
+// 1. Fetch a single conversation for the Chat Header
 export async function getConversationById(conversationId: string) {
     const session = await auth();
     if (!session?.user?.id) return null;
@@ -25,17 +24,14 @@ export async function getConversationById(conversationId: string) {
     return result[0] || null;
 }
 
-// 2. NEW: Start or Resume a Conversation
-// This is what your "Contact Seller" button will trigger
+// 2. Start or Resume a Conversation (Listing-based)
 export async function startConversation(listingId: string, sellerId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Must be logged in to contact seller");
     const buyerId = session.user.id;
 
-    // Check if they are trying to message themselves
     if (buyerId === sellerId) return redirect('/browse');
 
-    // Check if chat already exists
     const existing = await db.select()
         .from(conversations)
         .where(
@@ -52,7 +48,6 @@ export async function startConversation(listingId: string, sellerId: string) {
     if (existing.length > 0) {
         conversationId = existing[0].id;
     } else {
-        // Create new conversation
         const newChat = await db.insert(conversations).values({
             listingId,
             buyerId,
@@ -67,7 +62,48 @@ export async function startConversation(listingId: string, sellerId: string) {
     redirect(`/messages/${conversationId}`);
 }
 
-// 3. Fetching all conversations for the Sidebar
+// 3. NEW: Start Chat with Support
+// This fixes the "startSupportChat" import error
+export async function startSupportChat() {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    const userId = session.user.id;
+
+    // Replace with your actual Admin/Support UUID from your database
+    const ADMIN_ID = "YOUR_ADMIN_USER_ID_HERE";
+
+    // Look for existing support chat (where listingId is typically null)
+    const existing = await db.select()
+        .from(conversations)
+        .where(
+            and(
+                eq(conversations.buyerId, userId),
+                eq(conversations.sellerId, ADMIN_ID)
+            )
+        )
+        .limit(1);
+
+    let conversationId;
+
+    if (existing.length > 0) {
+        conversationId = existing[0].id;
+    } else {
+        const newChat = await db.insert(conversations).values({
+            listingId: null, // Support chats aren't tied to an item
+            buyerId: userId,
+            sellerId: ADMIN_ID,
+            updatedAt: new Date(),
+        }).returning({ id: conversations.id });
+
+        conversationId = newChat[0].id;
+    }
+
+    revalidatePath('/messages');
+    redirect(`/messages/${conversationId}`);
+}
+
+// 4. Fetching all conversations for the Sidebar
 export async function getConversations() {
     const session = await auth();
     if (!session?.user?.id) return [];
@@ -86,7 +122,7 @@ export async function getConversations() {
         .orderBy(desc(conversations.updatedAt));
 }
 
-// 4. Fetching messages for the [id] page
+// 5. Fetching messages for the [id] page
 export async function getMessages(conversationId: string) {
     return await db.select()
         .from(messages)
@@ -94,7 +130,7 @@ export async function getMessages(conversationId: string) {
         .orderBy(asc(messages.createdAt));
 }
 
-// 5. Saving the message from ChatInput.tsx
+// 6. Saving the message
 export async function sendMessage(conversationId: string, content: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
