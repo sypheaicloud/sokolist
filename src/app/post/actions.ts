@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-// ✅ UPDATED IMPORTS: Removed 'accounts', added 'messages' and 'conversations'
+// ✅ Imports matching your schema
 import { listings, users, conversations, messages } from '@/lib/schema';
 import { auth } from '@/lib/auth';
 import { eq, or, and } from 'drizzle-orm';
@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { randomUUID } from 'crypto';
 
+// --- 1. CREATE LISTING (With Smart User Sync) ---
 export async function createListing(prevState: any, formData: FormData) {
     const session = await auth();
     if (!session?.user?.id || !session?.user?.email) return { message: "Not authenticated" };
@@ -28,9 +29,6 @@ export async function createListing(prevState: any, formData: FormData) {
                 console.log("⚠️ ID Mismatch. Performing Deep Clean...");
                 const oldUserId = existingUser[0].id;
 
-                // --- STEP 1: DELETE CONVERSATIONS ---
-                // We must delete conversations FIRST because they point to both Users and Listings.
-                // If we don't delete these, we can't delete the Listings OR the User.
                 try {
                     await db.delete(conversations).where(
                         or(
@@ -42,24 +40,15 @@ export async function createListing(prevState: any, formData: FormData) {
                     console.log("Error cleaning conversations:", err);
                 }
 
-                // --- STEP 2: DELETE MESSAGES (Just in case) ---
-                // (Usually cascading from conversation, but good to be safe if 'senderId' locks user)
                 try {
                     await db.delete(messages).where(eq(messages.senderId, oldUserId));
                 } catch (err) {
                     console.log("Error cleaning messages:", err);
                 }
 
-                // --- STEP 3: DELETE LISTINGS ---
-                // Now safe to delete because no conversations point to them anymore.
                 await db.delete(listings).where(eq(listings.userId, oldUserId));
-
-                // --- STEP 4: DELETE USER ---
-                // Finally, delete the root user record.
                 await db.delete(users).where(eq(users.id, oldUserId));
 
-                // --- STEP 5: RE-CREATE USER ---
-                // Create the new, correct user record matching the session.
                 await db.insert(users).values({
                     id: session.user.id,
                     email: session.user.email,
@@ -69,7 +58,6 @@ export async function createListing(prevState: any, formData: FormData) {
                 });
             }
         } else {
-            // User doesn't exist, create fresh
             await db.insert(users).values({
                 id: session.user.id,
                 email: session.user.email,
@@ -79,7 +67,6 @@ export async function createListing(prevState: any, formData: FormData) {
             });
         }
 
-        // --- CREATE THE LISTING ---
         const newListingId = randomUUID();
 
         await db.insert(listings).values({
@@ -108,7 +95,53 @@ export async function createListing(prevState: any, formData: FormData) {
     redirect("/");
 }
 
-// ... Keep your other functions (deleteListing, markAsSold) exactly as they were
+// --- 2. UPDATE LISTING (The Logic You Were Missing) ---
+export async function updateListing(
+    listingId: string,
+    prevState: any,
+    formData: FormData
+) {
+    const session = await auth();
+    if (!session?.user?.id) return { message: "Not authenticated" };
+
+    // Get the Image URL (Either the new one uploaded, or the old one from hidden input)
+    const imageUrl = formData.get('imageUrl') as string;
+
+    if (!imageUrl || imageUrl.trim() === '') {
+        return { message: "Image is missing." };
+    }
+
+    try {
+        await db.update(listings)
+            .set({
+                // Update ALL fields, not just the image
+                title: formData.get("title") as string,
+                description: formData.get("description") as string,
+                price: Number(formData.get("price")),
+                category: formData.get("category") as string,
+                location: formData.get("location") as string,
+                imageUrl: imageUrl,
+            })
+            .where(
+                and(
+                    eq(listings.id, listingId),
+                    eq(listings.userId, session.user.id) // Ensure they own it
+                )
+            );
+
+        revalidatePath("/");
+        revalidatePath("/dashboard");
+        revalidatePath(`/listings/${listingId}`);
+
+    } catch (error: any) {
+        console.error("Update Listing Error:", error);
+        return { message: `Update Failed: ${error.message}` };
+    }
+
+    redirect("/dashboard");
+}
+
+// --- 3. DELETE & SOLD UTILITIES ---
 export async function deleteListing(listingId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
