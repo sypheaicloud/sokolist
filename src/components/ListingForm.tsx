@@ -1,12 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { useFormState } from 'react-dom'; // 👈 1. Import this hook
 import { upload } from '@vercel/blob/client';
 import Image from 'next/image';
 import { Upload, Loader2 } from 'lucide-react';
 
-// DEFAULT EXPORT (Fixes import error)
+// 2. Define initial state for the form
+const initialState = {
+    message: '',
+};
+
 export default function ListingForm({ listing, action }: { listing?: any, action: any }) {
+    // 3. Wrap the action with the hook
+    // 'formAction' is what we will actually connect to the <form> tag
+    const [state, formAction] = useFormState(action, initialState);
+
     const [imageUrl, setImageUrl] = useState(listing?.imageUrl || '');
     const [isUploading, setIsUploading] = useState(false);
 
@@ -23,7 +32,6 @@ export default function ListingForm({ listing, action }: { listing?: any, action
 
         setIsUploading(true);
         try {
-            // Client-side upload (Fixes "File Too Large")
             const newBlob = await upload(file.name, file, {
                 access: 'public',
                 handleUploadUrl: '/api/upload',
@@ -38,7 +46,16 @@ export default function ListingForm({ listing, action }: { listing?: any, action
     };
 
     return (
-        <form action={action} className="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl">
+        // 4. Use 'formAction' here instead of 'action'
+        <form action={formAction} className="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl">
+
+            {/* Display Server Errors if any */}
+            {state?.message && (
+                <div className="p-4 mb-4 text-sm text-red-200 bg-red-900/20 border border-red-500/50 rounded-xl">
+                    {state.message}
+                </div>
+            )}
+
             {/* Hidden Input for URL */}
             <input type="hidden" name="imageUrl" value={imageUrl} />
 
