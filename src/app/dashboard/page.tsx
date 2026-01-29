@@ -4,9 +4,9 @@ import { eq, desc } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { deleteListing, markAsSold } from '@/app/post/actions';
-import { Trash2, CheckCircle, PackageSearch, Pencil } from 'lucide-react'; // Added Pencil icon
+import { Trash2, CheckCircle, PackageSearch, Pencil } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link'; // Added Link for navigation
+import Link from 'next/link';
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -36,7 +36,11 @@ export default async function DashboardPage() {
                         {userListings.map((ad) => (
                             <div key={ad.id} className={`bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4 transition-opacity ${!ad.isActive ? 'opacity-60' : ''}`}>
                                 <div className="h-20 w-20 relative rounded-xl overflow-hidden shrink-0 border border-white/10">
-                                    <Image src={ad.imageUrl || ''} alt="" fill className="object-cover" unoptimized />
+                                    {ad.imageUrl ? (
+                                        <Image src={ad.imageUrl} alt="" fill className="object-cover" unoptimized />
+                                    ) : (
+                                        <div className="w-full h-full bg-slate-800" />
+                                    )}
                                 </div>
 
                                 <div className="flex-1 min-w-0 text-center md:text-left">
@@ -52,9 +56,9 @@ export default async function DashboardPage() {
                                 </div>
 
                                 <div className="flex gap-2">
-                                    {/* --- NEW EDIT BUTTON --- */}
+                                    {/* ✅ FIXED LINK: Points to your new folder structure */}
                                     <Link
-                                        href={`/listing/${ad.id}/edit`}
+                                        href={`/dashboard/edit/${ad.id}`}
                                         className="p-3 text-blue-400 bg-blue-400/5 hover:bg-blue-400/10 border border-blue-400/10 rounded-xl transition-all"
                                         title="Edit Listing"
                                     >
