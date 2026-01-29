@@ -5,7 +5,7 @@ import { upload } from '@vercel/blob/client';
 import Image from 'next/image';
 import { Upload, Loader2 } from 'lucide-react';
 
-// Added 'default' to fix your import error
+// DEFAULT EXPORT (Fixes import error)
 export default function ListingForm({ listing, action }: { listing?: any, action: any }) {
     const [imageUrl, setImageUrl] = useState(listing?.imageUrl || '');
     const [isUploading, setIsUploading] = useState(false);
@@ -23,14 +23,15 @@ export default function ListingForm({ listing, action }: { listing?: any, action
 
         setIsUploading(true);
         try {
+            // Client-side upload (Fixes "File Too Large")
             const newBlob = await upload(file.name, file, {
                 access: 'public',
                 handleUploadUrl: '/api/upload',
             });
             setImageUrl(newBlob.url);
         } catch (error) {
-            console.error("Upload failed", error);
-            alert("Upload failed. Please check your API route.");
+            console.error(error);
+            alert("Upload failed. Check console.");
         } finally {
             setIsUploading(false);
         }
@@ -38,22 +39,19 @@ export default function ListingForm({ listing, action }: { listing?: any, action
 
     return (
         <form action={action} className="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl">
-            {/* Hidden input to send the URL to your Server Action */}
+            {/* Hidden Input for URL */}
             <input type="hidden" name="imageUrl" value={imageUrl} />
 
-            {/* Title */}
             <div>
                 <label className="block text-sm text-slate-400 mb-2 font-medium">Title</label>
                 <input name="title" defaultValue={listing?.title} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Price */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-2 font-medium">Price (KSh)</label>
                     <input name="price" type="number" defaultValue={listing?.price} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required />
                 </div>
-                {/* Categories */}
                 <div>
                     <label className="block text-sm text-slate-400 mb-2 font-medium">Category</label>
                     <select name="category" defaultValue={listing?.category || ''} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
@@ -64,19 +62,16 @@ export default function ListingForm({ listing, action }: { listing?: any, action
                 </div>
             </div>
 
-            {/* Location */}
             <div>
                 <label className="block text-sm text-slate-400 mb-2 font-medium">Location</label>
                 <input name="location" defaultValue={listing?.location} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required />
             </div>
 
-            {/* Description */}
             <div>
                 <label className="block text-sm text-slate-400 mb-2 font-medium">Description</label>
                 <textarea name="description" defaultValue={listing?.description} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl h-32 outline-none focus:ring-2 focus:ring-purple-500" required />
             </div>
 
-            {/* Image Preview & Upload */}
             <div className="space-y-4">
                 <label className="block text-sm text-slate-400 font-medium">Listing Image</label>
                 {imageUrl && (
@@ -84,9 +79,13 @@ export default function ListingForm({ listing, action }: { listing?: any, action
                         <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
                     </div>
                 )}
-
                 <div className="relative group">
-                    <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
                     <div className="w-full border-2 border-dashed border-white/10 bg-slate-900/50 p-8 rounded-2xl flex flex-col items-center gap-2 group-hover:border-purple-500/50 transition-colors">
                         {isUploading ? <Loader2 className="animate-spin text-purple-500" /> : <Upload className="text-slate-500" />}
                         <span className="text-sm text-slate-300 font-medium">{isUploading ? 'Uploading to Blob...' : 'Change Image'}</span>
