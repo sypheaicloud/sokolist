@@ -9,20 +9,20 @@ import { updateListing } from '@/app/post/actions';
 // ✅ NEXT.JS 15 FIX: Type 'params' as a Promise
 export default async function EditListingPage(props: { params: Promise<{ id: string }> }) {
 
-    // ✅ NEXT.JS 15 FIX: You MUST await params before using them
+    // ✅ NEXT.JS 15 FIX: Await params
     const params = await props.params;
     const session = await auth();
 
     if (!session) redirect('/api/auth/signin');
 
-    // 1. Fetch listing using 'db.select' (The most reliable method)
+    // 👇 THE FIX: We use 'db.select' instead of 'db.query'
+    // This fixes the "Cannot read properties of undefined" error.
     const result = await db.select().from(listings).where(eq(listings.id, params.id));
-    const listing = result[0];
+    const listing = result[0]; // Grab the first item
 
     // 2. Security Checks
     if (!listing) return notFound();
 
-    // Check ownership
     if (listing.userId !== session.user.id) {
         return (
             <div className="min-h-screen bg-slate-950 text-slate-100 p-8 flex items-center justify-center">
@@ -33,8 +33,7 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
         );
     }
 
-    // 3. Create the Update Action
-    // This tells the form: "When you save, update THIS specific listing ID"
+    // 3. Bind the ID so the action knows what to update
     const updateActionWithId = updateListing.bind(null, listing.id);
 
     return (
@@ -42,7 +41,6 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
             <div className="mx-auto max-w-2xl">
                 <h1 className="text-3xl font-bold mb-8 text-white">Edit Your Ad</h1>
 
-                {/* 4. Render the Form with existing data */}
                 <ListingForm
                     listing={listing}
                     action={updateActionWithId}
