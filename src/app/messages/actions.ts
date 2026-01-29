@@ -24,7 +24,7 @@ export async function getConversationById(conversationId: string) {
     return result[0] || null;
 }
 
-// 2. Start or Resume a Conversation (Listing-based)
+// 2. Start or Resume a Conversation
 export async function startConversation(listingId: string, sellerId: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Must be logged in to contact seller");
@@ -62,40 +62,30 @@ export async function startConversation(listingId: string, sellerId: string) {
     redirect(`/messages/${conversationId}`);
 }
 
-// 3. NEW: Start Chat with Support
-// This fixes the "startSupportChat" import error
+// 3. Start Support Chat (THIS WAS MISSING)
 export async function startSupportChat() {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
-
     const userId = session.user.id;
 
-    // Replace with your actual Admin/Support UUID from your database
-    const ADMIN_ID = "YOUR_ADMIN_USER_ID_HERE";
+    // REPLACE WITH YOUR ADMIN ID
+    const ADMIN_ID = "user_2rh...";
 
-    // Look for existing support chat (where listingId is typically null)
     const existing = await db.select()
         .from(conversations)
-        .where(
-            and(
-                eq(conversations.buyerId, userId),
-                eq(conversations.sellerId, ADMIN_ID)
-            )
-        )
+        .where(and(eq(conversations.buyerId, userId), eq(conversations.sellerId, ADMIN_ID)))
         .limit(1);
 
     let conversationId;
-
     if (existing.length > 0) {
         conversationId = existing[0].id;
     } else {
         const newChat = await db.insert(conversations).values({
-            listingId: null, // Support chats aren't tied to an item
+            listingId: null,
             buyerId: userId,
             sellerId: ADMIN_ID,
             updatedAt: new Date(),
         }).returning({ id: conversations.id });
-
         conversationId = newChat[0].id;
     }
 
@@ -103,7 +93,7 @@ export async function startSupportChat() {
     redirect(`/messages/${conversationId}`);
 }
 
-// 4. Fetching all conversations for the Sidebar
+// 4. Fetch Conversations
 export async function getConversations() {
     const session = await auth();
     if (!session?.user?.id) return [];
@@ -122,7 +112,7 @@ export async function getConversations() {
         .orderBy(desc(conversations.updatedAt));
 }
 
-// 5. Fetching messages for the [id] page
+// 5. Fetch Messages
 export async function getMessages(conversationId: string) {
     return await db.select()
         .from(messages)
@@ -130,7 +120,7 @@ export async function getMessages(conversationId: string) {
         .orderBy(asc(messages.createdAt));
 }
 
-// 6. Saving the message
+// 6. Send Message
 export async function sendMessage(conversationId: string, content: string) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
