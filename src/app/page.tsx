@@ -9,7 +9,6 @@ import SubscribeForm from '@/components/SubscribeForm';
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string; error?: string }> }) {
   const session = await auth();
   const params = await searchParams;
-
   const isUnavailable = params.error === "support_unavailable";
 
   return (
@@ -33,9 +32,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       <header className="fixed top-0 left-0 right-0 z-[100]">
 
         {/* 1. TOP CREDIT BAR */}
-        {/* UPDATED PADDING: px-6 md:px-12 */}
         <div className="bg-gradient-to-r from-purple-900 to-slate-900 border-b border-white/10 shadow-lg relative z-[101]">
-          <div className="container mx-auto px-6 md:px-12 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+          {/* FIXED: Removed max-width, added heavy padding (px-8 to px-20) */}
+          <div className="w-full px-8 md:px-20 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
 
             <div className="flex items-center text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest">
               <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
@@ -53,9 +52,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </div>
 
         {/* 2. NAVIGATION BAR */}
-        {/* UPDATED PADDING: px-6 md:px-12 */}
         <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
-          <div className="container mx-auto flex h-full items-center justify-between px-6 md:px-12">
+          {/* FIXED: Removed max-width, added heavy padding (px-8 to px-20) */}
+          <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
               <span className="text-xl font-bold tracking-tight">SokoKenya</span>
@@ -97,8 +96,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1628526521369-2b4e72d24484?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay" />
         </div>
 
-        {/* UPDATED PADDING: px-6 md:px-12 */}
-        <div className="container relative z-10 mx-auto px-6 md:px-12 text-center">
+        {/* FIXED: Added heavy padding (px-8 to px-20) */}
+        <div className="relative z-10 w-full px-8 md:px-20 text-center">
           <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
           </h1>
@@ -136,8 +135,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* Categories & Listings */}
-      {/* UPDATED PADDING: px-6 md:px-12 */}
-      <section className="container mx-auto px-6 md:px-12 py-12 flex-1">
+      {/* FIXED: Added heavy padding (px-8 to px-20) */}
+      <section className="w-full px-8 md:px-20 py-12 flex-1">
         <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mb-16">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
@@ -170,9 +169,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* Safety Footer */}
-      {/* UPDATED PADDING: px-6 md:px-12 */}
       <footer className="border-t border-white/10 bg-slate-900/50 py-12 mt-20 relative z-10">
-        <div className="container mx-auto px-6 md:px-12">
+        {/* FIXED: Added heavy padding (px-8 to px-20) */}
+        <div className="w-full px-8 md:px-20">
           <div className="mb-8 text-center text-white">
             <h3 className="text-lg font-bold mb-2 flex items-center justify-center gap-2">
               <ShieldCheck className="text-emerald-400" /> Safety First
