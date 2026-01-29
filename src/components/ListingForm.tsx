@@ -1,21 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { useFormState } from 'react-dom'; // 👈 1. Import this hook
+import { useFormState } from 'react-dom';
 import { upload } from '@vercel/blob/client';
 import Image from 'next/image';
 import { Upload, Loader2 } from 'lucide-react';
 
-// 2. Define initial state for the form
 const initialState = {
     message: '',
 };
 
 export default function ListingForm({ listing, action }: { listing?: any, action: any }) {
-    // 3. Wrap the action with the hook
-    // 'formAction' is what we will actually connect to the <form> tag
     const [state, formAction] = useFormState(action, initialState);
 
+    // Initialize image state (default to existing image if editing)
     const [imageUrl, setImageUrl] = useState(listing?.imageUrl || '');
     const [isUploading, setIsUploading] = useState(false);
 
@@ -35,6 +33,7 @@ export default function ListingForm({ listing, action }: { listing?: any, action
             const newBlob = await upload(file.name, file, {
                 access: 'public',
                 handleUploadUrl: '/api/upload',
+                addRandomSuffix: true, // 👈 ✅ THE FIX: Prevents duplicate filename errors
             });
             setImageUrl(newBlob.url);
         } catch (error) {
@@ -46,7 +45,6 @@ export default function ListingForm({ listing, action }: { listing?: any, action
     };
 
     return (
-        // 4. Use 'formAction' here instead of 'action'
         <form action={formAction} className="space-y-6 bg-white/5 p-8 rounded-3xl border border-white/10 shadow-2xl">
 
             {/* Display Server Errors if any */}
