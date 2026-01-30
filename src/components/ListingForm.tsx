@@ -6,6 +6,19 @@ import { upload } from '@vercel/blob/client';
 import Image from 'next/image';
 import { Upload, Loader2 } from 'lucide-react';
 
+// ✅ 1. ADDED: List of all 47 Counties + Major Cities
+const KENYAN_LOCATIONS = [
+    "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika",
+    "Kiambu", "Kitale", "Malindi", "Garissa", "Kakamega", "Mbale",
+    "Kapenguria", "Bungoma", "Busia", "Nyeri", "Meru", "Kilifi",
+    "Wajir", "Kericho", "Vihiga", "Homa Bay", "Kisii", "Nyamira",
+    "Migori", "Embu", "Machakos", "Makueni", "Kitui", "Kajiado",
+    "Narok", "Bomet", "Kericho", "Nandi", "Uasin Gishu",
+    "Trans Nzoia", "West Pokot", "Turkana", "Samburu", "Isiolo",
+    "Marsabit", "Mandera", "Tana River", "Lamu", "Taita Taveta",
+    "Kwale", "Nyandarua", "Laikipia", "Kirinyaga", "Murang'a"
+].sort();
+
 const initialState = {
     message: '',
 };
@@ -33,7 +46,6 @@ export default function ListingForm({ listing, action }: { listing?: any, action
             const newBlob = await upload(file.name, file, {
                 access: 'public',
                 handleUploadUrl: '/api/upload',
-                // ✅ REMOVED: addRandomSuffix (Now handled by the server API route)
             });
             setImageUrl(newBlob.url);
         } catch (error) {
@@ -77,9 +89,25 @@ export default function ListingForm({ listing, action }: { listing?: any, action
                 </div>
             </div>
 
+            {/* ✅ 2. UPDATED: Location Input with Search & Suggestions */}
             <div>
                 <label className="block text-sm text-slate-400 mb-2 font-medium">Location</label>
-                <input name="location" defaultValue={listing?.location} className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required />
+                <div className="relative">
+                    <input
+                        name="location"
+                        defaultValue={listing?.location}
+                        list="kenya-locations" // Connects to the list below
+                        placeholder="Type city (e.g. Nairobi) or custom area..."
+                        className="w-full bg-slate-900 border border-white/10 p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-slate-600"
+                        required
+                    />
+                    {/* The Hidden Suggestion List */}
+                    <datalist id="kenya-locations">
+                        {KENYAN_LOCATIONS.map((loc) => (
+                            <option key={loc} value={loc} />
+                        ))}
+                    </datalist>
+                </div>
             </div>
 
             <div>
