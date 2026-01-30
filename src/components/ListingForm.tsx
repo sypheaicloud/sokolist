@@ -19,7 +19,7 @@ export default function ListingForm({ listing, action }: { listing?: any, action
 
     const categories = [
         "Vehicles", "Electronics", "Laptops",
-        "IT (Network, Cloud, Devops, AI)", "Real Estate",
+        "IT Operations (End User, Network, Cloud, Devops, AI)", "Real Estate",
         "Jobs", "Services", "Trade", "Dating",
         "Phones", "Construction"
     ];
