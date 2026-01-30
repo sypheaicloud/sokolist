@@ -5,10 +5,24 @@ import { Search, MapPin, ArrowRight, ShieldCheck, Sparkles, AlertCircle } from "
 import { auth } from "@/lib/auth";
 import { getListings } from './actions';
 import SubscribeForm from '@/components/SubscribeForm';
+import UnreadBadge from '@/components/UnreadBadge';
 
-export default async function LandingPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; location?: string; error?: string }> }) {
+// ✅ 1. ADDED: Locations Data
+const KENYAN_LOCATIONS = [
+  "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika",
+  "Kiambu", "Kitale", "Malindi", "Garissa", "Kakamega", "Mbale",
+  "Kapenguria", "Bungoma", "Busia", "Nyeri", "Meru", "Kilifi",
+  "Wajir", "Kericho", "Vihiga", "Homa Bay", "Kisii", "Nyamira",
+  "Migori", "Embu", "Machakos", "Makueni", "Kitui", "Kajiado",
+  "Narok", "Bomet", "Kericho", "Nandi", "Uasin Gishu",
+  "Trans Nzoia", "West Pokot", "Turkana", "Samburu", "Isiolo",
+  "Marsabit", "Mandera", "Tana River", "Lamu", "Taita Taveta",
+  "Kwale", "Nyandarua", "Laikipia", "Kirinyaga", "Murang'a"
+].sort();
+
+export default async function LandingPage(props: { searchParams: Promise<{ q?: string; category?: string; location?: string; error?: string }> }) {
   const session = await auth();
-  const params = await searchParams;
+  const params = await props.searchParams;
   const isUnavailable = params.error === "support_unavailable";
 
   return (
@@ -30,27 +44,21 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
-
-        {/* 1. TOP CREDIT BAR */}
         <div className="bg-gradient-to-r from-purple-900 to-slate-900 border-b border-white/10 shadow-lg relative z-[101]">
           <div className="w-full px-8 md:px-20 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
-
             <div className="flex items-center text-[10px] md:text-xs font-medium text-purple-200 uppercase tracking-widest">
               <Sparkles className="h-3 w-3 mr-2 text-purple-400" />
               Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
               <span className="hidden sm:inline mx-2 text-purple-500">|</span>
               <span className="hidden sm:inline text-purple-300 lowercase tracking-normal">sypheit@gmail.com</span>
             </div>
-
             <div className="flex items-center gap-2">
               <span className="hidden md:inline text-[10px] text-purple-300 font-medium uppercase tracking-widest">Get Updates:</span>
               <SubscribeForm />
             </div>
-
           </div>
         </div>
 
-        {/* 2. NAVIGATION BAR */}
         <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
           <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
             <div className="flex items-center gap-2">
@@ -60,7 +68,17 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <div className="hidden items-center gap-6 md:flex">
               <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
               <Link href="/browse" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Browse</Link>
-              <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Messages</Link>
+
+              <Link
+                href="/messages"
+                className="relative text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center"
+              >
+                Messages
+                <Suspense fallback={null}>
+                  <UnreadBadge />
+                </Suspense>
+              </Link>
+
               {(session?.user as any)?.isAdmin && (
                 <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
                   Admin
@@ -87,7 +105,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </header>
 
       {/* Hero Section */}
-      {/* UPDATED: pt-24 (moved up) and min-h-[35vh] (shorter, so categories show) */}
       <section className="relative flex min-h-[35vh] items-center justify-center overflow-hidden pt-24 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
@@ -96,15 +113,15 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </div>
 
         <div className="relative z-10 w-full px-8 md:px-20 text-center">
-          {/* UPDATED: Reduced font size (text-3xl ... md:text-5xl lg:text-6xl) */}
           <h1 className="mx-auto max-w-4xl text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 md:text-xl">
-            Buy,Sell, Trade, Freelance, Services, Real Estate - connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
+            Buy, sell, trade, and connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
           <div className="mx-auto mt-8 max-w-2xl">
+            {/* SEARCH FORM */}
             <form action="/" method="GET" className="group relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
               <Search className="ml-3 text-slate-500" size={20} />
               <input
@@ -115,16 +132,25 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                 className="flex-1 bg-transparent px-2 py-3 text-white placeholder:text-slate-500 focus:outline-none"
               />
               <div className="h-8 w-[1px] bg-white/10" />
-              <div className="flex items-center gap-2 px-3 text-slate-400">
-                <MapPin size={18} className="text-slate-500" />
+
+              {/* ✅ 2. UPDATED: Location Dropdown + Search */}
+              <div className="flex items-center gap-2 px-3 text-slate-400 relative">
+                <MapPin size={18} className="text-slate-500 shrink-0" />
                 <input
                   type="text"
                   name="location"
+                  list="home-locations" // Connects to datalist below
                   defaultValue={params.location}
-                  placeholder="Kenya"
-                  className="w-24 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                  placeholder="Location"
+                  className="w-28 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
                 />
+                <datalist id="home-locations">
+                  {KENYAN_LOCATIONS.map((loc) => (
+                    <option key={loc} value={loc} />
+                  ))}
+                </datalist>
               </div>
+
               <button type="submit" className="rounded-xl bg-purple-600 p-3 text-white hover:bg-purple-500 transition-colors">
                 <ArrowRight size={20} />
               </button>
@@ -140,7 +166,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
           <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" />
-          <CategoryCard emoji="🌐" label="IT Operations(End User, Network, Cloud, Devops, AI)" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
+          <CategoryCard emoji="🌐" label="IT (Network, Cloud, Devops, AI)" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
           <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
