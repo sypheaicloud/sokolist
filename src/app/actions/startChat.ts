@@ -5,6 +5,7 @@ import { conversations } from "@/lib/schema";
 import { auth } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { v4 as uuidv4 } from 'uuid'; // 👈 Import the ID generator
 
 export async function startChat(listingId: string, sellerId: string) {
     const session = await auth();
@@ -14,7 +15,6 @@ export async function startChat(listingId: string, sellerId: string) {
 
     // 2. Prevent chatting with yourself
     if (session.user.id === sellerId) {
-        // You could redirect to your dashboard or just do nothing
         return;
     }
 
@@ -34,13 +34,16 @@ export async function startChat(listingId: string, sellerId: string) {
         redirect(`/messages/${existingChat[0].id}`);
     }
 
-    // 4. Create new conversation
-    const newChat = await db.insert(conversations).values({
+    // 4. Create new conversation WITH A GENERATED ID
+    const newChatId = uuidv4(); // 👈 Generate ID here
+
+    await db.insert(conversations).values({
+        id: newChatId, // 👈 Explicitly set the ID
         buyerId: session.user.id,
         sellerId: sellerId,
         listingId: listingId,
-    }).returning();
+    });
 
     // 5. Redirect to the new chat room
-    redirect(`/messages/${newChat[0].id}`);
+    redirect(`/messages/${newChatId}`);
 }
