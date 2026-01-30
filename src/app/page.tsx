@@ -101,7 +101,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             Kenya&apos;s Premier Marketplace
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 md:text-xl">
-            Buy,sell,trade,Freelance,IT Services - connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
+            Buy,Sell, Trade, Freelance, Services, Real Estate - connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
           <div className="mx-auto mt-8 max-w-2xl">
