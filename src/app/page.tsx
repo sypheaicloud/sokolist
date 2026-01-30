@@ -140,7 +140,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
           <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" />
-          <CategoryCard emoji="🌐" label="IT Operations (End User, Network, Cloud, Devops, AI)" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
+          <CategoryCard emoji="🌐" label="IT Operations(End User, Network, Cloud, Devops, AI)" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
           <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
