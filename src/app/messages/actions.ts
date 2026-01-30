@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { messages, conversations, listings, users } from "@/lib/schema";
-import { eq, asc, desc, or, and } from "drizzle-orm";
+import { eq, asc, desc, or } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 
 // 1. Fetch messages for a specific chat (Chat Room)
@@ -30,19 +30,20 @@ export async function getConversationById(conversationId: string) {
     return result[0];
 }
 
-// 3. 👇 NEW: Fetch ALL conversations for the Sidebar/Inbox
+// 3. Fetch ALL conversations for the Sidebar/Inbox
 export async function getConversations() {
     const session = await auth();
     if (!session?.user?.id) return [];
 
     const userId = session.user.id;
 
-    // Find all chats where I am the Buyer OR the Seller
     const chats = await db.select({
         id: conversations.id,
         updatedAt: conversations.updatedAt,
         listingTitle: listings.title,
         listingImage: listings.imageUrl,
+        // 👇 ADDED THIS so your icon logic works!
+        listingId: conversations.listingId,
         buyerId: conversations.buyerId,
         sellerId: conversations.sellerId,
     })
@@ -54,10 +55,9 @@ export async function getConversations() {
                 eq(conversations.sellerId, userId)
             )
         )
-        .orderBy(desc(conversations.updatedAt)); // Newest first
+        .orderBy(desc(conversations.updatedAt));
 
-    // Helper: Fetch the "Other User's" name for each chat
-    // (We do this in a loop because SQL joins with the same table twice can be tricky)
+    // Fetch the "Other User's" name
     const chatsWithNames = await Promise.all(chats.map(async (chat) => {
         const otherUserId = chat.buyerId === userId ? chat.sellerId : chat.buyerId;
 
