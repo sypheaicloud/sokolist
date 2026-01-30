@@ -174,6 +174,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <CategoryCard emoji="❤️" label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
           <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
           <CategoryCard emoji="🏗️" label="Construction" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
+          <CategoryCard emoji="💼" label="Photography" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
         </div>
 
         <div className="flex items-center justify-between mb-8">
