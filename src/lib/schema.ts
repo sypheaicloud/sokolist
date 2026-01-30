@@ -20,8 +20,7 @@ export const listings = pgTable('listings', {
     price: integer('price').notNull(),
     category: text('category').notNull(),
     location: text('location').notNull(),
-    // ⚠️ UPDATED: Added onDelete: 'cascade' 
-    // If you delete a user, their listings disappear automatically.
+    // ⚠️ Cascade delete: User deleted = Listings deleted
     userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
     imageUrl: text('image_url'),
     isApproved: boolean('is_approved').default(true),
@@ -31,8 +30,7 @@ export const listings = pgTable('listings', {
 
 export const conversations = pgTable('conversations', {
     id: text('id').primaryKey(),
-    // ⚠️ UPDATED: Added onDelete: 'set null'
-    // If a listing is deleted, the chat remains but is just unlinked.
+    // ⚠️ Set Null: Listing deleted = Chat stays, but shows "Item Unavailable"
     listingId: text('listing_id').references(() => listings.id, { onDelete: 'set null' }),
     buyerId: text('buyer_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
     sellerId: text('seller_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
@@ -45,6 +43,7 @@ export const messages = pgTable('messages', {
     conversationId: text('conversation_id').references(() => conversations.id, { onDelete: 'cascade' }).notNull(),
     senderId: text('sender_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
     content: text('content').notNull(),
-    isRead: boolean('is_read').default(false),
+    // 👇 THIS IS THE KEY PART
+    isRead: boolean('is_read').default(false).notNull(),
     createdAt: timestamp('created_at').defaultNow(),
 });

@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { startSupportChat } from "@/app/messages/actions";
-import { MessageSquare, LifeBuoy } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+import UnreadBadge from "@/components/UnreadBadge"; // 👈 Import the Badge
+import { Suspense } from "react"; // 👈 Needed for async components
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,21 +39,16 @@ export default function RootLayout({
             </Link>
 
             <nav className="flex items-center gap-6">
-              <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                Messages
+              {/* 👇 UPDATED: Messages Link with Badge */}
+              <Link href="/messages" className="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2 relative">
+                <div className="relative flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Messages
+                  <Suspense fallback={null}>
+                    <UnreadBadge />
+                  </Suspense>
+                </div>
               </Link>
-
-              {/* Support Button for Josiah */}
-              <form action={startSupportChat}>
-                <button
-                  type="submit"
-                  className="group flex items-center gap-2 text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all"
-                >
-                  <LifeBuoy className="h-4 w-4 text-purple-400 group-hover:rotate-45 transition-transform" />
-                  <span>Support</span>
-                </button>
-              </form>
             </nav>
           </div>
         </header>
