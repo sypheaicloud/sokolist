@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (!user.email) return false;
 
             try {
-                // 1. Check for existing user first
+                // 1. Check for existing user
                 const existingUser = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
                 const isSystemAdmin = user.email === 'djboziah@gmail.com';
 
@@ -67,7 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         isAdmin: isSystemAdmin,
                     });
                 } else if (isSystemAdmin && !existingUser[0].isAdmin) {
-                    // 3. Existing User is Admin but not marked: Update safely
+                    // 3. Update Admin status if needed
                     await db.update(users)
                         .set({ isAdmin: true, isVerified: true })
                         .where(eq(users.email, user.email));
@@ -76,32 +76,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 return true;
             } catch (err) {
                 console.error('SignIn Callback Error:', err);
-                // Return true so they can still log in even if DB sync has a minor hiccup
                 return true;
             }
         },
         async jwt({ token, user, trigger, session }) {
-            // When user first signs in
-            if (user) {
+            // 🛑 CRITICAL FIX: ALWAYS SYNC WITH DATABASE ID
+            // Don't trust the ID on the token blindly. The DB is the source of truth.
+
+            if (token.email) {
+                try {
+                    const dbUser = await db.select().from(users).where(eq(users.email, token.email as string)).limit(1);
+                    if (dbUser[0]) {
+                        // ✅ FORCE the Token ID to match the Database ID
+                        token.id = dbUser[0].id;
+                        token.isAdmin = dbUser[0].isAdmin;
+                    }
+                } catch (error) {
+                    console.error("Error syncing token with DB:", error);
+                }
+            }
+
+            // Initial sign in fallback (only runs if DB lookup failed above)
+            if (user && !token.id) {
                 token.id = user.id;
                 token.email = user.email;
                 token.isAdmin = user.email === 'djboziah@gmail.com';
             }
 
-            // Periodically refresh Admin status from DB to stay in sync
-            if (!token.isAdmin && token.email) {
-                try {
-                    const dbUser = await db.select().from(users).where(eq(users.email, token.email as string)).limit(1);
-                    token.isAdmin = dbUser[0]?.isAdmin ?? false;
-                } catch {
-                    token.isAdmin = false;
-                }
-            }
-
             return token;
         },
         async session({ session, token }) {
-            if (session.user) {
+            if (session.user && token.id) {
+                // Pass the robust ID to the session
                 session.user.id = token.id as string;
                 (session.user as any).isAdmin = !!token.isAdmin;
             }
