@@ -20,7 +20,9 @@ export const listings = pgTable('listings', {
     price: integer('price').notNull(),
     category: text('category').notNull(),
     location: text('location').notNull(),
-    userId: text('user_id').references(() => users.id),
+    // ⚠️ UPDATED: Added onDelete: 'cascade' 
+    // If you delete a user, their listings disappear automatically.
+    userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
     imageUrl: text('image_url'),
     isApproved: boolean('is_approved').default(true),
     isActive: boolean('is_active').default(true),
@@ -29,11 +31,11 @@ export const listings = pgTable('listings', {
 
 export const conversations = pgTable('conversations', {
     id: text('id').primaryKey(),
-    // Changed to optional so users can message Admin for support without a listing
-    listingId: text('listing_id').references(() => listings.id),
-    buyerId: text('buyer_id').references(() => users.id).notNull(),
-    sellerId: text('seller_id').references(() => users.id).notNull(),
-    // Added updatedAt to help sort your inbox by the most recent message
+    // ⚠️ UPDATED: Added onDelete: 'set null'
+    // If a listing is deleted, the chat remains but is just unlinked.
+    listingId: text('listing_id').references(() => listings.id, { onDelete: 'set null' }),
+    buyerId: text('buyer_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    sellerId: text('seller_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
     updatedAt: timestamp('updated_at').defaultNow(),
     createdAt: timestamp('created_at').defaultNow(),
 });
@@ -41,9 +43,8 @@ export const conversations = pgTable('conversations', {
 export const messages = pgTable('messages', {
     id: text('id').primaryKey(),
     conversationId: text('conversation_id').references(() => conversations.id, { onDelete: 'cascade' }).notNull(),
-    senderId: text('sender_id').references(() => users.id).notNull(),
+    senderId: text('sender_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
     content: text('content').notNull(),
-    // Added isRead to show "New Message" badges in the UI
     isRead: boolean('is_read').default(false),
     createdAt: timestamp('created_at').defaultNow(),
 });

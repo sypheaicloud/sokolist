@@ -1,16 +1,17 @@
 import { db } from '@/lib/db';
 import { listings, users } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
-import { startConversation } from '../../messages/actions';
+import { startChat } from '@/app/actions/startChat'; // ✅ Corrected Import
 import Image from 'next/image';
-import { MapPin, User, MessageCircle, ArrowLeft, ShieldCheck, Clock } from 'lucide-react';
+import { MapPin, ArrowLeft, ShieldCheck, Clock, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns'; // You'll need to: npm install date-fns
+import { formatDistanceToNow } from 'date-fns';
 
-export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+export default async function ListingDetailPage(props: { params: Promise<{ id: string }> }) {
+    // ✅ Next.js 15: Await params
+    const params = await props.params;
     const session = await auth();
 
     const result = await db.select({
@@ -19,20 +20,13 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
     })
         .from(listings)
         .leftJoin(users, eq(listings.userId, users.id))
-        .where(eq(listings.id, id))
+        .where(eq(listings.id, params.id))
         .limit(1);
 
     const data = result[0];
     if (!data) notFound();
 
     const { listing, seller } = data;
-
-    async function handleMessageAction() {
-        'use server';
-        if (listing.userId) {
-            await startConversation(listing.id, listing.userId);
-        }
-    }
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
@@ -69,7 +63,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                                 </span>
                                 <span className="flex items-center gap-1 text-[10px] text-slate-500 uppercase tracking-wider">
                                     <Clock className="h-3 w-3" />
-                                    {formatDistanceToNow(new Date(listing.createdAt))} ago
+                                    {formatDistanceToNow(new Date(listing.createdAt || new Date()))} ago
                                 </span>
                             </div>
                             <h1 className="text-3xl font-bold tracking-tight mb-2">{listing.title}</h1>
@@ -82,8 +76,13 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                                 {listing.location}
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="h-6 w-6 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30 text-[10px]">
-                                    {seller?.name?.[0] || 'U'}
+                                <div className="h-6 w-6 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30 text-[10px] overflow-hidden">
+                                    {/* Show User Image if available, otherwise Initials */}
+                                    {seller?.image ? (
+                                        <Image src={seller.image} alt="Seller" width={24} height={24} className="object-cover" />
+                                    ) : (
+                                        <span>{seller?.name?.[0] || 'U'}</span>
+                                    )}
                                 </div>
                                 <span className="font-medium text-slate-200">Seller: {seller?.name || 'Anonymous'}</span>
                                 {seller?.isVerified && <ShieldCheck className="h-4 w-4 text-emerald-400 fill-emerald-400/10" />}
@@ -97,7 +96,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
                         {/* Messaging Logic */}
                         {session?.user?.id !== listing.userId ? (
-                            <form action={handleMessageAction}>
+                            // ✅ Uses the startChat Action we created
+                            <form action={startChat.bind(null, listing.id, listing.userId || '')}>
                                 <button
                                     type="submit"
                                     className="w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 px-6 py-4 text-sm font-bold text-white hover:bg-purple-500 transition-all shadow-xl shadow-purple-600/20 active:scale-95"
@@ -107,8 +107,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                                 </button>
                             </form>
                         ) : (
+                            // ✅ Fixed Edit Link to point to Dashboard
                             <Link
-                                href={`/listing/${id}/edit`}
+                                href={`/dashboard/edit/${listing.id}`}
                                 className="block w-full text-center p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 font-bold text-sm hover:bg-emerald-500/10 transition-colors"
                             >
                                 You own this ad — Edit Listing
