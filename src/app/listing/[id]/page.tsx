@@ -1,16 +1,16 @@
 import { db } from '@/lib/db';
 import { listings, users } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
-import { startChat } from '@/app/actions/startChat'; // ✅ Corrected Import
+import { startChat } from '@/app/actions/startChat';
+import { markAsSold } from '@/app/actions/markAsSold'; // 👈 IMPORTED YOUR ACTION
 import Image from 'next/image';
-import { MapPin, ArrowLeft, ShieldCheck, Clock, MessageCircle } from 'lucide-react';
+import { MapPin, ArrowLeft, ShieldCheck, Clock, MessageCircle, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
 export default async function ListingDetailPage(props: { params: Promise<{ id: string }> }) {
-    // ✅ Next.js 15: Await params
     const params = await props.params;
     const session = await auth();
 
@@ -28,6 +28,10 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
 
     const { listing, seller } = data;
 
+    // ✅ Logic: Is the item sold? Is the viewer the owner?
+    const isOwner = session?.user?.id === listing.userId;
+    const isSold = listing.isActive === false;
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
             <div className="mx-auto max-w-4xl">
@@ -38,13 +42,23 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
 
                 <div className="grid gap-8 md:grid-cols-2">
                     {/* Image Section */}
-                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square relative shadow-2xl">
+                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square relative shadow-2xl group">
+
+                        {/* 🔴 SOLD OVERLAY */}
+                        {isSold && (
+                            <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                                <span className="text-5xl font-black text-red-500 -rotate-12 border-4 border-red-500 px-8 py-2 rounded-xl tracking-widest uppercase">
+                                    SOLD
+                                </span>
+                            </div>
+                        )}
+
                         {listing.imageUrl ? (
                             <Image
                                 src={listing.imageUrl}
                                 alt={listing.title}
                                 fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
+                                className={`object-cover transition-transform duration-500 ${!isSold && 'group-hover:scale-105'}`}
                                 unoptimized
                             />
                         ) : (
@@ -66,8 +80,14 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                                     {formatDistanceToNow(new Date(listing.createdAt || new Date()))} ago
                                 </span>
                             </div>
-                            <h1 className="text-3xl font-bold tracking-tight mb-2">{listing.title}</h1>
-                            <p className="text-2xl font-bold text-emerald-400">KSh {listing.price.toLocaleString()}</p>
+                            <h1 className={`text-3xl font-bold tracking-tight mb-2 ${isSold ? 'line-through decoration-red-500 decoration-4 text-slate-500' : ''}`}>
+                                {listing.title}
+                            </h1>
+                            {isSold ? (
+                                <p className="text-2xl font-bold text-red-500">SOLD OUT</p>
+                            ) : (
+                                <p className="text-2xl font-bold text-emerald-400">KSh {listing.price.toLocaleString()}</p>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-3 text-sm text-slate-400 border-y border-white/5 py-6">
@@ -77,7 +97,6 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="h-6 w-6 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30 text-[10px] overflow-hidden">
-                                    {/* Show User Image if available, otherwise Initials */}
                                     {seller?.image ? (
                                         <Image src={seller.image} alt="Seller" width={24} height={24} className="object-cover" />
                                     ) : (
@@ -94,9 +113,33 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                             <p className="text-slate-400 leading-relaxed whitespace-pre-wrap text-sm">{listing.description}</p>
                         </div>
 
-                        {/* Messaging Logic */}
-                        {session?.user?.id !== listing.userId ? (
-                            // ✅ Uses the startChat Action we created
+                        {/* ACTION BUTTONS */}
+                        {isSold ? (
+                            // 🔒 CASE 1: ITEM IS SOLD
+                            <div className="w-full text-center p-4 rounded-2xl bg-slate-800/50 text-slate-500 font-bold border border-white/5 cursor-not-allowed flex items-center justify-center gap-2">
+                                ❌ This item is no longer available.
+                            </div>
+                        ) : isOwner ? (
+                            // 🛠️ CASE 2: OWNER VIEW (Show Mark as Sold)
+                            <div className="space-y-3">
+                                <form action={markAsSold.bind(null, listing.id)}>
+                                    <button
+                                        type="submit"
+                                        className="w-full flex items-center justify-center gap-2 rounded-2xl bg-red-500/10 border border-red-500/20 px-6 py-4 text-sm font-bold text-red-400 hover:bg-red-500 hover:text-white transition-all"
+                                    >
+                                        <CheckCircle className="h-5 w-5" />
+                                        Mark as Sold
+                                    </button>
+                                </form>
+                                <Link
+                                    href={`/dashboard/edit/${listing.id}`}
+                                    className="block w-full text-center p-3 text-xs text-slate-500 hover:text-white hover:underline transition-colors"
+                                >
+                                    Edit Details
+                                </Link>
+                            </div>
+                        ) : (
+                            // 💬 CASE 3: BUYER VIEW (Show Message Button)
                             <form action={startChat.bind(null, listing.id, listing.userId || '')}>
                                 <button
                                     type="submit"
@@ -106,14 +149,6 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                                     Message Seller
                                 </button>
                             </form>
-                        ) : (
-                            // ✅ Fixed Edit Link to point to Dashboard
-                            <Link
-                                href={`/dashboard/edit/${listing.id}`}
-                                className="block w-full text-center p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 font-bold text-sm hover:bg-emerald-500/10 transition-colors"
-                            >
-                                You own this ad — Edit Listing
-                            </Link>
                         )}
                     </div>
                 </div>
