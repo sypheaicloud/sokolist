@@ -13,9 +13,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     secret: process.env.AUTH_SECRET,
     providers: [
         GoogleProvider({
-            // ✅ UPDATED: Matching the Vercel Environment Variables exactly
+            // ✅ MATCHES VERCEL ENV VARS
             clientId: process.env.AUTH_GOOGLE_ID,
             clientSecret: process.env.AUTH_GOOGLE_SECRET,
+            // ✅ NEW: Forces Google to ask "Which account?" every time
+            authorization: {
+                params: {
+                    prompt: "select_account",
+                },
+            },
         }),
         Credentials({
             credentials: {
@@ -82,8 +88,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
         async jwt({ token, user, trigger, session }) {
             // 🛑 CRITICAL FIX: ALWAYS SYNC WITH DATABASE ID
-            // Don't trust the ID on the token blindly. The DB is the source of truth.
-
             if (token.email) {
                 try {
                     const dbUser = await db.select().from(users).where(eq(users.email, token.email as string)).limit(1);
@@ -97,7 +101,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             }
 
-            // Initial sign in fallback (only runs if DB lookup failed above)
+            // Initial sign in fallback
             if (user && !token.id) {
                 token.id = user.id;
                 token.email = user.email;
@@ -108,7 +112,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
         async session({ session, token }) {
             if (session.user && token.id) {
-                // Pass the robust ID to the session
                 session.user.id = token.id as string;
                 (session.user as any).isAdmin = !!token.isAdmin;
             }
