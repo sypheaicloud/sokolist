@@ -140,7 +140,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <span className="text-white drop-shadow-sm">Housing</span>
           </div>
 
-          <p className="mx-auto mt-8 max-w-2xl text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-slate-400/80 leading-relaxed">
+          <p className="mx-auto mt-8 max-w-2xl text-[11px] md:text-sm font-bold uppercase tracking-[0.25em] text-white/90 leading-relaxed drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
             Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
