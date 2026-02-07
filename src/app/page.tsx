@@ -140,8 +140,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <span>Housing</span>
           </div>
 
-          <p className="mx-auto mt-8 max-w-2xl text-lg text-slate-400 md:text-xl">
-            Buy, sell, trade, and connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
+          <p className="mx-auto mt-8 max-w-2xl text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-slate-400/80 leading-relaxed">
+            Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
           <div className="mx-auto mt-8 max-w-2xl">
