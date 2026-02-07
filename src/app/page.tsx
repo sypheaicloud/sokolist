@@ -61,9 +61,16 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
 
         <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
           <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-purple-500 to-emerald-400" />
-              <span className="text-xl font-bold tracking-tight">SokoKenya</span>
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                <Image
+                  src="/logo.png"
+                  alt="MarketPlace-Kenya Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <span className="text-xl font-bold tracking-tight text-white">MarketPlace-Kenya</span>
             </div>
             <div className="hidden items-center gap-6 md:flex">
               <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
@@ -204,7 +211,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <h3 className="text-lg font-bold mb-2 flex items-center justify-center gap-2">
               <ShieldCheck className="text-emerald-400" /> Safety First
             </h3>
-            <p className="text-slate-400 text-sm">Follow these simple rules to stay safe while trading on SokoKenya.</p>
+            <p className="text-slate-400 text-sm">Follow these simple rules to stay safe while trading on MarketPlace-Kenya.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <SafetyTip emoji="⚠️" title="Do Not Prepay" desc="Never pay for items in advance, including delivery fees." />
@@ -212,7 +219,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <SafetyTip emoji="📍" title="Meet in Public" desc="Meet in safe, busy public locations like malls." />
           </div>
           <div className="mt-12 text-center border-t border-white/5 pt-8 text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} SokoKenya. Website by Syphe IT.
+            &copy; {new Date().getFullYear()} MarketPlace-Kenya. Website by Syphe IT.
           </div>
         </div>
       </footer>
