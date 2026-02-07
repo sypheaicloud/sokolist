@@ -128,16 +128,16 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             Kenya&apos;s Premier Marketplace
           </h1>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-purple-400/80">
-            <span>Buy</span>
-            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
-            <span>Sell</span>
-            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
-            <span>Trade</span>
-            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
-            <span>Services</span>
-            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
-            <span>Housing</span>
+          <div className="mt-8 flex items-center justify-center gap-4 md:gap-6 text-[10px] md:text-sm font-black uppercase tracking-[0.4em] whitespace-nowrap overflow-visible">
+            <span className="text-white drop-shadow-sm">Buy</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-sm">Sell</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-sm">Trade</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-sm">Services</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-sm">Housing</span>
           </div>
 
           <p className="mx-auto mt-8 max-w-2xl text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-slate-400/80 leading-relaxed">
