@@ -127,7 +127,20 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <h1 className="mx-auto max-w-4xl text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400 md:text-xl">
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-purple-400/80">
+            <span>Buy</span>
+            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+            <span>Sell</span>
+            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+            <span>Trade</span>
+            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+            <span>Services</span>
+            <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+            <span>Housing</span>
+          </div>
+
+          <p className="mx-auto mt-8 max-w-2xl text-lg text-slate-400 md:text-xl">
             Buy, sell, trade, and connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
