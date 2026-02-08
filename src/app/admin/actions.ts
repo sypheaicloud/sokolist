@@ -1,8 +1,8 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { users, listings } from '@/lib/schema';
-import { eq, desc } from 'drizzle-orm';
+import { users, listings, siteStats } from '@/lib/schema';
+import { eq, desc, sql } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/admin';
 import { revalidatePath } from 'next/cache';
 
@@ -11,8 +11,8 @@ import { revalidatePath } from 'next/cache';
 export async function getAdminData() {
     await requireAdmin();
 
-    const allListings = await db
-        .select({
+    const [allListings, allUsers, statsResult, locationsResult] = await Promise.all([
+        db.select({
             id: listings.id,
             title: listings.title,
             price: listings.price,
@@ -22,21 +22,30 @@ export async function getAdminData() {
                 email: users.email
             }
         })
-        .from(listings)
-        .leftJoin(users, eq(listings.userId, users.id))
-        .orderBy(desc(listings.createdAt));
+            .from(listings)
+            .leftJoin(users, eq(listings.userId, users.id))
+            .orderBy(desc(listings.createdAt)),
 
-    const allUsers = await db
-        .select()
-        .from(users)
-        .orderBy(desc(users.createdAt));
+        db.select().from(users).orderBy(desc(users.createdAt)),
+
+        db.select().from(siteStats).where(eq(siteStats.id, 'main-stats')).limit(1),
+
+        db.select({
+            location: listings.location,
+            count: sql<number>`count(*)`
+        })
+            .from(listings)
+            .groupBy(listings.location)
+    ]);
 
     return {
         listings: allListings.map(l => ({
             ...l,
             status: l.isActive ? 'ACTIVE' : 'HOLD'
         })),
-        users: allUsers
+        users: allUsers,
+        stats: statsResult[0] || { totalVisits: 0 },
+        locations: locationsResult
     };
 }
 

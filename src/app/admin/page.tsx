@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { ShieldCheck, LayoutDashboard, FileText, Users, LogOut, Trash2, PauseCircle, PlayCircle, Ban, Power, Shield, ExternalLink } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, FileText, Users, LogOut, Trash2, PauseCircle, PlayCircle, Power, Shield, ExternalLink, Activity, Globe, MapPin } from "lucide-react";
 import { getAdminData, deleteListing, toggleListingStatus, deleteUser, toggleUserBan, toggleUserAdmin } from "./actions";
 
 // ⚡ FORCE DYNAMIC: Ensures fresh data every time
@@ -17,7 +17,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     }
 
     // Fetch Data
-    const { listings, users } = await getAdminData();
+    const { listings, users, stats, locations } = await getAdminData();
     const activeListings = listings.length;
     const totalUsers = users.length;
     // @ts-expect-error - status checking
@@ -39,6 +39,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     <a href="/admin?view=dashboard" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer hover:scale-105 ${currentView === 'dashboard' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
                         <LayoutDashboard className="h-5 w-5" />
                         <span className="font-medium">Dashboard</span>
+                    </a>
+                    <a href="/admin?view=analytics" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer hover:scale-105 ${currentView === 'analytics' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
+                        <Activity className="h-5 w-5" />
+                        <span className="font-medium">Analytics</span>
                     </a>
                     <a href="/admin?view=listings" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer hover:scale-105 ${currentView === 'listings' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
                         <FileText className="h-5 w-5" />
@@ -74,9 +78,60 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 {/* VIEW: DASHBOARD */}
                 {currentView === 'dashboard' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <StatCard label="Total Listings" value={activeListings.toString()} change="Live on site" />
-                        <StatCard label="Registered Users" value={totalUsers.toString()} change="Total accounts" />
-                        <StatCard label="On Hold / Pending" value={pendingListings.toString()} change="Requires review" alert />
+                        <StatCard label="Total Site Visits" value={stats.totalVisits.toLocaleString()} change="Overall traffic" />
+                        <StatCard label="Live Listings" value={activeListings.toString()} change="Verified items" />
+                        <StatCard label="Registered Users" value={totalUsers.toString()} change="Platform growth" />
+                    </div>
+                )}
+
+                {/* VIEW: ANALYTICS */}
+                {currentView === 'analytics' && (
+                    <div className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="p-8 rounded-2xl border border-white/10 bg-white/5 flex flex-col items-center justify-center text-center">
+                                <Activity className="h-12 w-12 text-purple-400 mb-4" />
+                                <h3 className="text-4xl font-black text-white mb-2">{stats.totalVisits.toLocaleString()}</h3>
+                                <p className="text-slate-400 font-medium uppercase tracking-widest text-xs">Total Page Views</p>
+                            </div>
+                            <div className="p-8 rounded-2xl border border-white/10 bg-white/5">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
+                                        <Globe className="h-5 w-5" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-white">Regional Distribution</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    {(locations || []).length > 0 ? (
+                                        locations.map((loc) => (
+                                            <div key={loc.location} className="flex items-center justify-between text-sm">
+                                                <div className="flex items-center gap-2 text-slate-300">
+                                                    <MapPin className="h-3 w-3 text-slate-500" />
+                                                    {loc.location}
+                                                </div>
+                                                <div className="font-bold text-white pr-2">{loc.count} Posts</div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center text-slate-500 py-4">No regional data yet</div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-8 rounded-2xl border border-purple-500/30 bg-purple-500/5 text-center">
+                            <h3 className="text-xl font-bold text-white mb-4">Need even more detail?</h3>
+                            <p className="text-slate-400 mb-6 max-w-2xl mx-auto">
+                                For deep insights into user behavior, device types, and real-time session tracking, check the Vercel Analytics dashboard.
+                            </p>
+                            <a
+                                href="https://vercel.com/dashboard"
+                                target="_blank"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20"
+                            >
+                                <ExternalLink className="h-5 w-5" />
+                                Open Vercel Analytics
+                            </a>
+                        </div>
                     </div>
                 )}
 
@@ -116,7 +171,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                         : <span className="px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 text-xs font-bold">HOLD</span>
                                                     }
                                                 </td>
-                                                <td className="p-4 flex justify-end gap-2">
+                                                <td className="p-4 flex justify-end gap-2 text-white">
                                                     <form action={toggleListingStatus}>
                                                         <input type="hidden" name="id" value={listing.id} />
                                                         {/* @ts-expect-error - status check */}
@@ -176,7 +231,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                                                         : <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">ACTIVE</span>
                                                     }
                                                 </td>
-                                                <td className="p-4 flex justify-end gap-2">
+                                                <td className="p-4 flex justify-end gap-2 text-white">
                                                     <form action={toggleUserAdmin}>
                                                         <input type="hidden" name="id" value={user.id} />
                                                         <input type="hidden" name="isAdmin" value={String(user.isAdmin)} />
