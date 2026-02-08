@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import Image from "next/image";
+import { Analytics } from "@vercel/analytics/react";
 import { MessageSquare } from "lucide-react";
 import UnreadBadge from "@/components/UnreadBadge"; // 👈 Import the Badge
 import { Suspense } from "react"; // 👈 Needed for async components
@@ -68,6 +69,7 @@ export default function RootLayout({
         <main>
           {children}
         </main>
+        <Analytics />
       </body>
     </html>
   );
