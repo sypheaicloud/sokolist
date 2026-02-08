@@ -234,8 +234,10 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           </div>
           <div className="mt-12 text-center border-t border-white/5 pt-8 text-xs text-slate-500 uppercase tracking-widest flex flex-col items-center gap-2">
             <div>&copy; {new Date().getFullYear()} MarketPlace-Kenya. Website by Syphe IT.</div>
-            <div className="flex items-center gap-2 text-[10px] text-purple-400/60 font-medium">
+            <div className="flex items-center gap-3 text-[10px] text-purple-400/60 font-medium">
               <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+              Serving {(stats.locationsCount ?? 0) > 0 ? stats.locationsCount : "all"} Active Regions
+              <span className="h-1 w-1 rounded-full bg-slate-700" />
               {stats.totalVisits.toLocaleString()} Total Visits
               <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
             </div>

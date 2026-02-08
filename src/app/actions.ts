@@ -11,7 +11,13 @@ import { randomUUID } from 'crypto';
 
 export async function getSiteStats() {
     try {
-        const stats = await db.select().from(siteStats).where(eq(siteStats.id, 'main-stats')).limit(1);
+        const [stats, locationsResult] = await Promise.all([
+            db.select().from(siteStats).where(eq(siteStats.id, 'main-stats')).limit(1),
+            db.select({ count: sql<number>`count(distinct ${listings.location})` }).from(listings).where(eq(listings.isActive, true))
+        ]);
+
+        const locationsCount = locationsResult[0]?.count || 0;
+
         if (stats.length === 0) {
             // Initialize stats if they don't exist
             await db.insert(siteStats).values({
@@ -19,9 +25,9 @@ export async function getSiteStats() {
                 totalVisits: 1,
                 updatedAt: new Date(),
             });
-            return { totalVisits: 1 };
+            return { totalVisits: 1, locationsCount };
         }
-        return { totalVisits: stats[0].totalVisits };
+        return { totalVisits: stats[0].totalVisits, locationsCount };
     } catch (error) {
         console.error("Error fetching site stats:", error);
         return { totalVisits: 0 };
