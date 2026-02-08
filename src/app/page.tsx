@@ -128,15 +128,15 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             Kenya&apos;s Premier Marketplace
           </h1>
 
-          <div className="mt-8 flex items-center justify-center gap-4 md:gap-6 text-[10px] md:text-sm font-black uppercase tracking-[0.4em] whitespace-nowrap overflow-visible">
+          <div className="mt-8 flex items-center justify-center gap-2 md:gap-6 text-[8px] md:text-sm font-black uppercase tracking-[0.15em] md:tracking-[0.4em] whitespace-nowrap overflow-visible">
             <span className="text-white drop-shadow-sm">Buy</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-white drop-shadow-sm">Sell</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-white drop-shadow-sm">Trade</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-white drop-shadow-sm">Services</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-white drop-shadow-sm">Housing</span>
           </div>
 
