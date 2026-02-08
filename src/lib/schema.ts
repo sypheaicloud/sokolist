@@ -47,3 +47,9 @@ export const messages = pgTable('messages', {
     isRead: boolean('is_read').default(false).notNull(),
     createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const siteStats = pgTable('site_stats', {
+    id: text('id').primaryKey(),
+    totalVisits: integer('total_visits').default(0).notNull(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+});

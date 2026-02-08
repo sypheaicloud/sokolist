@@ -1,13 +1,45 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { listings, users } from '@/lib/schema';
-import { desc, eq, ilike, or, and, SQL } from 'drizzle-orm';
+import { listings, users, siteStats } from '@/lib/schema';
+import { desc, eq, ilike, or, and, SQL, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 // 👇 1. IMPORT THIS TO FIX THE ID ERROR
 import { randomUUID } from 'crypto';
+
+export async function getSiteStats() {
+    try {
+        const stats = await db.select().from(siteStats).where(eq(siteStats.id, 'main-stats')).limit(1);
+        if (stats.length === 0) {
+            // Initialize stats if they don't exist
+            await db.insert(siteStats).values({
+                id: 'main-stats',
+                totalVisits: 1,
+                updatedAt: new Date(),
+            });
+            return { totalVisits: 1 };
+        }
+        return { totalVisits: stats[0].totalVisits };
+    } catch (error) {
+        console.error("Error fetching site stats:", error);
+        return { totalVisits: 0 };
+    }
+}
+
+export async function trackVisit() {
+    try {
+        await db.update(siteStats)
+            .set({
+                totalVisits: sql`${siteStats.totalVisits} + 1`,
+                updatedAt: new Date()
+            })
+            .where(eq(siteStats.id, 'main-stats'));
+    } catch (error) {
+        console.error("Error tracking visit:", error);
+    }
+}
 
 // --- GET LISTINGS (Your existing code) ---
 export async function getListings(searchParams?: { q?: string; category?: string; location?: string }) {

@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { MessageSquare } from "lucide-react";
 import UnreadBadge from "@/components/UnreadBadge"; // 👈 Import the Badge
 import { Suspense } from "react"; // 👈 Needed for async components
+import AnalyticsTracker from "@/components/AnalyticsTracker";
+import { getSiteStats } from "./actions";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +25,12 @@ export const metadata: Metadata = {
   description: "Buy, sell, trade, and connect with verified locals across Kenya.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const stats = await getSiteStats();
   return (
     <html lang="en" className="dark">
       <body
@@ -66,6 +69,7 @@ export default function RootLayout({
           </div>
         </header>
 
+        <AnalyticsTracker />
         <main>
           {children}
         </main>

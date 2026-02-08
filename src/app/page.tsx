@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { Search, MapPin, ArrowRight, ShieldCheck, Sparkles, AlertCircle } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getListings } from './actions';
+import { getListings, getSiteStats } from './actions';
 import SubscribeForm from '@/components/SubscribeForm';
 import UnreadBadge from '@/components/UnreadBadge';
 
@@ -24,6 +24,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
   const session = await auth();
   const params = await props.searchParams;
   const isUnavailable = params.error === "support_unavailable";
+  const stats = await getSiteStats();
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
@@ -231,8 +232,13 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <SafetyTip emoji="🔎" title="Inspect Products" desc="Always check the item thoroughly before handing over money." />
             <SafetyTip emoji="📍" title="Meet in Public" desc="Meet in safe, busy public locations like malls." />
           </div>
-          <div className="mt-12 text-center border-t border-white/5 pt-8 text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} MarketPlace-Kenya. Website by Syphe IT.
+          <div className="mt-12 text-center border-t border-white/5 pt-8 text-xs text-slate-500 uppercase tracking-widest flex flex-col items-center gap-2">
+            <div>&copy; {new Date().getFullYear()} MarketPlace-Kenya. Website by Syphe IT.</div>
+            <div className="flex items-center gap-2 text-[10px] text-purple-400/60 font-medium">
+              <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+              {stats.totalVisits.toLocaleString()} Total Visits
+              <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
+            </div>
           </div>
         </div>
       </footer>
