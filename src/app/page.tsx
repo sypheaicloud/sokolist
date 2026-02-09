@@ -116,7 +116,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
           <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay">
-            <source src="/hero-bg.mp4" type="video/mp4" />
+            <source src="/hero-v3.mp4" type="video/mp4" />
             {/* Fallback image if video fails to load or during loading */}
             <img src="/hero-bg.jpg" alt="Background" className="w-full h-full object-cover" />
           </video>
