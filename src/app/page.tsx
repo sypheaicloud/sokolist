@@ -111,7 +111,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       </header>
 
       {/* Hero Section */}
-      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-16 pb-12">
+      <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-12 pb-6">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
@@ -179,7 +179,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               </button>
             </form>
 
-            <div className="mt-12 flex flex-col items-center gap-6">
+            <div className="mt-6 flex flex-col items-center gap-4">
               <Link
                 href="/how-it-works"
                 className="group flex items-center gap-2 text-white/80 hover:text-white transition-colors"
