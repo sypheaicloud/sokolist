@@ -58,10 +58,10 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           </div>
         </div>
 
-        <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-16 relative z-[100]">
+        <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-12 relative z-[100]">
           <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
             <div className="flex items-center gap-3">
-              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+              <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                 <Image
                   src="/logo.png"
                   alt="MarketPlace-Kenya Logo"
@@ -179,11 +179,22 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               </button>
             </form>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <span className="text-white font-extrabold uppercase tracking-widest text-[10px] md:text-xs">Questions? Email us:</span>
-              <a href="mailto:support@sypheit.cloud" className="text-yellow-400 font-black uppercase tracking-widest text-xs md:text-sm bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl hover:bg-black/60 transition-all hover:scale-105">
-                support@sypheit.cloud
-              </a>
+            <div className="mt-12 flex flex-col items-center gap-6">
+              <Link
+                href="/how-it-works"
+                className="group flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+              >
+                <div className="h-0.5 w-8 bg-emerald-500/50 group-hover:w-12 transition-all" />
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em]">How Uza Market Works</span>
+                <div className="h-0.5 w-8 bg-emerald-500/50 group-hover:w-12 transition-all" />
+              </Link>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <span className="text-white font-extrabold uppercase tracking-widest text-[10px] md:text-xs">Questions? Email us:</span>
+                <a href="mailto:support@sypheit.cloud" className="text-yellow-400 font-black uppercase tracking-widest text-xs md:text-sm bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl hover:bg-black/60 transition-all hover:scale-105">
+                  support@sypheit.cloud
+                </a>
+              </div>
             </div>
           </div>
         </div>
