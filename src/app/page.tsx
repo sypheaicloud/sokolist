@@ -46,7 +46,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
         <div className="bg-gradient-to-r from-red-700 via-green-700 to-black border-b border-white/10 shadow-lg relative z-[101]">
-          <div className="w-full px-8 md:px-20 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="w-full px-8 md:px-20 py-1 flex flex-col sm:flex-row items-center justify-between gap-1">
             <div className="flex items-center text-[10px] md:text-xs font-medium text-white/90 uppercase tracking-widest">
               <Sparkles className="h-3 w-3 mr-2 text-yellow-400" />
               Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
