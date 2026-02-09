@@ -122,8 +122,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           </video>
         </div>
 
-        <div className="relative z-10 w-full px-8 md:px-20 text-center -mt-16">
-          <h1 className="mx-auto max-w-4xl text-3xl font-bold tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
+        <div className="relative z-10 w-full px-8 md:px-20 text-center">
+          <h1 className="mx-auto max-w-none text-3xl font-bold tracking-tight md:text-5xl lg:text-5xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent sm:whitespace-nowrap">
             Kenya&apos;s Premier Marketplace
           </h1>
 
