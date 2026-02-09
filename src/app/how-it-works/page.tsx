@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Camera, Tag, ShieldCheck, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Camera, Tag, ShieldCheck, Zap, Sparkles } from "lucide-react";
 
 export default function HowItWorks() {
     return (
@@ -52,7 +52,51 @@ export default function HowItWorks() {
                         </div>
                     </section>
 
-                    {/* Section 2: Pricing Strategy */}
+                    {/* Section 2: Writing Winning Titles */}
+                    <section className="relative p-8 rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                            <Sparkles size={120} />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="h-12 w-12 rounded-2xl bg-yellow-600/20 flex items-center justify-center text-yellow-400 mb-6 border border-yellow-500/20">
+                                <Sparkles size={24} />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-4 italic uppercase">2. Write Winning Titles</h2>
+                            <p className="text-slate-400 leading-relaxed mb-6">
+                                Your title is the first thing buyers see. A precise, descriptive title builds trust and helps your item show up in search results.
+                            </p>
+
+                            <div className="grid md:grid-cols-2 gap-6 mb-8">
+                                <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+                                    <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-2">❌ Bad Title</p>
+                                    <p className="text-slate-500 line-through text-sm italic">"Used Car for Sale"</p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 animate-pulse">
+                                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-2">✅ Winning Title</p>
+                                    <p className="text-white font-bold text-sm italic italic">"2018 Toyota Vitz (KCU) - Silver, Excellent Condition, 45k KM"</p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-3">Include these details:</p>
+                            <ul className="grid grid-cols-2 gap-3">
+                                {[
+                                    "Make & Model",
+                                    "Year of Manufacture",
+                                    "Current Condition",
+                                    "Mileage (for cars)",
+                                    "Color / Specific Version",
+                                    "Registration (e.g. KDL)"
+                                ].map((detail, i) => (
+                                    <li key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                                        <Zap size={14} className="text-yellow-500" />
+                                        {detail}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </section>
+
+                    {/* Section 3: Pricing Strategy */}
                     <section className="relative p-8 rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
                         <div className="absolute top-0 right-0 p-4 opacity-10">
                             <Tag size={120} />
@@ -61,7 +105,7 @@ export default function HowItWorks() {
                             <div className="h-12 w-12 rounded-2xl bg-emerald-600/20 flex items-center justify-center text-emerald-400 mb-6 border border-emerald-500/20">
                                 <Tag size={24} />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 italic uppercase">2. Competitive Pricing</h2>
+                            <h2 className="text-2xl font-bold mb-4 italic uppercase">3. Competitive Pricing</h2>
                             <p className="text-slate-400 leading-relaxed mb-6">
                                 Price your item competitively by checking what others are charging in Nairobi or your local town. Be open to a bit of negotiation—it&apos;s part of the culture!
                             </p>
@@ -83,7 +127,7 @@ export default function HowItWorks() {
                             <div className="h-12 w-12 rounded-2xl bg-blue-600/20 flex items-center justify-center text-blue-400 mb-6 border border-blue-500/20">
                                 <ShieldCheck size={24} />
                             </div>
-                            <h2 className="text-2xl font-bold mb-4 italic uppercase">3. Stay Safe</h2>
+                            <h2 className="text-2xl font-bold mb-4 italic uppercase">4. Stay Safe</h2>
                             <p className="text-slate-400 leading-relaxed mb-6">
                                 Your safety is our priority. Always use our in-app messaging system and follow these core rules:
                             </p>
