@@ -112,15 +112,23 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
 
       {/* Hero Section */}
       <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-12 pb-6">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
-          <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
-          <video autoPlay loop muted playsInline poster="/hero-bg.jpg" className="absolute inset-0 w-full h-full object-cover">
+        <div className="absolute inset-0 z-0 bg-slate-950">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
+          >
             <source src="/hero-bg.mp4" type="video/mp4" />
-            <img src="/hero-bg.jpg" alt="Background" className="w-full h-full object-cover" />
           </video>
-          {/* Subtle overlay directly on the content or a lighter one here */}
-          <div className="absolute inset-0 bg-slate-950/20" />
+
+          {/* Blur Orbs - positioned relative to the background */}
+          <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/10 blur-[128px]" />
+          <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/5 blur-[128px]" />
+
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950" />
         </div>
 
         <div className="relative z-10 w-full px-8 md:px-20 text-center">
