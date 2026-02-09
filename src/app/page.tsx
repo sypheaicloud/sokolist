@@ -118,7 +118,11 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             loop
             muted
             playsInline
+            preload="auto"
             className="absolute inset-0 w-full h-full object-cover opacity-60"
+            onLoadedData={(e) => {
+              e.currentTarget.play();
+            }}
           >
             <source src="/herov6.mp4" type="video/mp4" />
           </video>
