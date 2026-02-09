@@ -69,7 +69,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                   className="object-contain"
                 />
               </div>
-              <span className="text-2xl font-bold tracking-tight text-white">MarketPlace254</span>
+              <span className="text-xl font-bold tracking-tight text-white">MarketPlace254</span>
             </div>
             <div className="hidden items-center gap-6 md:flex">
               <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
