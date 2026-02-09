@@ -203,8 +203,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
         </div>
 
         {/* 🚀 BRANDING SECTION BREAK */}
-        <div className="mb-16 -mx-8 md:-mx-20 bg-gradient-to-r from-red-700 via-green-700 to-black border-y border-white/10 shadow-2xl relative z-10">
-          <div className="w-full px-8 md:px-20 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mb-16 bg-gradient-to-r from-red-700 via-green-700 to-black rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden transition-transform hover:scale-[1.01]">
+          <div className="w-full px-6 md:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center text-xs md:text-sm font-black text-white uppercase tracking-widest">
               <Sparkles className="h-4 w-4 mr-3 text-yellow-400 animate-pulse" />
               Web App design by <span className="text-white font-black mx-1 underline decoration-yellow-400 decoration-2 underline-offset-4">Syphe IT</span>
