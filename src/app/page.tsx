@@ -45,18 +45,6 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
 
       {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
-        <div className="bg-gradient-to-r from-red-700 via-green-700 to-black border-b border-white/10 shadow-lg relative z-[101]">
-          <div className="w-full px-8 md:px-20 py-1 flex flex-col sm:flex-row items-center justify-between gap-1">
-            <div className="flex items-center text-[10px] md:text-xs font-medium text-white/90 uppercase tracking-widest">
-              <Sparkles className="h-3 w-3 mr-2 text-yellow-400" />
-              Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="hidden md:inline text-[10px] text-white/70 font-medium uppercase tracking-widest">Get Updates:</span>
-              <SubscribeForm />
-            </div>
-          </div>
-        </div>
 
         <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-12 relative z-[100]">
           <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
@@ -212,6 +200,20 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
           <CategoryCard emoji="🏗️" label="Construction" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
           <CategoryCard emoji="📸" label="Photography" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
+        </div>
+
+        {/* 🚀 BRANDING SECTION BREAK */}
+        <div className="mb-16 -mx-8 md:-mx-20 bg-gradient-to-r from-red-700 via-green-700 to-black border-y border-white/10 shadow-2xl relative z-10">
+          <div className="w-full px-8 md:px-20 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center text-xs md:text-sm font-black text-white uppercase tracking-widest">
+              <Sparkles className="h-4 w-4 mr-3 text-yellow-400 animate-pulse" />
+              Web App design by <span className="text-white font-black mx-1 underline decoration-yellow-400 decoration-2 underline-offset-4">Syphe IT</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="hidden lg:inline text-[10px] text-white/70 font-bold uppercase tracking-[0.2em]">Join our community:</span>
+              <SubscribeForm />
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-between mb-8">
