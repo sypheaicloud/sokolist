@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MarketPlace-Kenya | Kenya's Premier Marketplace",
+  title: "MarketPlace254 | Kenya's Premier Marketplace",
   description: "Buy, sell, trade, and connect with verified locals across Kenya.",
 };
 
@@ -43,14 +43,14 @@ export default async function RootLayout({
               <div className="relative h-9 w-9 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_10px_rgba(255,255,255,0.1)]">
                 <Image
                   src="/logo.png"
-                  alt="MarketPlace-Kenya Logo"
+                  alt="MarketPlace254 Logo"
                   width={36}
                   height={36}
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent">
-                MarketPlace-Kenya
+              <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent">
+                MarketPlace254
               </span>
             </Link>
 

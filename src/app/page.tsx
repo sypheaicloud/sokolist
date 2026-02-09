@@ -64,12 +64,12 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                 <Image
                   src="/logo.png"
-                  alt="MarketPlace-Kenya Logo"
+                  alt="MarketPlace254 Logo"
                   fill
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white">MarketPlace-Kenya</span>
+              <span className="text-lg font-bold tracking-tight text-white">MarketPlace254</span>
             </div>
             <div className="hidden items-center gap-6 md:flex">
               <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
