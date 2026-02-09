@@ -113,26 +113,13 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       {/* Hero Section */}
       <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-12 pb-6">
         <div className="absolute inset-0 z-0 bg-slate-950">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-60"
-          >
-            <source src="/herov6.mp4" type="video/mp4" />
-          </video>
-
-          {/* Blur Orbs - positioned relative to the background */}
-          <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/10 blur-[128px]" />
-          <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/5 blur-[128px]" />
-
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950" />
+          {/* Blur Orbs */}
+          <div className="absolute top-0 left-1/4 h-64 w-64 rounded-full bg-purple-600/10 blur-[100px]" />
+          <div className="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-emerald-500/5 blur-[100px]" />
         </div>
 
-        <div className="relative z-10 w-full px-8 md:px-20 text-center">
-          <h1 className="mx-auto max-w-none text-3xl font-bold tracking-tight md:text-5xl lg:text-5xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent sm:whitespace-nowrap">
+        <div className="relative z-10 w-full px-6 md:px-20 text-center">
+          <h1 className="mx-auto max-w-none text-2xl font-bold tracking-tight md:text-5xl lg:text-5xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent sm:whitespace-nowrap">
             Kenya&apos;s Premier Marketplace
           </h1>
 
@@ -148,20 +135,20 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <span className="text-white drop-shadow-sm">Housing</span>
           </div>
 
-          <p className="mx-auto mt-8 max-w-2xl text-[11px] md:text-sm font-bold uppercase tracking-[0.25em] text-white/90 leading-relaxed drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
+          <p className="mx-auto mt-6 max-w-xl text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] text-white/80 leading-relaxed drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
             Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
           <div className="mx-auto mt-8 max-w-2xl">
             {/* SEARCH FORM */}
-            <form action="/" method="GET" className="group relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
-              <Search className="ml-3 text-slate-500" size={20} />
+            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1.5 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
+              <Search className="ml-2 text-slate-500" size={16} />
               <input
                 type="text"
                 name="q"
                 defaultValue={params.q}
-                placeholder="What are you looking for?"
-                className="flex-1 bg-transparent px-2 py-3 text-white placeholder:text-slate-500 focus:outline-none"
+                placeholder="Search..."
+                className="flex-1 bg-transparent px-2 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
               <div className="h-8 w-[1px] bg-white/10" />
 
