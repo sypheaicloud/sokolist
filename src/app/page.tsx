@@ -50,9 +50,6 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <div className="flex items-center text-[10px] md:text-xs font-medium text-white/90 uppercase tracking-widest">
               <Sparkles className="h-3 w-3 mr-2 text-yellow-400" />
               Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
-              <span className="hidden sm:inline mx-2 text-white/30">|</span>
-              <span className="hidden sm:inline text-white font-extrabold uppercase tracking-wider mr-1">Questions? Email us:</span>
-              <span className="hidden sm:inline text-yellow-400 font-extrabold uppercase tracking-widest bg-white/10 px-2 py-0.5 rounded shadow-sm">support@sypheit.cloud</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="hidden md:inline text-[10px] text-white/70 font-medium uppercase tracking-widest">Get Updates:</span>
@@ -114,19 +111,19 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       </header>
 
       {/* Hero Section */}
-      <section className="relative flex min-h-[35vh] items-center justify-center overflow-hidden pt-24 pb-12">
+      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden pt-16 pb-12">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-purple-600/20 blur-[128px]" />
           <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-[128px]" />
-          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay">
-            <source src="/hero-bg.mp4" type="video/mp4" />
+          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay">
+            <source src="/hero1-bg.mp4" type="video/mp4" />
             {/* Fallback image if video fails to load or during loading */}
             <img src="/hero-bg.jpg" alt="Background" className="w-full h-full object-cover" />
           </video>
         </div>
 
-        <div className="relative z-10 w-full px-8 md:px-20 text-center">
-          <h1 className="mx-auto max-w-4xl text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
+        <div className="relative z-10 w-full px-8 md:px-20 text-center -mt-16">
+          <h1 className="mx-auto max-w-4xl text-3xl font-bold tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
             Kenya&apos;s Premier Marketplace
           </h1>
 
@@ -181,6 +178,13 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                 <ArrowRight size={20} />
               </button>
             </form>
+
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <span className="text-white font-extrabold uppercase tracking-widest text-[10px] md:text-xs">Questions? Email us:</span>
+              <a href="mailto:support@sypheit.cloud" className="text-yellow-400 font-black uppercase tracking-widest text-xs md:text-sm bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl hover:bg-black/60 transition-all hover:scale-105">
+                support@sypheit.cloud
+              </a>
+            </div>
           </div>
         </div>
       </section>
