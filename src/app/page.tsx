@@ -120,7 +120,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             playsInline
             className="absolute inset-0 w-full h-full object-cover opacity-60"
           >
-            <source src="/hero-bg.mp4" type="video/mp4" />
+            <source src="/herov6.mp4" type="video/mp4" />
           </video>
 
           {/* Blur Orbs - positioned relative to the background */}
