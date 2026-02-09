@@ -49,7 +49,7 @@ export default async function RootLayout({
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent">
+              <span className="text-sm font-bold bg-gradient-to-r from-purple-400 to-emerald-400 bg-clip-text text-transparent">
                 MarketPlace254
               </span>
             </Link>
