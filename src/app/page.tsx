@@ -51,7 +51,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               <Sparkles className="h-3 w-3 mr-2 text-yellow-400" />
               Web App design by <span className="text-white font-bold mx-1">Syphe IT</span>
               <span className="hidden sm:inline mx-2 text-white/30">|</span>
-              <span className="hidden sm:inline text-white/80 lowercase tracking-normal">support@sypheit.cloud</span>
+              <span className="hidden sm:inline text-white/60 lowercase tracking-normal mr-1">Questions? Email us:</span>
+              <span className="hidden sm:inline text-white/90 lowercase tracking-normal">support@sypheit.cloud</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="hidden md:inline text-[10px] text-white/70 font-medium uppercase tracking-widest">Get Updates:</span>
