@@ -123,16 +123,16 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             Kenya&apos;s Premier Marketplace
           </h1>
 
-          <div className="mt-8 flex items-center justify-center gap-2 md:gap-6 text-[8px] md:text-sm font-black uppercase tracking-[0.15em] md:tracking-[0.4em] whitespace-nowrap overflow-visible">
-            <span className="text-white drop-shadow-sm">Buy</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-sm">Sell</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-sm">Trade</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-sm">Services</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-sm">Housing</span>
+          <div className="mt-6 flex items-center justify-center gap-1 md:gap-6 text-[10px] md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible">
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Buy</span>
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Sell</span>
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Trade</span>
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Services</span>
+            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Housing</span>
           </div>
 
           <p className="mx-auto mt-6 max-w-xl text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] text-white/80 leading-relaxed drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
