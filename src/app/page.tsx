@@ -302,15 +302,14 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
     <>
       {items.map((item) => (
         <Link key={item.id} href={`/listing/${item.id}`} className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:-translate-y-1">
-          <div className="h-48 w-full relative overflow-hidden bg-slate-800">
+          <div className="h-48 w-full relative overflow-hidden">
             {item.imageUrl && (
               <Image
                 src={item.imageUrl}
                 alt={item.title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                priority={items.indexOf(item) < 4}
+                unoptimized
               />
             )}
           </div>
