@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { getListings, getSiteStats } from './actions';
 import SubscribeForm from '@/components/SubscribeForm';
 import UnreadBadge from '@/components/UnreadBadge';
+import ListingCard from '@/components/ListingCard';
 
 // ✅ 1. ADDED: Locations Data
 const KENYAN_LOCATIONS = [
@@ -301,24 +302,7 @@ async function ListingGrid({ searchParams }: { searchParams: { q?: string; categ
   return (
     <>
       {items.map((item) => (
-        <Link key={item.id} href={`/listing/${item.id}`} className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 transition-all hover:-translate-y-1">
-          <div className="h-48 w-full relative overflow-hidden">
-            {item.imageUrl && (
-              <Image
-                src={item.imageUrl}
-                alt={item.title}
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            )}
-          </div>
-          <div className="p-4">
-            <span className="text-[10px] uppercase tracking-widest text-purple-400 font-bold">{item.category}</span>
-            <h3 className="mb-1 text-base font-bold text-slate-100 truncate">{item.title}</h3>
-            <p className="font-bold text-emerald-400">KSh {item.price.toLocaleString()}</p>
-          </div>
-        </Link>
+        <ListingCard key={item.id} item={item} />
       ))}
     </>
   );

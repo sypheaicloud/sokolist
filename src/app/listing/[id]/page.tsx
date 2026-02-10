@@ -60,6 +60,7 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                                 fill
                                 className={`object-cover transition-transform duration-500 ${!isSold && 'group-hover:scale-105'}`}
                                 unoptimized
+                                decoding="async"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-600 bg-slate-900">

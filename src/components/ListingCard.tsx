@@ -18,6 +18,7 @@ export default function ListingCard({ item }: { item: any }) {
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         unoptimized
+                        decoding="async"
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-slate-600 bg-slate-900">
