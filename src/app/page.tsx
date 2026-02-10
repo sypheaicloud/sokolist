@@ -111,14 +111,14 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <source src="/try1.mp4" type="video/mp4" />
           </video>
           {/* Overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-slate-950/40" />
+          <div className="absolute inset-0 bg-slate-950/60" />
           {/* Blur Orbs */}
           <div className="absolute top-0 left-1/4 h-64 w-64 rounded-full bg-purple-600/10 blur-[100px]" />
           <div className="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-emerald-500/5 blur-[100px]" />
         </div>
 
         <div className="relative z-10 w-full px-6 md:px-20 text-center">
-          <h1 className="mx-auto max-w-none text-2xl font-black tracking-tight md:text-5xl lg:text-6xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+          <h1 className="mx-auto max-w-none text-2xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
             Kenya&apos;s Premier Marketplace
           </h1>
 
@@ -134,9 +134,11 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Housing</span>
           </div>
 
-          <p className="mx-auto mt-6 max-w-xl text-xs md:text-base font-medium text-white leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,1)] px-4">
-            Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
-          </p>
+          <div className="mx-auto mt-8 max-w-lg">
+            <p className="rounded-2xl bg-black/40 px-6 py-3 text-sm font-bold leading-relaxed text-white shadow-2xl backdrop-blur-md border border-white/10 md:text-lg">
+              Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
+            </p>
+          </div>
 
           <div className="mx-auto mt-8 max-w-2xl">
             {/* SEARCH FORM */}
