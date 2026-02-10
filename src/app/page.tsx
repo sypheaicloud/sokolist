@@ -118,7 +118,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
         </div>
 
         <div className="relative z-10 w-full px-6 md:px-20 text-center">
-          <h1 className="mx-auto max-w-none text-2xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+          <h1 className="mx-auto max-w-none text-2xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-rose-300 via-red-500 to-red-900 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">
             Kenya&apos;s Premier Marketplace
           </h1>
 
@@ -136,7 +136,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
 
           <div className="mx-auto mt-8 max-w-lg">
             <p className="rounded-2xl bg-black/40 px-6 py-3 text-sm font-bold leading-relaxed shadow-2xl backdrop-blur-md border border-white/10 md:text-lg">
-              <span className="bg-gradient-to-r from-emerald-300 via-emerald-500 to-emerald-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-rose-400 via-red-500 to-red-200 bg-clip-text text-transparent">
                 Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
               </span>
             </p>
