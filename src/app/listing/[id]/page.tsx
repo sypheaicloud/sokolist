@@ -59,7 +59,8 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                                 alt={listing.title}
                                 fill
                                 className={`object-cover transition-transform duration-500 ${!isSold && 'group-hover:scale-105'}`}
-                                unoptimized
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                priority
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-600 bg-slate-900">
