@@ -101,6 +101,17 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       {/* Hero Section */}
       <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-12 pb-6">
         <div className="absolute inset-0 z-0 bg-slate-950">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="h-full w-full object-cover opacity-60"
+          >
+            <source src="/try1.mp4" type="video/mp4" />
+          </video>
+          {/* Overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-slate-950/40" />
           {/* Blur Orbs */}
           <div className="absolute top-0 left-1/4 h-64 w-64 rounded-full bg-purple-600/10 blur-[100px]" />
           <div className="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-emerald-500/5 blur-[100px]" />
