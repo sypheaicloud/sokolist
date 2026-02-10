@@ -134,7 +134,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Housing</span>
           </div>
 
-          <p className="mx-auto mt-6 max-w-xl text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] text-white/80 leading-relaxed drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
+          <p className="mx-auto mt-6 max-w-xl text-xs md:text-base font-medium text-white leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,1)] px-4">
             Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
           </p>
 
