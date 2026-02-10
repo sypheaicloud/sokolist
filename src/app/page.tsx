@@ -135,8 +135,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           </div>
 
           <div className="mx-auto mt-8 max-w-lg">
-            <p className="rounded-2xl bg-black/40 px-6 py-3 text-sm font-bold leading-relaxed shadow-2xl backdrop-blur-md border border-white/10 md:text-lg">
-              <span className="bg-gradient-to-r from-emerald-300 via-emerald-500 to-emerald-200 bg-clip-text text-transparent">
+            <p className="rounded-2xl bg-black/40 px-6 py-3 text-[10px] font-bold leading-relaxed shadow-2xl backdrop-blur-md border border-white/10 md:text-sm">
+              <span className="bg-gradient-to-r from-emerald-300 via-emerald-500 to-emerald-200 bg-clip-text text-transparent uppercase tracking-widest">
                 Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
               </span>
             </p>
