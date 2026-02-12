@@ -123,16 +123,16 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             Kenya&apos;s Premier Marketplace
           </h1>
 
-          <div className="mt-4 flex items-center justify-center gap-1 md:gap-6 text-[8px] md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible opacity-80 md:opacity-100">
-            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Buy</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Sell</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Trade</span>
-            <span className="hidden sm:inline-flex h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="hidden sm:inline text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Services</span>
-            <span className="hidden sm:inline-flex h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="hidden sm:inline text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Housing</span>
+          <div className="mt-6 flex items-center justify-center gap-2 md:gap-8 text-[12px] md:text-lg font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+            <span className="text-white">Buy</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white">Sell</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="text-white">Trade</span>
+            <span className="hidden sm:inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="hidden sm:inline text-white">Services</span>
+            <span className="hidden sm:inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="hidden sm:inline text-white">Housing</span>
           </div>
 
           <div className="mx-auto mt-6 max-w-lg hidden sm:block">
