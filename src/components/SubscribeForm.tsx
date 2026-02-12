@@ -29,9 +29,9 @@ export default function SubscribeForm() {
                     name="email"
                     type="email"
                     required
-                    placeholder="Subscribe for updates..."
+                    placeholder="Subscribe..."
                     disabled={status === 'loading' || status === 'success'}
-                    className="h-9 pl-10 pr-4 rounded-full bg-white border border-white text-xs text-black font-black placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-52 transition-all disabled:opacity-50"
+                    className="h-9 pl-10 pr-4 rounded-full bg-white border border-white text-xs text-black font-black placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full max-w-[170px] md:max-w-none md:w-52 transition-all disabled:opacity-50"
                 />
             </div>
 

@@ -142,23 +142,23 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             </p>
           </div>
 
-          <div className="mx-auto mt-8 max-w-2xl px-2">
-            {/* PATRIOTIC SEARCH FORM */}
-            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-3xl border border-white/20 bg-black/60 p-2 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-3xl shadow-2xl">
-              <div className="ml-3 flex items-center justify-center">
-                <Search className="text-emerald-500 group-hover:scale-110 transition-transform" size={20} />
+          <div className="mx-auto mt-6 md:mt-10 max-w-2xl px-2">
+            {/* PATRIOTIC SEARCH FORM - MOBILE OPTIMIZED */}
+            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-2xl md:rounded-3xl border border-white/20 bg-black/60 p-1.5 md:p-2 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-3xl shadow-2xl">
+              <div className="ml-2 md:ml-3 flex items-center justify-center shrink-0">
+                <Search className="text-emerald-500 group-hover:scale-110 transition-transform" size={18} />
               </div>
               <input
                 type="text"
                 name="q"
                 defaultValue={params.q}
-                placeholder="What are you looking for in Kenya?"
-                className="flex-1 bg-transparent px-3 py-3 text-base md:text-lg text-white placeholder:text-slate-500 focus:outline-none font-medium"
+                placeholder="I'm looking for..."
+                className="flex-1 bg-transparent px-2 md:px-3 py-2.5 md:py-3 text-sm md:text-lg text-white placeholder:text-slate-500 focus:outline-none font-medium min-w-0"
               />
-              <div className="h-10 w-[1px] bg-white/10 hidden sm:block mx-1" />
+              <div className="h-8 md:h-10 w-[1px] bg-white/10 hidden sm:block mx-1" />
 
-              {/* Location Selector */}
-              <div className="hidden sm:flex items-center gap-2 px-4 text-slate-400 relative">
+              {/* Location Selector - Desktop Only for clutter reduction */}
+              <div className="hidden md:flex items-center gap-2 px-4 text-slate-400 relative">
                 <MapPin size={20} className="text-red-500 shrink-0" />
                 <input
                   type="text"
@@ -175,8 +175,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                 </datalist>
               </div>
 
-              <button type="submit" className="rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-700 p-4 text-white hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(16,185,129,0.4)] active:scale-95">
-                <ArrowRight size={22} className="stroke-[3]" />
+              <button type="submit" className="rounded-xl md:rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-700 p-2.5 md:p-4 text-white hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(16,185,129,0.4)] active:scale-95 shrink-0">
+                <ArrowRight size={18} className="md:size-[22] stroke-[3]" />
               </button>
             </form>
 
@@ -220,19 +220,19 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
         </div>
 
-        {/* 🚀 PATRIOTIC BRANDING SECTION */}
-        <div className="mb-10 bg-gradient-to-r from-black via-red-700 to-emerald-700 rounded-3xl border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative z-10 overflow-hidden group">
+        {/* 🚀 PATRIOTIC BRANDING SECTION - MOBILE OPTIMIZED */}
+        <div className="mb-10 bg-gradient-to-r from-black via-red-700 to-emerald-700 rounded-2xl md:rounded-3xl border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative z-10 overflow-hidden group">
           <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
-          <div className="relative w-full px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative w-full px-5 py-6 md:px-8 md:py-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col gap-1 text-center md:text-left">
-              <h3 className="text-2xl font-black text-white tracking-tight drop-shadow-lg">
+              <h3 className="text-xl md:text-2xl font-black text-white tracking-tight drop-shadow-lg uppercase">
                 JOIN KENYANS TRADING DAILY
               </h3>
-              <p className="text-white/80 text-[10px] uppercase font-bold tracking-[0.3em]">
+              <p className="text-white/70 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em]">
                 The Heart of Kenya&apos;s Local Commerce
               </p>
             </div>
-            <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="flex items-center justify-center w-full md:w-auto">
               <SubscribeForm />
             </div>
           </div>
