@@ -142,29 +142,31 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             </p>
           </div>
 
-          <div className="mx-auto mt-6 max-w-2xl px-2">
-            {/* SEARCH FORM */}
-            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-2xl">
-              <Search className="ml-2 text-slate-500" size={18} />
+          <div className="mx-auto mt-8 max-w-2xl px-2">
+            {/* PATRIOTIC SEARCH FORM */}
+            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-3xl border border-white/20 bg-black/60 p-2 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-3xl shadow-2xl">
+              <div className="ml-3 flex items-center justify-center">
+                <Search className="text-emerald-500 group-hover:scale-110 transition-transform" size={20} />
+              </div>
               <input
                 type="text"
                 name="q"
                 defaultValue={params.q}
-                placeholder="What are you looking for?"
-                className="flex-1 bg-transparent px-2 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                placeholder="What are you looking for in Kenya?"
+                className="flex-1 bg-transparent px-3 py-3 text-base md:text-lg text-white placeholder:text-slate-500 focus:outline-none font-medium"
               />
-              <div className="h-8 w-[1px] bg-white/10 hidden sm:block" />
+              <div className="h-10 w-[1px] bg-white/10 hidden sm:block mx-1" />
 
-              {/* ✅ 2. UPDATED: Location Dropdown + Search */}
-              <div className="hidden sm:flex items-center gap-2 px-3 text-slate-400 relative">
-                <MapPin size={18} className="text-slate-500 shrink-0" />
+              {/* Location Selector */}
+              <div className="hidden sm:flex items-center gap-2 px-4 text-slate-400 relative">
+                <MapPin size={20} className="text-red-500 shrink-0" />
                 <input
                   type="text"
                   name="location"
-                  list="home-locations" // Connects to datalist below
+                  list="home-locations"
                   defaultValue={params.location}
                   placeholder="Location"
-                  className="w-28 bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                  className="w-32 bg-transparent text-sm font-semibold text-white placeholder:text-slate-500 focus:outline-none"
                 />
                 <datalist id="home-locations">
                   {KENYAN_LOCATIONS.map((loc) => (
@@ -173,8 +175,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                 </datalist>
               </div>
 
-              <button type="submit" className="rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 p-3 text-white hover:opacity-90 transition-opacity">
-                <ArrowRight size={20} />
+              <button type="submit" className="rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-700 p-4 text-white hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(16,185,129,0.4)] active:scale-95">
+                <ArrowRight size={22} className="stroke-[3]" />
               </button>
             </form>
 
@@ -218,15 +220,17 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
         </div>
 
-        {/* 🚀 BRANDING SECTION BREAK */}
-        <div className="mb-10 bg-gradient-to-r from-emerald-600 via-emerald-800 to-slate-900 rounded-2xl border border-white/10 shadow-2xl relative z-10 overflow-hidden">
-          <div className="w-full px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
-            <div className="flex flex-col gap-0 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start text-[10px] font-black text-white uppercase tracking-widest mb-1">
-                <Sparkles className="h-3 w-3 mr-2 text-yellow-400 animate-pulse" />
-                Experience the difference
-              </div>
-              <h3 className="text-lg font-black text-white">Join 10,000+ Kenyans Trading Daily</h3>
+        {/* 🚀 PATRIOTIC BRANDING SECTION */}
+        <div className="mb-10 bg-gradient-to-r from-black via-red-700 to-emerald-700 rounded-3xl border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative z-10 overflow-hidden group">
+          <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
+          <div className="relative w-full px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col gap-1 text-center md:text-left">
+              <h3 className="text-2xl font-black text-white tracking-tight drop-shadow-lg">
+                JOIN KENYANS TRADING DAILY
+              </h3>
+              <p className="text-white/80 text-[10px] uppercase font-bold tracking-[0.3em]">
+                The Heart of Kenya&apos;s Local Commerce
+              </p>
             </div>
             <div className="flex items-center gap-4 w-full md:w-auto">
               <SubscribeForm />

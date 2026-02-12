@@ -24,29 +24,29 @@ export default function SubscribeForm() {
     return (
         <form action={handleSubmit} className="flex items-center gap-2">
             <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400 group-focus-within:text-purple-400 transition-colors" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-emerald-600 transition-colors" />
                 <input
                     name="email"
                     type="email"
                     required
                     placeholder="Subscribe for updates..."
                     disabled={status === 'loading' || status === 'success'}
-                    className="h-8 pl-8 pr-3 rounded-full bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-48 transition-all disabled:opacity-50"
+                    className="h-9 pl-10 pr-4 rounded-full bg-white border border-white text-xs text-black font-black placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-52 transition-all disabled:opacity-50"
                 />
             </div>
 
             <button
                 type="submit"
                 disabled={status === 'loading' || status === 'success'}
-                className={`h-8 w-8 flex items-center justify-center rounded-full transition-all ${status === 'success'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-purple-600 hover:bg-purple-500 text-white'
+                className={`h-9 w-9 flex items-center justify-center rounded-full transition-all shadow-lg ${status === 'success'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white'
                     }`}
             >
-                {status === 'loading' && <Loader2 className="h-3 w-3 animate-spin" />}
-                {status === 'success' && <Check className="h-3 w-3" />}
-                {status === 'idle' && <ArrowRight className="h-3 w-3" />}
-                {status === 'error' && <span className="text-[10px] font-bold">!</span>}
+                {status === 'loading' && <Loader2 className="h-4 w-4 animate-spin" />}
+                {status === 'success' && <Check className="h-4 w-4" />}
+                {status === 'idle' && <ArrowRight className="h-4 w-4 stroke-[3]" />}
+                {status === 'error' && <span className="text-[10px] font-black italic">!</span>}
             </button>
         </form>
     );
