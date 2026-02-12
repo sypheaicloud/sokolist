@@ -218,14 +218,14 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
         </div>
 
         {/* 🚀 BRANDING SECTION BREAK */}
-        <div className="mb-12 bg-gradient-to-r from-emerald-600 via-emerald-800 to-slate-900 rounded-2xl border border-white/10 shadow-2xl relative z-10 overflow-hidden">
-          <div className="w-full px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col gap-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start text-xs font-black text-white uppercase tracking-widest mb-2">
-                <Sparkles className="h-4 w-4 mr-2 text-yellow-400 animate-pulse" />
+        <div className="mb-10 bg-gradient-to-r from-emerald-600 via-emerald-800 to-slate-900 rounded-2xl border border-white/10 shadow-2xl relative z-10 overflow-hidden">
+          <div className="w-full px-6 py-4 md:py-6 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+            <div className="flex flex-col gap-0 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start text-[10px] font-black text-white uppercase tracking-widest mb-1">
+                <Sparkles className="h-3 w-3 mr-2 text-yellow-400 animate-pulse" />
                 Experience the difference
               </div>
-              <h3 className="text-xl font-black text-white">Join 10,000+ Kenyans Trading Daily</h3>
+              <h3 className="text-lg font-black text-white">Join 10,000+ Kenyans Trading Daily</h3>
             </div>
             <div className="flex items-center gap-4 w-full md:w-auto">
               <SubscribeForm />
