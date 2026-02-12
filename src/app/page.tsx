@@ -120,8 +120,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
         </div>
 
         <div className="relative z-10 w-full px-6 md:px-20 text-center">
-          <h1 className="mx-auto max-w-none text-3xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-            Kenya&apos;s Premier Marketplace
+          <h1 className="mx-auto max-w-none text-3xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] uppercase">
+            KENYA&apos;S PREMIER MARKETPLACE
           </h1>
 
           <div className="mt-6 flex items-center justify-center gap-2 md:gap-8 text-[12px] md:text-lg font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
