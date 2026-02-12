@@ -220,23 +220,6 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
         </div>
 
-        {/* 🚀 PATRIOTIC BRANDING SECTION - MOBILE OPTIMIZED */}
-        <div className="mb-10 bg-gradient-to-r from-black via-red-700 to-emerald-700 rounded-2xl md:rounded-3xl border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative z-10 overflow-hidden group">
-          <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
-          <div className="relative w-full px-5 py-6 md:px-8 md:py-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col gap-1 text-center md:text-left">
-              <h3 className="text-xl md:text-2xl font-black text-white tracking-tight drop-shadow-lg uppercase">
-                JOIN KENYANS TRADING DAILY
-              </h3>
-              <p className="text-white/70 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em]">
-                The Heart of Kenya&apos;s Local Commerce
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-full md:w-auto">
-              <SubscribeForm />
-            </div>
-          </div>
-        </div>
 
         <div className="flex items-center justify-between mb-8 px-2">
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
@@ -251,6 +234,24 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <Suspense fallback={<div className="col-span-full text-center text-slate-500 py-12 px-4 bg-white/5 rounded-2xl">Loading listings...</div>}>
             <ListingGrid searchParams={params} />
           </Suspense>
+        </div>
+
+        {/* 🚀 RELOCATED PATRIOTIC BRANDING - SLIM VERSION */}
+        <div className="mt-16 bg-gradient-to-r from-black via-red-700 to-emerald-700 rounded-2xl md:rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-black/10" />
+          <div className="relative w-full px-6 py-4 md:py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col gap-0 text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-black text-white tracking-tight uppercase">
+                JOIN KENYANS TRADING DAILY
+              </h3>
+              <p className="text-white/60 text-[8px] md:text-[9px] uppercase font-bold tracking-[0.2em]">
+                The Heart of Kenya&apos;s Local Commerce
+              </p>
+            </div>
+            <div className="flex items-center justify-center w-full md:w-auto scale-95 md:scale-100">
+              <SubscribeForm />
+            </div>
+          </div>
         </div>
       </section>
 
