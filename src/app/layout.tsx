@@ -9,6 +9,7 @@ import UnreadBadge from "@/components/UnreadBadge"; // 👈 Import the Badge
 import { Suspense } from "react"; // 👈 Needed for async components
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { getSiteStats } from "./actions";
+import MobileNav from "@/components/MobileNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,13 +35,14 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-100`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-100 mb-20 md:mb-0`}
       >
 
         <AnalyticsTracker />
         <main>
           {children}
         </main>
+        <MobileNav />
         <Analytics />
       </body>
     </html>

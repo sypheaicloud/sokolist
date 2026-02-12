@@ -46,9 +46,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
 
       {/* 🔒 COMBINED HEADER */}
       <header className="fixed top-0 left-0 right-0 z-[100]">
-
-        <nav className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl h-12 relative z-[100]">
-          <div className="w-full flex h-full items-center justify-between px-8 md:px-20">
+        <nav className="border-b border-white/10 bg-slate-950/40 backdrop-blur-xl h-14 relative z-[100]">
+          <div className="w-full flex h-full items-center justify-between px-6 md:px-20">
             <div className="flex items-center gap-3">
               <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                 <Image
@@ -58,12 +57,13 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                   className="object-contain"
                 />
               </div>
-              <span className="text-sm font-bold tracking-tight text-white">MarketPlace254</span>
+              <span className="text-sm font-bold tracking-tight text-white hidden sm:block">MarketPlace254</span>
+              <span className="text-sm font-bold tracking-tight text-white sm:hidden">MP254</span>
             </div>
+
             <div className="hidden items-center gap-6 md:flex">
               <Link href="/" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Home</Link>
               <Link href="/browse" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Browse</Link>
-
               <Link
                 href="/messages"
                 className="relative text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center"
@@ -73,25 +73,25 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                   <UnreadBadge />
                 </Suspense>
               </Link>
-
               {(session?.user as any)?.isAdmin && (
                 <Link href="/admin" className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
                   Admin
                 </Link>
               )}
             </div>
+
             <div className="flex items-center gap-4">
               {session?.user ? (
                 <Link href="/profile" className="flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white transition-colors">
                   <div className="h-8 w-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
-                    <span>{session.user.name?.[0] || 'U'}</span>
+                    <span className="text-xs">{session.user.name?.[0] || 'U'}</span>
                   </div>
-                  <span className="hidden sm:inline">{session.user.name?.split(' ')[0]}</span>
+                  <span className="hidden md:inline">{session.user.name?.split(' ')[0]}</span>
                 </Link>
               ) : (
                 <Link href="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Login</Link>
               )}
-              <Link href="/post" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 hover:bg-slate-200 transition-colors">
+              <Link href="/post" className="hidden sm:flex rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 hover:bg-slate-200 transition-colors shadow-lg shadow-white/10">
                 Post Ad
               </Link>
             </div>
@@ -119,43 +119,43 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
         </div>
 
         <div className="relative z-10 w-full px-6 md:px-20 text-center">
-          <h1 className="mx-auto max-w-none text-2xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+          <h1 className="mx-auto max-w-none text-3xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
             Kenya&apos;s Premier Marketplace
           </h1>
 
-          <div className="mt-6 flex items-center justify-center gap-1 md:gap-6 text-[10px] md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible">
+          <div className="mt-4 flex items-center justify-center gap-1 md:gap-6 text-[8px] md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible opacity-80 md:opacity-100">
             <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Buy</span>
             <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Sell</span>
             <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
             <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Trade</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Services</span>
-            <span className="h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Housing</span>
+            <span className="hidden sm:inline-flex h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="hidden sm:inline text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Services</span>
+            <span className="hidden sm:inline-flex h-1 w-1 md:h-1.5 md:w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="hidden sm:inline text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">Housing</span>
           </div>
 
-          <div className="mx-auto mt-8 max-w-lg">
+          <div className="mx-auto mt-6 max-w-lg hidden sm:block">
             <p className="rounded-2xl bg-black/40 px-6 py-3 text-[10px] font-black leading-relaxed shadow-2xl backdrop-blur-md border border-white/10 md:text-sm uppercase tracking-[0.2em] text-white">
               Connect with verified locals. From Nairobi to Mombasa, find everything you need in one secure place.
             </p>
           </div>
 
-          <div className="mx-auto mt-8 max-w-2xl">
+          <div className="mx-auto mt-6 max-w-2xl px-2">
             {/* SEARCH FORM */}
-            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1.5 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-md">
-              <Search className="ml-2 text-slate-500" size={16} />
+            <form action="/" method="GET" className="group relative flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 transition-all hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/10 backdrop-blur-2xl">
+              <Search className="ml-2 text-slate-500" size={18} />
               <input
                 type="text"
                 name="q"
                 defaultValue={params.q}
-                placeholder="Search..."
-                className="flex-1 bg-transparent px-2 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                placeholder="What are you looking for?"
+                className="flex-1 bg-transparent px-2 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
-              <div className="h-8 w-[1px] bg-white/10" />
+              <div className="h-8 w-[1px] bg-white/10 hidden sm:block" />
 
               {/* ✅ 2. UPDATED: Location Dropdown + Search */}
-              <div className="flex items-center gap-2 px-3 text-slate-400 relative">
+              <div className="hidden sm:flex items-center gap-2 px-3 text-slate-400 relative">
                 <MapPin size={18} className="text-slate-500 shrink-0" />
                 <input
                   type="text"
@@ -172,24 +172,24 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                 </datalist>
               </div>
 
-              <button type="submit" className="rounded-xl bg-purple-600 p-3 text-white hover:bg-purple-500 transition-colors">
+              <button type="submit" className="rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 p-3 text-white hover:opacity-90 transition-opacity">
                 <ArrowRight size={20} />
               </button>
             </form>
 
-            <div className="mt-6 flex flex-col items-center gap-4">
+            <div className="mt-8 flex flex-col items-center gap-4">
               <Link
                 href="/how-it-works"
-                className="group flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+                className="group flex items-center gap-2 text-white/60 hover:text-white transition-colors"
               >
-                <div className="h-0.5 w-8 bg-emerald-500/50 group-hover:w-12 transition-all" />
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em]">How Uza Market Works</span>
-                <div className="h-0.5 w-8 bg-emerald-500/50 group-hover:w-12 transition-all" />
+                <div className="h-[1px] w-6 bg-emerald-500/50 group-hover:w-10 transition-all" />
+                <span className="text-[8px] md:text-xs font-black uppercase tracking-[0.3em]">How it works</span>
+                <div className="h-[1px] w-6 bg-emerald-500/50 group-hover:w-10 transition-all" />
               </Link>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <span className="text-white font-extrabold uppercase tracking-widest text-[10px] md:text-xs">Questions? Email us:</span>
-                <a href="mailto:support@sypheit.cloud" className="text-yellow-400 font-black uppercase tracking-widest text-xs md:text-sm bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl hover:bg-black/60 transition-all hover:scale-105">
+              <div className="hidden sm:flex flex-col sm:flex-row items-center justify-center gap-3">
+                <span className="text-white/60 font-medium uppercase tracking-widest text-[10px]">Need help?</span>
+                <a href="mailto:support@sypheit.cloud" className="text-yellow-400 font-black uppercase tracking-widest text-[10px] bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl hover:bg-white/10 transition-all">
                   support@sypheit.cloud
                 </a>
               </div>
@@ -199,48 +199,51 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       </section>
 
       {/* Categories & Listings */}
-      <section className="w-full px-8 md:px-20 py-12 flex-1">
-        <h2 className="text-2xl font-semibold tracking-tight text-white mb-8">Browse Categories</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mb-16">
+      <section className="w-full px-4 md:px-20 py-8 flex-1">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold tracking-tight text-white px-2">Browse Categories</h2>
+          <Link href="/browse" className="text-xs font-bold text-purple-400 hover:text-purple-300 uppercase tracking-widest md:hidden">View All</Link>
+        </div>
+
+        {/* Mobile Horizontal Scroll Categories */}
+        <div className="flex md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 overflow-x-auto pb-8 snap-x no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
           <CategoryCard emoji="🚗" label="Vehicles" color="bg-blue-500/10 text-blue-400 border-blue-500/20" />
           <CategoryCard emoji="📱" label="Electronics" color="bg-purple-500/10 text-purple-400 border-purple-500/20" />
-          <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" />
-          <CategoryCard emoji="🌐" label="IT (Network, Cloud, Devops, AI)" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="🏠" label="Real Estate" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20" />
           <CategoryCard emoji="💼" label="Jobs" color="bg-amber-500/10 text-amber-400 border-amber-500/20" />
           <CategoryCard emoji="🔧" label="Services" color="bg-rose-500/10 text-rose-400 border-rose-500/20" />
-          <CategoryCard emoji="🤝" label="Trade" color="bg-orange-500/10 text-orange-400 border-orange-500/20" />
-          <CategoryCard emoji="❤️" label="Dating" color="bg-pink-500/10 text-pink-400 border-pink-500/20" />
+          <CategoryCard emoji="💻" label="Laptops" color="bg-zinc-500/10 text-zinc-400 border-zinc-500/20" />
+          <CategoryCard emoji="🌐" label="IT & Tech" color="bg-cyan-500/10 text-cyan-400 border-cyan-500/20" />
           <CategoryCard emoji="📞" label="Phones" color="bg-indigo-500/10 text-indigo-400 border-indigo-500/20" />
-          <CategoryCard emoji="🏗️" label="Construction" color="bg-yellow-500/10 text-yellow-400 border-yellow-500/20" />
-          <CategoryCard emoji="📸" label="Photography" color="bg-teal-500/10 text-teal-400 border-teal-500/20" />
         </div>
 
         {/* 🚀 BRANDING SECTION BREAK */}
-        <div className="mb-16 bg-gradient-to-r from-red-700 via-green-700 to-black rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden transition-transform hover:scale-[1.01]">
-          <div className="w-full px-6 md:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center text-xs md:text-sm font-black text-white uppercase tracking-widest">
-              <Sparkles className="h-4 w-4 mr-3 text-yellow-400 animate-pulse" />
-              Web App design by <span className="text-white font-black mx-1 underline decoration-yellow-400 decoration-2 underline-offset-4">Syphe IT</span>
+        <div className="mb-12 bg-gradient-to-r from-emerald-600 via-emerald-800 to-slate-900 rounded-2xl border border-white/10 shadow-2xl relative z-10 overflow-hidden">
+          <div className="w-full px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col gap-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start text-xs font-black text-white uppercase tracking-widest mb-2">
+                <Sparkles className="h-4 w-4 mr-2 text-yellow-400 animate-pulse" />
+                Experience the difference
+              </div>
+              <h3 className="text-xl font-black text-white">Join 10,000+ Kenyans Trading Daily</h3>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="hidden lg:inline text-[10px] text-white/70 font-bold uppercase tracking-[0.2em]">Join our community:</span>
+            <div className="flex items-center gap-4 w-full md:w-auto">
               <SubscribeForm />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-white">
-            {params.category ? `${params.category} Listings` : (params.q ? `Results for "${params.q}"` : "Just In")}
+        <div className="flex items-center justify-between mb-8 px-2">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+            {params.category ? `${params.category}` : (params.q ? `Results for "${params.q}"` : "Newly Listed")}
           </h2>
           {(params.q || params.category || params.location) && (
-            <Link href="/" className="text-sm text-purple-400 hover:underline">Clear all</Link>
+            <Link href="/" className="text-xs font-bold text-purple-400 hover:underline uppercase tracking-wider">Reset</Link>
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Suspense fallback={<div className="col-span-full text-center text-slate-500 py-12">Loading listings...</div>}>
+        <div className="grid grid-cols-2 gap-3 md:gap-6 lg:grid-cols-4">
+          <Suspense fallback={<div className="col-span-full text-center text-slate-500 py-12 px-4 bg-white/5 rounded-2xl">Loading listings...</div>}>
             <ListingGrid searchParams={params} />
           </Suspense>
         </div>
@@ -288,9 +291,12 @@ function SafetyTip({ emoji, title, desc }: { emoji: string, title: string, desc:
 
 function CategoryCard({ emoji, label, color }: { emoji: string, label: string, color: string }) {
   return (
-    <Link href={`/?category=${encodeURIComponent(label)}`} className={`group flex flex-col items-center justify-center gap-4 rounded-3xl border p-6 transition-all hover:scale-105 hover:bg-white/5 ${color} border-white/5`}>
-      <span className="text-3xl">{emoji}</span>
-      <span className="font-medium text-slate-200 text-center text-sm">{label}</span>
+    <Link
+      href={`/?category=${encodeURIComponent(label)}`}
+      className={`group flex flex-col items-center justify-center gap-3 shrink-0 rounded-2xl border p-4 transition-all active:scale-95 hover:bg-white/5 ${color} border-white/5 w-24 md:w-auto snap-center`}
+    >
+      <span className="text-2xl md:text-3xl">{emoji}</span>
+      <span className="font-bold text-slate-200 text-center text-[10px] md:text-xs uppercase tracking-tighter truncate w-full">{label}</span>
     </Link>
   );
 }

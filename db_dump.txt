@@ -1,0 +1,9 @@
+Database Dump:
+ID: 12b75fa1-5197-4029-b4e9-a4b58ca2993d | Title: Fresh fruits | URL: /logo.png
+ID: 13104758-b6dc-4a17-bb1c-de452d2da6bd | Title: Gto 52 for sale | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/IMG-20260121-WA0007-DgNWnOuneowm5dZkaMObkLuvvuM3KA.jpg
+ID: 025e2db7-e2a5-4e2d-9c42-4fda88d16db9 | Title: Greencity consumer  | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/06eb2319-f13b-4faa-a138-7b1ec6d7a081-0HlMsU9vPkX8VV9vFfAyY5BI5URjTH.jpeg
+ID: 3ea3a2c7-51fc-4aab-a87c-d97518ca860f | Title: Food Catering Service | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/WhatsApp%20Image%202026-01-30%20at%2008.21.23-8LnheUwWatLG86pqJyBv9rhKovPgKY.jpeg
+ID: 46a62570-b738-46bd-a3eb-b58d85c81589 | Title: Greencity consumer solutions | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/f9afe85a-d2de-4a64-be70-9f4dc553b2db-5TjiL7GddKyFRiFlT3clhvpMvV7sed.jpeg
+ID: 82cae8b4-4bb5-4637-ad2f-65dd208c403a | Title: Managed Services Provider Tech -  Remote Support,Infrastructure, DevOps, Cloud, Security,,Automation & AI | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/DOPE%20IMAGE.png
+ID: 146f3e19-9d83-4923-b66d-a1fadcef68d7 | Title: Atem Mini Pro | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/2405223-tPDuJjUqfHAqwVGfWRovL0gZ3BOAyt.jpg
+ID: 0a293442-0b59-461f-bb87-366c5533b232 | Title: 2 bedroom house for sale  | URL: https://ahhpmteokk9zs0fr.public.blob.vercel-storage.com/IMG_2096-l3WIjrOZJ3eh6BVAuYzoLoIHXbwc5q.jpeg

@@ -49,6 +49,7 @@ export async function trackVisit() {
 
 // --- GET LISTINGS (Your existing code) ---
 export async function getListings(searchParams?: { q?: string; category?: string; location?: string }) {
+    console.log("Fetching listings with params:", searchParams);
     try {
         const query = db.select({
             id: listings.id,
@@ -89,6 +90,7 @@ export async function getListings(searchParams?: { q?: string; category?: string
             .where(and(...activeFilters))
             .orderBy(desc(listings.id));
 
+        console.log(`Fetched ${results.length} listings`);
         return JSON.parse(JSON.stringify(results));
 
     } catch (error) {
