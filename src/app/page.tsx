@@ -109,8 +109,8 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             playsInline
             className="h-full w-full object-cover opacity-60"
           >
-            <source src="/niceforuza.mov" type="video/quicktime" />
-            <source src="/niceforuza.mov" type="video/mp4" />
+            <source src="/niceforuza.mov?v=1" type="video/quicktime" />
+            <source src="/niceforuza.mov?v=1" type="video/mp4" />
           </video>
           {/* Overlay to ensure text readability */}
           <div className="absolute inset-0 bg-slate-950/60" />
