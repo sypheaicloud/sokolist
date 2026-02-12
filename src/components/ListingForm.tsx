@@ -32,9 +32,9 @@ export default function ListingForm({ listing, action }: { listing?: any, action
 
     const categories = [
         "Vehicles", "Electronics", "Laptops",
-        "IT Operations (End User, Network, Cloud, Devops, AI)", "Real Estate",
+        "IT & Tech", "Real Estate",
         "Jobs", "Services", "Trade", "Dating",
-        "Phones", "Construction", "Furniture", "Photography"
+        "Phones", "Construction", "Furniture", "Photography", "Transportation"
     ];
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

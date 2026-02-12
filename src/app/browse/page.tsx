@@ -4,9 +4,9 @@ import { Search, Filter, MapPin } from "lucide-react";
 import { getListings } from "../actions"; // Imports from your main actions file
 
 const CATEGORIES = [
-    "Vehicles", "Electronics", "Laptops", "4K TVs", "Real Estate",
-    "Jobs", "Services", "Dating", "Auctions", "Free Parts",
-    "AI Photoshoot", "Events", "Restaurants", "Printing Service", "Shuttle/Car Rental"
+    "Vehicles", "Electronics", "Laptops", "IT & Tech", "Real Estate",
+    "Jobs", "Services", "Trade", "Dating", "Phones", "Construction",
+    "Furniture", "Photography", "Transportation"
 ];
 
 export default async function BrowsePage({
@@ -100,7 +100,7 @@ export default async function BrowsePage({
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {listings.map((item) => (
+                            {listings.map((item: any) => (
                                 <ListingCard key={item.id} item={item} />
                             ))}
                         </div>
