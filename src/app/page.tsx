@@ -283,7 +283,22 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               {stats.totalVisits.toLocaleString()} Total Visits
               <span className="h-1 w-1 rounded-full bg-emerald-500/50" />
             </div>
-            <div>&copy; {new Date().getFullYear()} MarketPlace254. Website by Syphe IT.</div>
+
+            {/* Currency Converter Widget */}
+            <div className="mt-8 flex justify-center w-full overflow-hidden">
+              <div className="max-w-full overflow-x-auto no-scrollbar">
+                <iframe
+                  src="/currency-converter-widget.html"
+                  width="860"
+                  height="220"
+                  frameBorder="0"
+                  scrolling="no"
+                  style={{ borderRadius: '20px', border: 'none', overflow: 'hidden' }}
+                ></iframe>
+              </div>
+            </div>
+
+            <div className="mt-8">&copy; {new Date().getFullYear()} MarketPlace254. Website by Syphe IT.</div>
           </div>
         </div>
       </footer>
