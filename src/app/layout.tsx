@@ -24,6 +24,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Kenyan Digital Marketplace | Kenya's Premier Marketplace",
   description: "Buy, sell, trade, and connect with verified locals across Kenya.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default async function RootLayout({

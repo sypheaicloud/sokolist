@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
     description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
     url: "https://uzamarket.com",
-    siteName: "Kenyan Digital Marketplace",
+    siteName: "Kenya's Online Marketplace",
     images: [
       {
         url: "https://uzamarket.com/seo.jpg",
@@ -37,6 +37,9 @@ export const metadata: Metadata = {
     title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
     description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
     images: ["https://uzamarket.com/seo.jpg"],
+  },
+  icons: {
+    icon: "/favicon.ico",
   },
 };
 
