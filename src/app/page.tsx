@@ -11,7 +11,7 @@ import ListingCard from '@/components/ListingCard';
 
 // ✅ COMPLETE METADATA BLOCK ADDED HERE FOR SEO & OPEN GRAPH
 export const metadata: Metadata = {
-  title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
+  title: "Buy, Sell, Trade Services & Dating in Kenya | Kenyan  Marketplace",
   description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
   alternates: {
     canonical: "https://uzamarket.com",
