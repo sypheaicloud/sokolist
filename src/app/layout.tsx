@@ -22,15 +22,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kenyan Digital Marketplace | Kenya's Premier Marketplace",
-  description: "Buy, sell, trade, and connect with verified locals across Kenya.",
+  metadataBase: new URL("https://www.uzamarket.com"),
+  title: "Kenya MarketPlace - :Buy, Sell, Trade & Connect in Kenya",
+  description: "Looking to buy, sell, or trade in Kenya? UzaMarket is your free local classifieds platform for cars, electronics, services, dating, and more. Join now!",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Kenya MarketPlace - :Buy, Sell, Trade & Connect in Kenya",
+    description: "Looking to buy, sell, or trade in Kenya? UzaMarket is your free local classifieds platform for cars, electronics, services, dating, and more. Join now!",
+    url: "https://www.uzamarket.com",
+    siteName: "UzaMarket",
+    images: "/seo.jpg",
+    locale: "en_KE",
+    type: "website",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/favicon_io/icon.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/favicon_io/apple-icon.png",
+    apple: "/apple-icon.png",
   },
 };
 

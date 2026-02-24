@@ -9,45 +9,6 @@ import SubscribeForm from '@/components/SubscribeForm';
 import UnreadBadge from '@/components/UnreadBadge';
 import ListingCard from '@/components/ListingCard';
 
-// ✅ COMPLETE METADATA BLOCK ADDED HERE FOR SEO & OPEN GRAPH
-export const metadata: Metadata = {
-  title: "Buy, Sell, Trade Services & Dating in Kenya | Kenyan  Marketplace",
-  description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
-  alternates: {
-    canonical: "https://uzamarket.com",
-  },
-  openGraph: {
-    title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
-    description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
-    url: "https://uzamarket.com",
-    siteName: "Kenya's Online Marketplace",
-    images: [
-      {
-        url: "https://uzamarket.com/seo.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Kenya's Premier Local Marketplace",
-      },
-    ],
-    locale: "en_KE",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
-    description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
-    images: ["https://uzamarket.com/seo.jpg"],
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon_io/icon.png", sizes: "512x512", type: "image/png" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: "/favicon_io/apple-icon.png",
-  },
-};
-
 // ✅ 1. ADDED: Locations Data
 const KENYAN_LOCATIONS = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika",
