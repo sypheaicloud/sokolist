@@ -24,15 +24,15 @@ export async function subscribeUser(formData: FormData) {
         });
 
         await transporter.sendMail({
-            from: `"MarketPlace254 Bot" <${process.env.GMAIL_USER}>`,
+            from: `"Kenyan Digital Marketplace Bot" <${process.env.GMAIL_USER}>`,
             to: process.env.GMAIL_USER,
             replyTo: email,
             // ✅ CORRECT SPELLING HERE
-            subject: `[MarketPlace254 Subscriber] ${email}`,
+            subject: `[Kenyan Digital Marketplace Subscriber] ${email}`,
             text: `New subscriber: ${email}\n\nHit Reply to contact them.`,
             html: `
                 <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
-                    <h2 style="color: #7c3aed; margin-top:0;">New MarketPlace254 Subscriber 🎉</h2>
+                    <h2 style="color: #7c3aed; margin-top:0;">New Kenyan Digital Marketplace Subscriber 🎉</h2>
                     <p style="font-size: 16px;">A new user has requested to join your list:</p>
                     <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: bold; font-size: 18px;">
                         ${email}

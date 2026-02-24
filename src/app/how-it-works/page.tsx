@@ -15,10 +15,10 @@ export default function HowItWorks() {
 
                 <header className="mb-16">
                     <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent">
-                        How Uza Market Works
+                        How Kenyan Digital Marketplace Works
                     </h1>
                     <p className="text-xl text-slate-400">
-                        Expert strategies to help you sell faster and safer on MarketPlace254.
+                        Expert strategies to help you sell faster and safer on Kenyan Digital Marketplace.
                     </p>
                 </header>
 

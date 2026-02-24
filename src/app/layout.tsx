@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MarketPlace254 | Kenya's Premier Marketplace",
+  title: "Kenyan Digital Marketplace | Kenya's Premier Marketplace",
   description: "Buy, sell, trade, and connect with verified locals across Kenya.",
 };
 
