@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
@@ -7,6 +8,37 @@ import { getListings, getSiteStats } from './actions';
 import SubscribeForm from '@/components/SubscribeForm';
 import UnreadBadge from '@/components/UnreadBadge';
 import ListingCard from '@/components/ListingCard';
+
+// ✅ COMPLETE METADATA BLOCK ADDED HERE FOR SEO & OPEN GRAPH
+export const metadata: Metadata = {
+  title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
+  description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
+  alternates: {
+    canonical: "https://uzamarket.com",
+  },
+  openGraph: {
+    title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
+    description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
+    url: "https://uzamarket.com",
+    siteName: "Kenyan Digital Marketplace",
+    images: [
+      {
+        url: "https://uzamarket.com/seo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Kenya's Premier Local Marketplace",
+      },
+    ],
+    locale: "en_KE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Buy, Sell, Services & Dating in Kenya | Kenyan Digital Marketplace",
+    description: "Discover Kenyan Digital Marketplace, Kenya's top platform to buy, sell, trade, find local services, and connect. Post your free classified ad and start browsing today!",
+    images: ["https://uzamarket.com/seo.jpg"],
+  },
+};
 
 // ✅ 1. ADDED: Locations Data
 const KENYAN_LOCATIONS = [
@@ -52,13 +84,13 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/20 bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                 <Image
                   src="/logo.png"
-                  alt="MarketPlace254 Logo"
+                  alt="Kenyan Digital Marketplace Logo"
                   fill
                   className="object-contain"
                 />
               </div>
-              <span className="text-sm font-bold tracking-tight text-white hidden sm:block">MarketPlace254</span>
-              <span className="text-sm font-bold tracking-tight text-white sm:hidden">MP254</span>
+              <span className="text-sm font-bold tracking-tight text-white hidden sm:block">Kenyan Digital Marketplace</span>
+              <span className="text-sm font-bold tracking-tight text-white sm:hidden">KDM</span>
             </div>
 
             <div className="hidden items-center gap-6 md:flex">
@@ -226,7 +258,6 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           <CategoryCard emoji="🤝" label="Trade" color="bg-lime-500/10 text-lime-400 border-lime-500/20" />
         </div>
 
-
         <div className="flex items-center justify-between mb-8 px-2">
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
             {params.category ? `${params.category}` : (params.q ? `Results for "${params.q}"` : "Newly Listed")}
@@ -268,7 +299,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
             <h3 className="text-lg font-bold mb-2 flex items-center justify-center gap-2">
               <ShieldCheck className="text-emerald-400" /> Safety First
             </h3>
-            <p className="text-slate-400 text-sm">Follow these simple rules to stay safe while trading on MarketPlace-Kenya.</p>
+            <p className="text-slate-400 text-sm">Follow these simple rules to stay safe while trading on Kenyan Digital Marketplace.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <SafetyTip emoji="⚠️" title="Do Not Prepay" desc="Never pay for items in advance, including delivery fees." />
@@ -298,7 +329,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
               </div>
             </div>
 
-            <div className="mt-8">&copy; {new Date().getFullYear()} MarketPlace254. Website by Syphe IT.</div>
+            <div className="mt-8">&copy; {new Date().getFullYear()} Kenyan Digital Marketplace. Website by Syphe IT.</div>
           </div>
         </div>
       </footer>
