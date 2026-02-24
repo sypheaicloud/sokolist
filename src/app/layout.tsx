@@ -56,6 +56,39 @@ export default async function RootLayout({
   const stats = await getSiteStats();
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Uzamarket-Kenyan MarketPlace",
+              "url": "https://uzamarket.com",
+              "description": "Looking to buy, sell, or trade in Kenya? UzaMarket is your free local classifieds platform for cars, electronics, services, dating, and more. Join now!",
+              "applicationCategory": "Marketplace",
+              "operatingSystem": "Web",
+              "brand": {
+                "@type": "Brand",
+                "name": "Uzamarket"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "RASWILK COMPANY LTD",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://uzamarket.com/seo.png"
+                }
+              },
+              "offers": {
+                "@type": "Offer",
+                "price": "5.00",
+                "priceCurrency": "KES"
+              }
+            })
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-100 mb-20 md:mb-0`}
       >
