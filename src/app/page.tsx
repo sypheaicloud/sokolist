@@ -39,7 +39,12 @@ export const metadata: Metadata = {
     images: ["https://uzamarket.com/seo.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon_io/icon.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/favicon_io/apple-icon.png",
   },
 };
 

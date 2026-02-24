@@ -25,7 +25,12 @@ export const metadata: Metadata = {
   title: "Kenyan Digital Marketplace | Kenya's Premier Marketplace",
   description: "Buy, sell, trade, and connect with verified locals across Kenya.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon_io/icon.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/favicon_io/apple-icon.png",
   },
 };
 
