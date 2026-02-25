@@ -101,40 +101,44 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
       </header>
 
       {/* Hero Section */}
-      <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden pt-12 pb-6">
+      <section className="relative flex min-h-[60vh] items-center justify-center overflow-hidden pt-14 pb-8">
         <div className="absolute inset-0 z-0 bg-slate-950">
           <video
             autoPlay
             muted
             loop
             playsInline
-            className="h-full w-full object-cover opacity-60"
+            className="h-full w-full object-cover opacity-70"
           >
             <source src="/niceforuza.mov?v=1" type="video/quicktime" />
             <source src="/niceforuza.mov?v=1" type="video/mp4" />
           </video>
-          {/* Overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-slate-950/60" />
-          {/* Blur Orbs */}
-          <div className="absolute top-0 left-1/4 h-64 w-64 rounded-full bg-purple-600/10 blur-[100px]" />
-          <div className="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-emerald-500/5 blur-[100px]" />
+          {/* Lighter overlay so the video pops through */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/40 to-slate-950/70" />
+          {/* Vivid Blur Orbs */}
+          <div className="absolute top-10 left-1/4 h-96 w-96 rounded-full bg-purple-600/30 blur-[120px] animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-emerald-500/20 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-72 w-72 rounded-full bg-cyan-500/10 blur-[80px]" />
         </div>
 
         <div className="relative z-10 w-full px-6 md:px-20 text-center">
-          <h1 className="mx-auto max-w-none text-3xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-800 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] uppercase">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-5 backdrop-blur-sm">
+            <Sparkles size={12} /> Kenya&apos;s #1 Marketplace
+          </div>
+          <h1 className="mx-auto max-w-none text-3xl font-black tracking-tight md:text-5xl lg:text-7xl bg-gradient-to-br from-white via-emerald-200 to-emerald-500 bg-clip-text text-transparent sm:whitespace-nowrap drop-shadow-[0_0_40px_rgba(16,185,129,0.5)] uppercase">
             KENYA&apos;S PREMIER MARKETPLACE
           </h1>
 
-          <div className="mt-6 flex items-center justify-center gap-2 md:gap-8 text-[12px] md:text-lg font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-            <span className="text-white">Buy</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+          <div className="mt-5 flex items-center justify-center gap-2 md:gap-8 text-[12px] md:text-lg font-black uppercase tracking-[0.2em] md:tracking-[0.4em] whitespace-nowrap overflow-visible drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            <span className="text-emerald-300">Buy</span>
+            <span className="h-2 w-2 rounded-full bg-emerald-400 mx-1 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
             <span className="text-white">Sell</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="text-white">Trade</span>
-            <span className="hidden sm:inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400 mx-1 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+            <span className="text-emerald-300">Trade</span>
+            <span className="hidden sm:inline-flex h-2 w-2 rounded-full bg-emerald-400 mx-1 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
             <span className="hidden sm:inline text-white">Services</span>
-            <span className="hidden sm:inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 mx-1 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-            <span className="hidden sm:inline text-white">Housing</span>
+            <span className="hidden sm:inline-flex h-2 w-2 rounded-full bg-emerald-400 mx-1 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+            <span className="hidden sm:inline text-emerald-300">Housing</span>
           </div>
 
           <div className="mx-auto mt-6 max-w-lg hidden sm:block">
@@ -176,7 +180,7 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
                 </datalist>
               </div>
 
-              <button type="submit" className="rounded-xl md:rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-700 p-2.5 md:p-4 text-white hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(16,185,129,0.4)] active:scale-95 shrink-0">
+              <button type="submit" className="rounded-xl md:rounded-2xl bg-gradient-to-br from-emerald-500 via-emerald-400 to-green-600 p-2.5 md:p-4 text-white hover:brightness-125 hover:scale-105 transition-all shadow-[0_4px_25px_rgba(16,185,129,0.6)] active:scale-95 shrink-0">
                 <ArrowRight size={18} className="md:size-[22] stroke-[3]" />
               </button>
             </form>
@@ -201,6 +205,31 @@ export default async function LandingPage(props: { searchParams: Promise<{ q?: s
           </div>
         </div>
       </section>
+
+      {/* Stats Trust Bar */}
+      <div className="w-full border-y border-white/5 bg-white/[0.02] backdrop-blur-sm py-4 px-4 md:px-20">
+        <div className="flex flex-wrap items-center justify-center md:justify-around gap-6 md:gap-0 text-center">
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-xl font-black text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.6)]">10,000+</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Active Listings</span>
+          </div>
+          <div className="hidden md:block h-8 w-[1px] bg-white/10" />
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-xl font-black text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.6)]">47+</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Counties Covered</span>
+          </div>
+          <div className="hidden md:block h-8 w-[1px] bg-white/10" />
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-xl font-black text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]">Free</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">To Post Ads</span>
+          </div>
+          <div className="hidden md:block h-8 w-[1px] bg-white/10" />
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-xl font-black text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)]">Verified</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Local Sellers</span>
+          </div>
+        </div>
+      </div>
 
       {/* Categories & Listings */}
       <section className="w-full px-4 md:px-20 py-8 flex-1">
@@ -320,10 +349,10 @@ function CategoryCard({ emoji, label, color }: { emoji: string, label: string, c
   return (
     <Link
       href={`/?category=${encodeURIComponent(label)}`}
-      className={`group flex flex-col items-center justify-center gap-3 shrink-0 rounded-2xl border p-4 transition-all active:scale-95 hover:bg-white/5 ${color} border-white/5 w-24 md:w-auto snap-center`}
+      className={`group flex flex-col items-center justify-center gap-3 shrink-0 rounded-2xl border p-4 transition-all duration-200 active:scale-95 hover:scale-105 hover:border-white/20 hover:shadow-lg ${color} w-24 md:w-auto snap-center`}
     >
-      <span className="text-2xl md:text-3xl">{emoji}</span>
-      <span className="font-bold text-slate-200 text-center text-[10px] md:text-xs uppercase tracking-tighter truncate w-full">{label}</span>
+      <span className="text-2xl md:text-3xl group-hover:scale-110 transition-transform duration-200">{emoji}</span>
+      <span className="font-bold text-slate-300 group-hover:text-white text-center text-[10px] md:text-xs uppercase tracking-tighter truncate w-full transition-colors">{label}</span>
     </Link>
   );
 }
