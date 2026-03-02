@@ -1,6 +1,25 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin } from "lucide-react";
+import { MapPin, Images } from "lucide-react";
+
+/** Parse imageUrl – supports plain string or JSON array */
+function getFirstPhoto(imageUrl?: string | null): string | null {
+    if (!imageUrl) return null;
+    try {
+        const parsed = JSON.parse(imageUrl);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+    } catch { /* plain URL */ }
+    return imageUrl;
+}
+
+function getPhotoCount(imageUrl?: string | null): number {
+    if (!imageUrl) return 0;
+    try {
+        const parsed = JSON.parse(imageUrl);
+        if (Array.isArray(parsed)) return parsed.length;
+    } catch { /* plain URL */ }
+    return imageUrl ? 1 : 0;
+}
 
 // This component represents a single "item" in your marketplace grid.
 export default function ListingCard({ item }: { item: any }) {
@@ -11,9 +30,9 @@ export default function ListingCard({ item }: { item: any }) {
         >
             {/* Image Container */}
             <div className="h-32 sm:h-48 w-full relative overflow-hidden bg-slate-800">
-                {item.imageUrl ? (
+                {getFirstPhoto(item.imageUrl) ? (
                     <Image
-                        src={item.imageUrl}
+                        src={getFirstPhoto(item.imageUrl)!}
                         alt={item.title}
                         fill
                         className="object-cover transition-transform duration-500 md:group-hover:scale-110"
@@ -22,6 +41,13 @@ export default function ListingCard({ item }: { item: any }) {
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-[10px] text-slate-600 bg-slate-900 uppercase font-black tracking-widest">
                         {item.category}
+                    </div>
+                )}
+                {/* Multi-photo badge */}
+                {getPhotoCount(item.imageUrl) > 1 && (
+                    <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        <Images className="h-3 w-3 text-white" />
+                        <span className="text-[10px] font-bold text-white">{getPhotoCount(item.imageUrl)}</span>
                     </div>
                 )}
                 {/* Price Tag Overlay on Mobile */}

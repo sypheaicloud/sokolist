@@ -4,11 +4,23 @@ import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { startChat } from '@/app/actions/startChat';
-import { markAsSold } from '@/app/actions/markAsSold'; // 👈 IMPORTED YOUR ACTION
-import Image from 'next/image';
+import { markAsSold } from '@/app/actions/markAsSold';
 import { MapPin, ArrowLeft, ShieldCheck, Clock, MessageCircle, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import ListingGallery from './ListingGallery';
+
+/** Parse imageUrl which can be a JSON array string or a plain URL */
+function parseImageUrls(imageUrl: string | null | undefined): string[] {
+    if (!imageUrl) return [];
+    try {
+        const parsed = JSON.parse(imageUrl);
+        if (Array.isArray(parsed)) return parsed.filter(Boolean);
+    } catch {
+        // plain URL
+    }
+    return [imageUrl];
+}
 
 export default async function ListingDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -28,9 +40,9 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
 
     const { listing, seller } = data;
 
-    // ✅ Logic: Is the item sold? Is the viewer the owner?
     const isOwner = session?.user?.id === listing.userId;
     const isSold = listing.isActive === false;
+    const photos = parseImageUrls(listing.imageUrl);
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
@@ -41,33 +53,8 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                 </Link>
 
                 <div className="grid gap-8 md:grid-cols-2">
-                    {/* Image Section */}
-                    <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden aspect-square relative shadow-2xl group">
-
-                        {/* 🔴 SOLD OVERLAY */}
-                        {isSold && (
-                            <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                                <span className="text-5xl font-black text-red-500 -rotate-12 border-4 border-red-500 px-8 py-2 rounded-xl tracking-widest uppercase">
-                                    SOLD
-                                </span>
-                            </div>
-                        )}
-
-                        {listing.imageUrl ? (
-                            <Image
-                                src={listing.imageUrl}
-                                alt={listing.title}
-                                fill
-                                className={`object-cover transition-transform duration-500 ${!isSold && 'group-hover:scale-105'}`}
-                                sizes="(max-width: 768px) 100vw, 50vw"
-                                priority
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-600 bg-slate-900">
-                                No image available
-                            </div>
-                        )}
-                    </div>
+                    {/* Image / Gallery Section */}
+                    <ListingGallery photos={photos} title={listing.title} isSold={isSold} />
 
                     {/* Info Section */}
                     <div className="space-y-6">
@@ -99,7 +86,8 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                             <div className="flex items-center gap-2">
                                 <div className="h-6 w-6 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400 border border-purple-500/30 text-[10px] overflow-hidden">
                                     {seller?.image ? (
-                                        <Image src={seller.image} alt="Seller" width={24} height={24} className="object-cover" />
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={seller.image} alt="Seller" className="w-full h-full object-cover" />
                                     ) : (
                                         <span>{seller?.name?.[0] || 'U'}</span>
                                     )}
@@ -116,12 +104,10 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
 
                         {/* ACTION BUTTONS */}
                         {isSold ? (
-                            // 🔒 CASE 1: ITEM IS SOLD
                             <div className="w-full text-center p-4 rounded-2xl bg-slate-800/50 text-slate-500 font-bold border border-white/5 cursor-not-allowed flex items-center justify-center gap-2">
                                 ❌ This item is no longer available.
                             </div>
                         ) : isOwner ? (
-                            // 🛠️ CASE 2: OWNER VIEW (Show Mark as Sold)
                             <div className="space-y-3">
                                 <form action={markAsSold.bind(null, listing.id)}>
                                     <button
@@ -140,7 +126,6 @@ export default async function ListingDetailPage(props: { params: Promise<{ id: s
                                 </Link>
                             </div>
                         ) : (
-                            // 💬 CASE 3: BUYER VIEW (Show Message Button)
                             <form action={startChat.bind(null, listing.id, listing.userId || '')}>
                                 <button
                                     type="submit"
